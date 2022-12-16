@@ -1,6 +1,4 @@
-/target
 !/pom.xml
-/target/
 */target/*
 .idea
 .idea/
@@ -13,6 +11,5 @@ gen
 .settings/
 /.metadata/
 /.recommenders/
-gitignore
-.gitignore
-.factorypath
+/backend/.gitignore
+/backend/.factorypath
