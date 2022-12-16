@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mom.backend.XUSM3110">
-  <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
-	 SELECT    MCD.COMPANY_CD
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    SELECT MCD.COMPANY_CD
 		     , MCD.COMPANY_NM
 		     , MCD.DIVISION_CD
 		     , MCD.DIVISION_NM
 		     , MG.MENU_ID
-		     , (SELECT MOM_COMMON_PKG.FN_GET_DIVISION_MENU_NAME(MG.COMPANY_CD,MG.DIVISION_CD, MG.MENU_ID) FROM DUAL) AS MENU_NM  
+		     , MM.MENU_NM
 		     , MG.GRID_ID
 		     , MG.GRID_NM
 		     , MG.USE_YN
@@ -16,25 +16,27 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MG.COMPANY_CD, MG.DIVISION_CD, MG.UPDATE_BY) FROM DUAL ) AS UPDATEBYNM
 		     , TO_CHAR(MG.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 		     , MG.MENU_ID ||'_'|| MG.GRID_ID AS KEY_ID
-	 FROM   MOM_COM_DIV_V MCD
-	      , MOM_GRID  MG
-	 WHERE  MCD.COMPANY_CD   = MG.COMPANY_CD
-	 AND    MCD.DIVISION_CD  = MG.DIVISION_CD
-	 AND    MCD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
-     AND    MCD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
-	  <if test="menuId != null and menuId != ''">
-	  AND      MG.MENU_ID = #{menuId, jdbcType=VARCHAR}
-	  </if>
-	  <if test="gridId != null and gridId != ''">
-	  AND      MG.GRID_ID = #{gridId, jdbcType=VARCHAR}
-	  </if>
-	  <if test="useYn != null and useYn != ''">
-	  AND      MG.USE_YN = #{useYn, jdbcType=VARCHAR}
-	  </if>
-	 ORDER BY MCD.COMPANY_NM, MCD.DIVISION_NM, MG.MENU_ID, MG.GRID_ID    
-  </select>
+	    FROM   MOM_COM_DIV_V MCD
+	         , MOM_GRID  MG
+	         , MOM_MENU  MM
+	    WHERE  MCD.COMPANY_CD   = MG.COMPANY_CD
+	    AND    MCD.DIVISION_CD  = MG.DIVISION_CD
+	    AND    MG.MENU_ID       = MM.MENU_ID
+	    AND    MCD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+        AND    MCD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+	    <if test="menuId != null and menuId != ''">
+	    AND    (UPPER(MG.MENU_ID) LIKE '%' || UPPER(#{menuId, jdbcType=VARCHAR}) || '%' OR UPPER(MM.MENU_NM) LIKE '%' || UPPER(#{menuId, jdbcType=VARCHAR}))
+	    </if>
+	    <if test="gridId != null and gridId != ''">
+	    AND      MG.GRID_ID = #{gridId, jdbcType=VARCHAR}
+	    </if>
+	    <if test="useYn != null and useYn != ''">
+	    AND      MG.USE_YN = #{useYn, jdbcType=VARCHAR}
+	    </if>
+	    ORDER BY MCD.COMPANY_NM, MCD.DIVISION_NM, MG.MENU_ID, MG.GRID_ID    
+    </select>
     <insert id="create_createBtn1" parameterType="java.util.List">
-   <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+    <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
      INTO MOM_GRID (
                   COMPANY_CD
                 , DIVISION_CD
