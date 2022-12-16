@@ -42,7 +42,7 @@
 	  AND    MF.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	  
 	  AND    MF.MENU_ID      = #{menuId, jdbcType=VARCHAR}	
 	  AND    MF.GRID_ID      = #{gridId, jdbcType=VARCHAR}	
-	  AND    UPPER(MF.FILE_ID ) LIKE '%' || UPPER(#{fileKeyId, jdbcType=VARCHAR}) || '%'	  
+	  AND    UPPER(MF.FILE_ID ) LIKE '%' || UPPER(#{fileKeyId, jdbcType=VARCHAR}) ||  '%'	  
 	</select>
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MCD.COMPANY_CD

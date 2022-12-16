@@ -1,0 +1,15 @@
+!/pom.xml
+*/target/*
+.idea
+.idea/
+*.iml
+out
+gen
+.codetogether.ignore
+.classpath
+.project
+.settings/
+/.metadata/
+/.recommenders/
+/backend/.gitignore
+/backend/.factorypath
