@@ -193,7 +193,7 @@
 	                 , #{userId, jdbcType=VARCHAR}         														           	   as createBy
 	                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{divisionCd, jdbcType=VARCHAR}, #{companyCd, jdbcType=VARCHAR})  as createDate
 	                 , TRIM(#{userId, jdbcType=VARCHAR})         														 as updateBy
-	                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{divisionCd, jdbcType=VARCHAR}, #{companyCd, jdbcType=VARCHAR})  as updateDate
+	                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{divisionCd, jdbcType=VARCHAR}, #{companyCd, jdbcType=VARCHAR}) as updateDate
 	            FROM DUAL
 	          ) PARAM 
 	    ON    ( COMPANY_CD  = PARAM.companyCd  AND 
