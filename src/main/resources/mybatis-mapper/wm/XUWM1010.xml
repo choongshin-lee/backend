@@ -58,7 +58,7 @@
 		            AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerNm, jdbcType=VARCHAR}) || '%')	  
 		            </if>	
 		            <if test="locationNm != null and locationNm != ''">
-		            AND    (UPPER(ML.LOCATION_NM)  LIKE '%' || UPPER(#{locationNm, jdbcType=VARCHAR}) ||  '%')	  
+		            AND    (UPPER(ML.LOCATION_NM)  LIKE '%' || UPPER(#{locationNm, jdbcType=VARCHAR}) ||   '%')	  
 		            </if>	    
 		            <if test="state != null and state != ''">
 		            AND    MDM.STATE IN (${state})
