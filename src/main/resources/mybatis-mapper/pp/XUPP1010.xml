@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUPP1010">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	SELECT A.*
+	FROM   (
+	</if> 
+	        SELECT MSO.COMPANY_CD
+	             , MSO.DIVISION_CD
+	             , MSO.SO_NO
+	             , MSO.SO_SEQ
+	             , MSO.SO_TYPE
+	             , MSO.SO_TYPE_NM
+	             , MSO.CUSTOMER_CD
+	             , MSO.CUSTOMER_NM
+	             , MSO.ITEM_ID
+	             , MSO.ITEM_NM
+	             , MSO.ITEM_TYPE
+	             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSO.COMPANY_CD, MSO.DIVISION_CD, 'MD0002', MSO.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM
+	             , MSO.ITEM_SPEC
+	             , MSO.PREV_QTY       AS BC_ORDER_QTY
+	             , MSO.ORDER_QTY      AS AC_ORDER_QTY
+	             , MSO.SALES_ORDER_ID
+	             , MSO.UPDATE_BY
+	             , MSO.UPDATE_BY_NM
+	             , MSO.UPDATE_DATE
+	             , MSO.SALES_ORDER_ID   AS KEY_ID
+	             , COUNT(*) OVER()      AS TOTAL_COUNT
+	             , ROW_NUMBER() OVER(PARTITION BY MSO.COMPANY_CD,MSO.DIVISION_CD ORDER BY MSO.SO_NO, MSO.SO_SEQ  ) AS ROW_COUNT
+	        FROM   MOM_SALES_ORDER_V MSO
+	        WHERE  MSO.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+	        AND    MSO.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}	  
+	        AND    MSO.CHANGE_YN   = 'Y'    
+	        <if test="soNo != null and soNo != ''">
+	        AND    (UPPER(MSO.SO_NO) LIKE '%' || UPPER(#{soNo, jdbcType=VARCHAR}) || '%' )
+	        </if>
+	        <if test="soType != null and soType != ''">
+	        AND    MSO.SO_TYPE  IN (${soType})
+	        </if>
+	        <if test="itemIdNm != null and itemIdNm != ''">
+	        AND    (UPPER(MSO.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MSO.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
+	        </if>  
+	<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	           ) A
+	WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+	</if>                                 
+    </select>
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_DEMAND_PKG.SP_DEMAND_PLAN( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+                                        , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+                                        , #{companyCd,  jdbcType=VARCHAR, mode=IN}
+                                        , #{divisionCd, jdbcType=VARCHAR, mode=IN}											  
+                                        , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+    </select>    
+</mapper>
