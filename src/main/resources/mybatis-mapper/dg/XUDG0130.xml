@@ -32,13 +32,14 @@
 		     , MSO.SALES_ITEM_ID
 		     , MSO.SALES_ORDER_ID
 		     , MSO.SALES_ORDER_ID            AS KEY_ID
+		     , MSO.DR_REQUEST_QTY
 		FROM   MOM_SALES_ORDER_V MSO
 		WHERE  MSO.COMPANY_CD  = #{companyCd , jdbcType=VARCHAR}
 		AND    MSO.DIVISION_CD = #{divisionCd , jdbcType=VARCHAR}
 		<if test="shipToCd != null and shipToCd != ''">
 		AND    MSO.SHIP_TO_CD  = #{shipToCd , jdbcType=VARCHAR}
 		</if>
-		AND    MSO.REMAIN_QTY > 0
+		AND    MSO.ORDER_QTY - NVL(MSO.DR_REQUEST_QTY,0) - NVL(MSO.CANCEL_QTY,0) > 0
 		<if test="soNo != null and soNo != ''">
 		AND   UPPER(MSO.SO_NO) LIKE '%' || UPPER(#{soNo, jdbcType=VARCHAR}) || '%'
 		</if>
@@ -64,10 +65,13 @@
 			                   , SEQ
 			                   , ITEM_ID
 			                   , REQUEST_QTY
+			                   , UNIT
 			                   , LOCATION_CD
 			                   , LC_NO
 			                   , TRACKING_NO
 			                   , CARTON_NO
+			                   , SO_NO
+			                   , SO_SEQ
 			                   , REFERENCE_NO
 			                   , DELIVERY_REQUEST_ID
 			                   , DESCRIPTION
@@ -82,11 +86,14 @@
 			                   , #{item.seq, jdbcType=NUMERIC}
 			                   , #{item.itemId, jdbcType=VARCHAR}
 			                   , #{item.remainQty, jdbcType=NUMERIC}
+			                   , #{item.soUnit, jdbcType=VARCHAR}
 			                   , #{item.locationCd, jdbcType=VARCHAR}
 			                   , #{item.lcNo, jdbcType=VARCHAR}
 			                   , #{item.trackingNo, jdbcType=VARCHAR}
 			                   , #{item.cartonNo, jdbcType=VARCHAR}
-			                   , #{item.referenceNo, jdbcType=VARCHAR}
+			                   , #{item.soNo, jdbcType=VARCHAR}
+			                   , #{item.soSeq, jdbcType=NUMERIC}
+			                   , #{item.salesOrderId, jdbcType=VARCHAR}
 			                   , #{item.deliveryRequestId, jdbcType=VARCHAR}
 			                   , #{item.description, jdbcType=VARCHAR}
 			                   , #{item.delYn, jdbcType=VARCHAR}
@@ -98,10 +105,11 @@
         </foreach>
     </insert>
     <select id="proc_customBtn21-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_UPSERT_DR_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+        { CALL MOM_WMS_PKG.SP_UPSERT_DR_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 	                                       , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 	                                       , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-	                                       , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  
+	                                       , #{divisionCd,  jdbcType=VARCHAR, mode=IN}		
+	                                       , 'CR'									  
 	                                       , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>    
 </mapper>    

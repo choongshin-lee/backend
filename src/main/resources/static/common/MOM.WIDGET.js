@@ -12879,7 +12879,8 @@ var momWidget = {
 
 
                 mom_ajax('C', queryId, param, function (result2, data2) {
-                    if (result2 != 'SUCCESS') {
+                    //if (result2 != 'SUCCESS') {
+	                if (data2[0]['p_err_code'] == 'E') {
                         momWidget.messageBox({
                             type: 'danger',
                             width: '400',
@@ -12910,7 +12911,7 @@ var momWidget = {
                                 height: '145',
                                 html: multiLang.transText('MESSAGE', data3[0]['p_err_msg'] == null ? '프로시저 에러발생!' : data3[0]['p_err_msg'])
                             });
-                            if(refindFlag == 'Y'){
+                            /*if(refindFlag == 'Y'){
 	 						   momWidget.findBtnClicked(index, {}, true, btnId, momWidget.pageProperty[index]['menuId'], your);
 							}
                                
@@ -12919,9 +12920,9 @@ var momWidget = {
 				                    width: '400',
 				                    height: '145',
 				                    html: multiLang.transText('MESSAGE', 'MSG00001')
-            					});
-			                   momWidget.splashHide();
-			                   return;
+            					});*/
+			                momWidget.splashHide();
+			                return; 
                         }
                         isProcess = 'N';
                     }, undefined, undefined, this, false, undefined, actionMode);
@@ -12937,6 +12938,17 @@ var momWidget = {
                 if (isProcess == 'Y') {
                     return;
                 }
+                if(refindFlag == 'Y'){
+				   momWidget.findBtnClicked(index, {}, true, btnId, momWidget.pageProperty[index]['menuId'], your);
+				}
+			    momWidget.messageBox({
+                    type: 'success',
+                    width: '400',
+                    height: '145',
+                    html: multiLang.transText('MESSAGE', 'MSG00001')
+				});
+               momWidget.splashHide();
+               return;
             
             }, undefined, undefined, this, false);
 

@@ -10,6 +10,12 @@ var VIEW= {
 	},
 	event: function(e) {
 	},
+	copyCallInit: function(index,your,action,btnId,param,result) {
+		if(index ==0 && btnId =='copyBtn'){	
+			  $('#drNoDP1').val('');
+			  $('#drNameDP1').val('');
+		}
+	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         let checkItem = widget.getCheckedRowItems(widget.grid[0]);
         if(index ==0){                                            

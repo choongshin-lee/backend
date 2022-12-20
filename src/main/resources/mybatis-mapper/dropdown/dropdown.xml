@@ -10,6 +10,12 @@
 	AND     COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 	AND     GROUP_CD    = #{groupCd, jdbcType=VARCHAR}
 	AND     USE_YN      = 'Y'
+	<if test="attribute1 != null and attribute1 != ''">
+    AND     ATTRIBUTE1 = #{attribute1, jdbcType=VARCHAR} 
+    </if>
+    <if test="attribute2 != null and attribute2 != ''">
+    AND     ATTRIBUTE2 = #{attribute2, jdbcType=VARCHAR} 
+    </if>
 	ORDER BY SORT_NO,LABEL
     </select> 
     <select id="get_DD00004" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
