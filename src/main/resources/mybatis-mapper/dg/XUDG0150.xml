@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0150">
+    <select id="get_findBtn11" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+		SELECT LOCATION_CD
+		     , LOCATION_NM
+		     , PROCESS_TYPE_ID
+		     , PROCESS_TYPE_NM
+		     , PROCESS_TYPE_ID||'('||PROCESS_TYPE_NM||')' AS PROCESS_TYPE_ID_NM
+		     , COMPANY_CD
+		     , DIVISION_CD
+		     , KEY_ID
+		FROM   (SELECT MLP.LOCATION_CD
+		             , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MLP.COMPANY_CD, MLP.DIVISION_CD, MLP.LOCATION_CD) FROM DUAL) AS LOCATION_NM
+		             , MLP.PROCESS_TYPE_ID
+		             , (SELECT MOM_COMMON_PKG.fn_get_code_name(MLP.COMPANY_CD, MLP.DIVISION_CD, 'MD0028', MLP.PROCESS_TYPE_ID, 'KR') FROM DUAL) AS PROCESS_TYPE_NM
+		             , MLP.COMPANY_CD
+		             , MLP.DIVISION_CD
+		             , ROWIDTOCHAR(MLP.ROWID)            AS KEY_ID
+		        FROM   MOM_LOCATION_PROCESS_TYPE MLP
+		        WHERE  MLP.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+		        AND    MLP.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+		        AND    MLP.USE_YN       = 'Y'
+		        <if test="locationCd != null and locationCd != ''">
+				AND    MLP.LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
+			   	</if>
+		       ) A
+    </select>
+</mapper>

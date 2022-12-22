@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0160">
+    <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+		SELECT MPID.COMPANY_CD    
+		     , MPID.DIVISION_CD   
+		     , MPID.INOUT_NO          AS RECEIVE_NO   
+		     , MPIM.INOUT_TYPE  
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'MM0012', MPIM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM          
+		     , MPIM.IO_TYPE         
+		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
+		     , MPIM.VENDOR_CD         AS PARTNER_CD 
+		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.VENDOR_CD) FROM DUAL)  AS PARTNER_NM       
+		     , MPIM.DEPARTURE_LOCATION_CD       AS LOCATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_LOCATION_CD) FROM DUAL) AS LOCATION_NM           
+		     , MPIM.CURRENCY_CD       
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM        
+		     , MPIM.EXCHANGE_RATE 
+		     , MPID.SEQ   
+		     , MPID.PURCHASE_ORDER_ID     AS REFERENCE_NO
+		     , MPID.ITEM_ID   
+		     , MI.ITEM_NM   
+		     , MI.ITEM_SPEC     
+		     , MI.ITEM_TYPE   
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM   
+		     , MI.PURCHASE_UNIT   
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MI.PURCHASE_UNIT) FROM DUAL) AS PURCHASE_UNIT_NM      
+		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.GOOD_QTY ELSE MPID.INOUT_QTY END  AS RECEIVE_WAIT_QTY     
+		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.UNIT_PRICE ELSE MPID.UNIT_PRICE END  AS UNIT_PRICE      
+		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.AMOUNT ELSE MPID.AMOUNT END  AS AMOUNT      
+		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.LOCAL_AMOUNT ELSE MPID.LOCAL_AMOUNT END  AS LOCAL_AMOUNT    
+		     , MPID.DESCRIPTION   
+		     , MPID.PURCHASE_INOUT_ID     
+		     , ROWIDTOCHAR(MPID.ROWID)            AS KEY_ID
+		FROM   MOM_PURCHASE_INOUT_DTL MPID        
+		     , MOM_PURCHASE_INOUT_MST MPIM  
+		     , MOM_NCPC MC                                                                                      
+		     , MOM_ITEM MI        
+		WHERE  MPID.COMPANY_CD  = MPIM.COMPANY_CD
+		AND    MPID.DIVISION_CD = MPIM.DIVISION_CD
+		AND    MPID.INOUT_NO    = MPIM.INOUT_NO  
+		AND    MPID.COMPANY_CD  = MC.COMPANY_CD(+)                                                                
+		AND    MPID.DIVISION_CD = MC.DIVISION_CD(+)                                                                 
+		AND    MPID.NCR_NO      = MC.NCR_NO(+)                                                                    
+		AND    MPID.COMPANY_CD  = MI.COMPANY_CD         
+		AND    MPID.DIVISION_CD = MI.DIVISION_CD        
+		AND    MPID.ITEM_ID     = MI.ITEM_ID   
+		AND    MPID.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+		AND    MPID.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}         
+		AND    MPID.STATE      IN ('PIWR', 'NCPC')     
+		<if test="receiveNo != null and receiveNo != ''">
+		AND    (UPPER(MPID.INOUT_NO) LIKE '%' || UPPER(#{receiveNo, jdbcType=VARCHAR}) || '%')	  
+		</if>
+		<if test="locationCd != null and locationCd != ''">
+		AND    MPIM.DEPARTURE_LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
+		</if>
+		<if test="partnerCd != null and partnerCd != ''">
+		AND    MPIM.VENDOR_CD   = #{partnerCd, jdbcType=VARCHAR}
+		</if>
+		ORDER BY MPID.INOUT_NO      
+		       , MPID.SEQ
+    </select>
+</mapper>

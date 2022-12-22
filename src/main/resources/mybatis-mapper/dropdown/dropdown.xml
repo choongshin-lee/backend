@@ -391,5 +391,41 @@
     AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
     AND    USE_YN      = 'Y'
     ORDER BY RECEIPT_TYPE_NM    
-    </select>           
+    </select>      
+    <select id="get_DD00040" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">  
+	SELECT MLM.LOCATION_CD  AS CODE 
+	     , MLM.LOCATION_CD ||'('||ML.LOCATION_NM       ||')' AS LABEL
+	FROM   MOM_LOCATION_MANAGER MLM
+	     , MOM_LOCATION ML
+	WHERE  MLM.COMPANY_CD   = ML.COMPANY_CD
+	AND    MLM.DIVISION_CD  = ML.DIVISION_CD
+	AND    MLM.LOCATION_CD  = ML.LOCATION_CD
+	AND    MLM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+    AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR} 
+	AND    MLM.USE_YN       = 'Y'
+	<if test="locationCd != null and locationCd != ''">
+	AND    MLM.LOCATION_CD = #{locationCd, jdbcType=VARCHAR} 
+	</if>
+	GROUP BY MLM.LOCATION_CD
+	       , ML.LOCATION_NM
+	ORDER BY ML.LOCATION_NM 
+    </select> 
+    <select id="get_DD00041" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">  
+	SELECT MU.USER_NO  AS CODE 
+	     , MU.USER_NO ||'('||MU.USER_NM   ||')' AS LABEL
+	FROM   MOM_LOCATION_MANAGER MLM
+	     , MOM_USER MU
+	WHERE  MLM.COMPANY_CD = MU.COMPANY_CD
+	AND    MLM.DIVISION_CD = MU.DIVISION_CD
+	AND    MLM.USER_NO     = MU.USER_NO
+	AND    MLM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+    AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR} 
+	AND    MLM.USE_YN       = 'Y'
+	<if test="locationCd != null and locationCd != ''">
+	AND    MLM.LOCATION_CD = #{locationCd, jdbcType=VARCHAR} 
+	</if>
+	GROUP BY MU.USER_NO
+	       , MU.USER_NM
+	ORDER BY MU.USER_NM     
+	</select>          
 </mapper>
