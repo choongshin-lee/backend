@@ -21,5 +21,14 @@
 		<if test="locationCd != null and locationCd != ''">
 		AND    MLM.LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
 		</if>
+		<if test="processTypeId != null and processTypeId != ''">
+		AND    MLM.LOCATION_CD   IN ( SELECT MLT.LOCATION_CD
+									  FROM   MOM_LOCATION_PROCESS_TYPE MLT
+									  WHERE  MLM.COMPANY_CD      = MLM.COMPANY_CD
+									  AND    MLM.DIVISION_CD     = MLM.DIVISION_CD
+									  AND    MLT.USE_YN          = 'Y'
+									  AND    MLT.PROCESS_TYPE_ID = #{processTypeId, jdbcType=VARCHAR})
+		</if>
+		
     </select>
 </mapper>

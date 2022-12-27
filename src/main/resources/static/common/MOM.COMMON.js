@@ -1611,9 +1611,7 @@ function mom_ajax(type, url, param, call_back, call_back_param, index_info, your
 			enctype: 'multipart/form-data',
 			beforeSend: function(xhr) {
 				xhr.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('token'));
-
 			},
-
 			success: function(data) {
 				if (call_back != undefined) {
 					call_back('SUCCESS', data, param, call_back_param, index_info, your);
@@ -1653,7 +1651,6 @@ function mom_ajax(type, url, param, call_back, call_back_param, index_info, your
 				if (excelUpYn == 'Y' && param.length >= 1000) {
 					bar.width('0%');
 					percent.html('0%');
-
 					interval = setInterval(function() {
 						$.ajax({
 							url: mCommon.contextPath() + '/progressBar',
@@ -1662,13 +1659,9 @@ function mom_ajax(type, url, param, call_back, call_back_param, index_info, your
 							data: { sessionId: sessionId, type: 'excelUpload' },
 							success: function(data) {
 								if (data.percent == 0) {
-
 									return;
 								}
-
 								var percentComplete = Math.floor((data.percent / paramSize) * 100);
-
-
 								var percentVal = percentComplete + '%';
 								bar.width(percentVal);
 								percent.html(percentVal + ' ' + paramSize + '/' + data.percent);
@@ -1682,29 +1675,17 @@ function mom_ajax(type, url, param, call_back, call_back_param, index_info, your
 								else {
 									bar.width('0%');
 									percent.text('0%');
-
 									momWidget.splashHide();
 									return;
 								}
-
-
 							}
 						});
 					}, 100);
-
-
 				}
-
-
-
-			},
-
-
+			}, 
 			success: function(data) {
-				clearInterval(interval);
+				//clearInterval(interval);
 				if (call_back != undefined) {
-
-
 					call_back('SUCCESS', data, param, call_back_param, index_info, your);
 				}
 			}, error: function(error) {

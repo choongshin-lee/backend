@@ -1,4 +1,4 @@
-var menuId = 'XUWM2010';
+var menuId = 'XUWM2030';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -15,17 +15,12 @@ var VIEW= {
 			  $('#receiptIdDP1').val('');
 			  $('#receiptNmDP1').val('');
 		}
-		else if(index ==1 && btnId =='copyBtn'){	
-			  $('#deliveryRequestIdDP2').val('');
-			  $('#seqDP2').val('');
-		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         let checkItem = widget.getCheckedRowItems(widget.grid[0]);
         if(index==1 && ( btnId== "createBtn2"|| btnId== "copyBtn2"|| btnId== "editBtn2" || btnId== "customBtn2-1")){
 			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
 			result.param = {drNo:checkItem[0].drNo};
-			  					
 		}
         else if(index ==0){                                            
             AUIGrid.clearGridData(widget.grid[1]);    
@@ -41,7 +36,7 @@ var VIEW= {
 	        let checkedItem = AUIGrid.getCheckedRowItems(widget.grid[index]);
 	        if(btnId == 'receiptLocationCdDP1'){   
 	             $('#receiptLocationCdSP11').val('');
-	             $('#processTypeIdSP11').val('IBR');  
+	             $('#processTypeIdSP11').val('OBS');  
 	             $('#processTypeIdSP11').jqxComboBox({disabled: true});
 	        }
 	    }
@@ -53,8 +48,10 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#receiveNoSP21').val('');
-                $('#partnerCdSP21').val('');
+                
+                
+                $('#drNoSP21').val('');
+                $('#customerCdSP21').val('');
                 //$('#locationCdSP21').jqxComboBox({disabled: true});
                 $('#locationCdSP21').val('');
             }
@@ -83,6 +80,6 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
 	momWidget.gridPopup.init(1,11,1,'XUDG0140', VIEW); 
-	momWidget.gridPopup.init(2,21,1,'XUDG0160', VIEW);
+	momWidget.gridPopup.init(2,21,1,'XUDG0170', VIEW);
 	VIEW.init();
 });

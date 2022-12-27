@@ -10,6 +10,9 @@
 	AND     COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 	AND     GROUP_CD    = #{groupCd, jdbcType=VARCHAR}
 	AND     USE_YN      = 'Y'
+	<if test="processTypeId != null and processTypeId != ''">
+    AND     CODE = #{processTypeId, jdbcType=VARCHAR} 
+    </if>
 	<if test="attribute1 != null and attribute1 != ''">
     AND     ATTRIBUTE1 = #{attribute1, jdbcType=VARCHAR} 
     </if>
@@ -384,12 +387,21 @@
     ORDER BY RESOURCE_NM    
     </select>  
     <select id="get_DD00039" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
-    SELECT RECEIPT_TYPE_CD       AS CODE 
-         , RECEIPT_TYPE_CD  ||'('|| RECEIPT_TYPE_NM       ||')' AS LABEL
-    FROM   MOM_LOCATION_RECEIPT_TYPE   
-    WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
-    AND    USE_YN      = 'Y'
+    SELECT MLT.RECEIPT_TYPE_CD       AS CODE 
+         , MLT.RECEIPT_TYPE_CD  ||'('|| MLT.RECEIPT_TYPE_NM       ||')' AS LABEL
+    FROM   MOM_LOCATION_RECEIPT_TYPE MLT   
+    WHERE  MLT.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+    AND    MLT.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    AND    MLT.USE_YN      = 'Y'
+    <if test="processTypeId != null and processTypeId != ''">
+	AND    MLT.ACTION_TYPE_ID = (SELECT MC.ATTRIBUTE1
+								 FROM   MOM_CODE MC
+								 WHERE  MC.COMPANY_CD   = MLT.COMPANY_CD
+								 AND    MC.DIVISION_CD  = MLT.DIVISION_CD 
+								 AND    MC.GROUP_CD     = 'MD0028'
+								 AND    MC.CODE         = #{processTypeId, jdbcType=VARCHAR} 
+								 AND    MC.USE_YN       = 'Y')
+	</if>
     ORDER BY RECEIPT_TYPE_NM    
     </select>      
     <select id="get_DD00040" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">  

@@ -10121,7 +10121,7 @@ var momWidget = {
                             percent.text('100%' + ' ' + param.length + '/' + param.length);
                             // percent.html(percentVal+' '+paramSize+'/'+data.percent);
                             if (result == 'ERROR' || data[0]['p_err_code'] == 'E') {
-                                $("#pleaseWaitDialog").modal('hide');
+	                            $("#pleaseWaitDialog").modal('hide');
                                 momWidget.messageBox({
                                     type: 'danger',
                                     width: '400',

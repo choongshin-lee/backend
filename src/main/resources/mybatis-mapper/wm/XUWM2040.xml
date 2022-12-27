@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUWM2010">
+<mapper namespace="com.mom.backend.XUWM2040">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -53,7 +53,7 @@
 					                                AND    MC.DIVISION_CD = MLM.DIVISION_CD
 					                                AND    MC.GROUP_CD    = 'MD0028'
 					                                AND    MC.USE_YN      = 'Y'
-					                                AND    MC.ATTRIBUTE1  = 'R' )
+					                                AND    MC.ATTRIBUTE1  = 'S' )
 					<if test="processTypeId != null and processTypeId != ''">
 					AND    MLM.PROCESS_TYPE_ID  = #{processTypeId, jdbcType=VARCHAR}
 					</if>     
@@ -170,7 +170,7 @@
                                                          , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
                                                          , #{companyCd,   jdbcType=VARCHAR, mode=IN}
                                                          , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                                         , 'IBR'
+                                                         , 'ITS'
                                                          , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select>  
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
@@ -243,7 +243,7 @@
                                                          , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
                                                          , #{companyCd,   jdbcType=VARCHAR, mode=IN}
                                                          , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                                         , 'IBR'
+                                                         , 'ITS'
                                                          , #{userId,      jdbcType=VARCHAR, mode=IN} )}                  
 	</select> 
 </mapper>    

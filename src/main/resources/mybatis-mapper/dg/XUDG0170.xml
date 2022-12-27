@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUDG0160">
+<mapper namespace="com.mom.backend.XUDG0170">
     <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
-		SELECT MPID.COMPANY_CD    
-		     , MPID.DIVISION_CD   
-		     , MPID.INOUT_NO          AS RECEIVE_NO   
-		     , MPIM.INOUT_TYPE  
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'MM0012', MPIM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM          
-		     , MPIM.IO_TYPE         
-		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
-		     , MPIM.VENDOR_CD         AS PARTNER_CD 
-		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.VENDOR_CD) FROM DUAL)  AS PARTNER_NM       
-		     , MPIM.DEPARTURE_LOCATION_CD       AS LOCATION_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_LOCATION_CD) FROM DUAL) AS LOCATION_NM           
-		     , MPIM.CURRENCY_CD       
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM        
-		     , MPIM.EXCHANGE_RATE 
-		     , MPID.SEQ   
-		     , MPID.PURCHASE_ORDER_ID     
-		     , MPID.PURCHASE_INOUT_ID     AS REFERENCE_NO
-		     , MPID.ITEM_ID   
-		     , MI.ITEM_NM   
-		     , MI.ITEM_SPEC     
-		     , MI.ITEM_TYPE   
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM   
-		     , MI.PURCHASE_UNIT   
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MI.PURCHASE_UNIT) FROM DUAL) AS PURCHASE_UNIT_NM      
-		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.GOOD_QTY ELSE MPID.INOUT_QTY END  AS RECEIVE_WAIT_QTY     
-		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.UNIT_PRICE ELSE MPID.UNIT_PRICE END  AS UNIT_PRICE      
-		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.AMOUNT ELSE MPID.AMOUNT END  AS AMOUNT      
-		     , CASE WHEN MC.NCPC_NO IS NOT NULL THEN MC.LOCAL_AMOUNT ELSE MPID.LOCAL_AMOUNT END  AS LOCAL_AMOUNT    
-		     , MPID.DESCRIPTION   
-		     , MPID.PURCHASE_INOUT_ID     
-		     , ROWIDTOCHAR(MPID.ROWID)            AS KEY_ID
-		     , #{receiptId, jdbcType=VARCHAR}	  AS RECEIPT_ID
-		FROM   MOM_PURCHASE_INOUT_DTL MPID        
-		     , MOM_PURCHASE_INOUT_MST MPIM  
-		     , MOM_NCPC MC                                                                                      
-		     , MOM_ITEM MI        
-		WHERE  MPID.COMPANY_CD  = MPIM.COMPANY_CD
-		AND    MPID.DIVISION_CD = MPIM.DIVISION_CD
-		AND    MPID.INOUT_NO    = MPIM.INOUT_NO  
-		AND    MPID.COMPANY_CD  = MC.COMPANY_CD(+)                                                                
-		AND    MPID.DIVISION_CD = MC.DIVISION_CD(+)                                                                 
-		AND    MPID.NCR_NO      = MC.NCR_NO(+)                                                                    
-		AND    MPID.COMPANY_CD  = MI.COMPANY_CD         
-		AND    MPID.DIVISION_CD = MI.DIVISION_CD        
-		AND    MPID.ITEM_ID     = MI.ITEM_ID   
-		AND    MPID.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-		AND    MPID.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}         
-		AND    MPID.STATE      IN ('PIWR', 'NCPC')     
-		<if test="receiveNo != null and receiveNo != ''">
-		AND    (UPPER(MPID.INOUT_NO) LIKE '%' || UPPER(#{receiveNo, jdbcType=VARCHAR}) || '%')	  
+		SELECT MDM.COMPANY_CD
+		     , MDM.DIVISION_CD
+		     , MDM.DR_NO     
+		     , MDD.SEQ         
+		     , MDM.INOUT_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'MM0012', MDM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
+		     , MSO.IO_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MSO.COMPANY_CD, MSO.DIVISION_CD, MSO.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
+		     , MDM.CUSTOMER_CD   
+		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDM.CUSTOMER_CD) FROM DUAL)  AS CUSTOMER_NM
+		     , MDM.REQUEST_LOCATION_CD   AS LOCATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDM.REQUEST_LOCATION_CD) FROM DUAL) AS LOCATION_NM
+		     , MDD.CURRENCY_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+		     , MDD.ITEM_ID
+		     , MSO.ITEM_NM
+		     , MSO.ITEM_SPEC
+		     , MSO.ITEM_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSO.COMPANY_CD, MSO.DIVISION_CD, 'MD0002', MSO.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM          
+		     , MSO.SO_UNIT
+		     , MSO.SO_UNIT_NM
+		     , MDD.CONFIRM_QTY   AS DR_CONFIRM_QTY
+		     , MDD.CONFIRM_QTY - NVL(MDD.PROGRESS_QTY,0)   AS RECEIVE_WAIT_QTY
+		     , MDD.UNIT_PRICE
+		     , MDD.CURRENCY_CD
+		     , MDD.EXCHANGE_RATE
+		     , MDD.AMOUNT
+		     , MDD.LOCAL_AMOUNT
+		     , MSO.UNIT_PRICE
+		     , MDD.DESCRIPTION
+		     , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
+		     , MSO.SO_NO
+		     , MSO.SO_SEQ
+		     , MSO.SALES_ORDER_ID
+		     , MDD.DELIVERY_REQUEST_ID           AS REFERENCE_NO
+		FROM   MOM_DR_MST MDM
+		     , MOM_DR_DTL MDD
+		     , MOM_SALES_ORDER_V MSO
+		WHERE  MDM.COMPANY_CD       = MDD.COMPANY_CD
+		AND    MDM.DIVISION_CD      = MDD.DIVISION_CD
+		AND    MDM.DR_NO            = MDD.DR_NO     
+		AND    MDD.COMPANY_CD       = MSO.COMPANY_CD
+		AND    MDD.DIVISION_CD      = MSO.DIVISION_CD
+		AND    MDD.REFERENCE_DTL_NO = MSO.SALES_ORDER_ID 
+		AND    MDM.INOUT_TYPE  	    = 'CR'
+		AND    MDD.STATE            = 'DRF'
+		AND    MDM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+		AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}         
+		<if test="drNo != null and drNo != ''">
+		AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')    
 		</if>
 		<if test="locationCd != null and locationCd != ''">
-		AND    MPIM.DEPARTURE_LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
+		AND    MDM.REQUEST_LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
 		</if>
-		<if test="partnerCd != null and partnerCd != ''">
-		AND    MPIM.VENDOR_CD   = #{partnerCd, jdbcType=VARCHAR}
+		<if test="customerCd != null and customerCd != ''">
+		AND    MDM.CUSTOMER_CD   = #{customerCd, jdbcType=VARCHAR}
 		</if>
-		ORDER BY MPID.INOUT_NO      
-		       , MPID.SEQ
+		ORDER BY MDD.DR_NO
+		       , MDD.SEQ 
     </select>
     <delete id="remove_customBtn21-1" parameterType="java.util.List">
 	    DELETE FROM MOM_PROC_LOCATION_RECEIPT_DTL
@@ -105,10 +105,10 @@
 	                                      , #{item.receiptId, jdbcType=VARCHAR}
 	                                      , #{item.seq, jdbcType=NUMERIC}
 	                                      , #{item.ioType, jdbcType=VARCHAR}
-	                                      , #{item.partnerCd, jdbcType=VARCHAR}
+	                                      , #{item.customerCd, jdbcType=VARCHAR}
 	                                      , #{item.locationCd, jdbcType=VARCHAR}
 	                                      , #{item.itemId, jdbcType=VARCHAR}
-	                                      , #{item.purchaseUnit, jdbcType=VARCHAR}
+	                                      , #{item.soUnit, jdbcType=VARCHAR}
 	                                      , #{item.receiveWaitQty, jdbcType=NUMERIC}
 	                                      , #{item.currencyCd, jdbcType=VARCHAR}
 	                                      , #{item.exchangeRate, jdbcType=NUMERIC}
@@ -132,7 +132,7 @@
 	                                                     , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 	                                                     , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 	                                                     , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
-	                                                     , 'IBR'                   
+	                                                     , 'OBS'                   
 	                                                     , #{userId,      jdbcType=VARCHAR, mode=IN} )}                   
 	</select>    
 </mapper>
