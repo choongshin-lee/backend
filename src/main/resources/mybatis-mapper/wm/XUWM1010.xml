@@ -9,7 +9,7 @@
 		            SELECT MDM.COMPANY_CD
 		                 , MDM.DIVISION_CD
 		                 , MDM.DR_NO
-		                 , MDM.DR_NAME
+		                 , MDM.DR_NM
 		                 , MDM.INOUT_TYPE
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'MM0012', MDM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
 		                 , MDM.REQUEST_LOCATION_CD
@@ -26,7 +26,7 @@
 		                 , MDM.NAME_PLATE
 		                 , MDM.INSPECTION_REPORT_YN
 		                 , MDM.TRANSIT_INSURANCE_YN
-		                 , TO_CHAR(MDM.SHIPPING_DATE ,'YYYY-MM-DD') AS SHIPPING_DATE
+		                 , TO_CHAR(MDM.SHIPPING_DUE_DATE ,'YYYY-MM-DD') AS SHIPPING_DUE_DATE
 		                 , MDM.STATE
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'WM0001', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 		                 , MDM.DESCRIPTION
@@ -128,7 +128,7 @@
         INTO MOM_PROC_DR_MST( COMPANY_CD
                             , DIVISION_CD
                             , DR_NO
-                            , DR_NAME
+                            , DR_NM
                             , INOUT_TYPE
                             , REQUEST_LOCATION_CD
                             , CUSTOMER_CD
@@ -140,7 +140,7 @@
                             , NAME_PLATE
                             , INSPECTION_REPORT_YN
                             , TRANSIT_INSURANCE_YN
-                            , SHIPPING_DATE
+                            , SHIPPING_DUE_DATE
                             , DESCRIPTION
                             , DEL_YN
                             , VAL_MSG
@@ -151,7 +151,7 @@
         VALUES              ( #{item.companyCd, jdbcType=VARCHAR}
                             , #{item.divisionCd, jdbcType=VARCHAR}
                             , #{item.drNo, jdbcType=VARCHAR}
-                            , #{item.drName, jdbcType=VARCHAR}
+                            , #{item.drNm, jdbcType=VARCHAR}
                             , #{item.inoutType, jdbcType=VARCHAR}
                             , #{item.requestLocationCd, jdbcType=VARCHAR}
                             , #{item.customerCd, jdbcType=VARCHAR}
@@ -163,7 +163,7 @@
                             , #{item.namePlate, jdbcType=VARCHAR}
                             , #{item.inspectionReportYn, jdbcType=VARCHAR}
                             , #{item.transitInsuranceYn, jdbcType=VARCHAR}
-                            , #{item.shippingDate, jdbcType=VARCHAR}
+                            , #{item.shippingDueDate, jdbcType=VARCHAR}
                             , #{item.description, jdbcType=VARCHAR}
                             , #{item.delYn, jdbcType=VARCHAR}
                             , #{item.valMsg, jdbcType=VARCHAR}
@@ -207,6 +207,7 @@
                             , SO_NO
                             , SO_SEQ
                             , REFERENCE_NO
+                            , REFERENCE_DTL_NO
                             , DELIVERY_REQUEST_ID
                             , DESCRIPTION
                             , DEL_YN
@@ -229,7 +230,8 @@
 		                    , #{item.cartonNo, jdbcType=VARCHAR}
 		                    , #{item.soNo, jdbcType=VARCHAR}
 		                    , #{item.soSeq, jdbcType=NUMERIC}
-		                    , #{item.salesOrderId, jdbcType=VARCHAR}
+		                    , #{item.referenceNo, jdbcType=VARCHAR}
+		                    , #{item.referenceDtlNo, jdbcType=VARCHAR}
 		                    , #{item.deliveryRequestId, jdbcType=VARCHAR}
 		                    , #{item.description, jdbcType=VARCHAR}
 		                    , #{item.delYn, jdbcType=VARCHAR}

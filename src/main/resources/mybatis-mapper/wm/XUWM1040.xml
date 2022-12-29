@@ -9,7 +9,7 @@
 		            SELECT MDM.COMPANY_CD
 		                 , MDM.DIVISION_CD
 		                 , MDM.DR_NO
-		                 , MDM.DR_NAME
+		                 , MDM.DR_NM
 		                 , MDM.INOUT_TYPE
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'MM0012', MDM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
 		                 , MDM.REQUEST_LOCATION_CD
@@ -26,7 +26,7 @@
 		                 , MDM.NAME_PLATE
 		                 , MDM.INSPECTION_REPORT_YN
 		                 , MDM.TRANSIT_INSURANCE_YN
-		                 , TO_CHAR(MDM.SHIPPING_DATE ,'YYYY-MM-DD') AS SHIPPING_DATE
+		                 , TO_CHAR(MDM.SHIPPING_DUE_DATE ,'YYYY-MM-DD') AS SHIPPING_DUE_DATE
 		                 , MDM.STATE
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'WM0001', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 		                 , MDM.DESCRIPTION
@@ -74,9 +74,9 @@
              , MDD.SEQ
              , MDD.ITEM_ID
              , MI.ITEM_NM
-	         , MI.ITEM_SPEC
-	         , MI.ITEM_TYPE
-	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+             , MI.ITEM_SPEC
+             , MI.ITEM_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
              , MDD.REQUEST_QTY
              , NVL(MDD.CONFIRM_QTY, MDD.REQUEST_QTY) AS CONFIRM_QTY
              , MDD.CONFIRM_QTY
@@ -88,6 +88,7 @@
              , MDD.TRACKING_NO
              , MDD.CARTON_NO
              , MDD.REFERENCE_NO
+             , MDD.REFERENCE_DTL_NO
              , MDD.STATE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'WM0002', MDD.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
              , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
@@ -101,8 +102,8 @@
         WHERE  MDD.COMPANY_CD   = MI.COMPANY_CD
         AND    MDD.DIVISION_CD  = MI.DIVISION_CD
 	    AND    MDD.ITEM_ID      = MI.ITEM_ID
-        AND    MDD.COMPANY_CD     =  #{companyCd, jdbcType=VARCHAR}
-	    AND    MDD.DIVISION_CD  =  #{divisionCd, jdbcType=VARCHAR}
+        AND    MDD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+	    AND    MDD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
 	    AND    MDD.DR_NO        = #{drNo, jdbcType=VARCHAR}  
     </select> 
     <delete id="remove_customBtn1-1" parameterType="java.util.List">
@@ -142,10 +143,10 @@
     </insert>
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
         { CALL MOM_WMS_PKG.SP_CONFIRM_DR_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+                                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
         <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_DR_DTL_CONFIRM
@@ -171,24 +172,24 @@
 									, CREATE_BY
 									, CREATE_DATE
                                     )
-        VALUES              ( #{item.companyCd, jdbcType=VARCHAR}  
-		                    , #{item.divisionCd, jdbcType=VARCHAR}         
-		                    , #{item.drNo, jdbcType=VARCHAR}
-		                    , #{item.deliveryRequestId, jdbcType=VARCHAR}
-		                    , #{item.confirmQty, jdbcType=NUMERIC}
-		                    , #{item.valMsg, jdbcType=VARCHAR}
-		                    , #{item.multiMsg, jdbcType=VARCHAR}
-		                    , #{item.description, jdbcType=VARCHAR}
-		                    , #{item.userId, jdbcType=VARCHAR}
-		                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-		                    )
+        VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}  
+				                    , #{item.divisionCd, jdbcType=VARCHAR}         
+				                    , #{item.drNo, jdbcType=VARCHAR}
+				                    , #{item.deliveryRequestId, jdbcType=VARCHAR}
+				                    , #{item.confirmQty, jdbcType=NUMERIC}
+				                    , #{item.valMsg, jdbcType=VARCHAR}
+				                    , #{item.multiMsg, jdbcType=VARCHAR}
+				                    , #{item.description, jdbcType=VARCHAR}
+				                    , #{item.userId, jdbcType=VARCHAR}
+				                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+				                    )
         </foreach>
     </insert>
     <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
         { CALL MOM_WMS_PKG.SP_CONFIRM_DR_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+                                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
 </mapper>     

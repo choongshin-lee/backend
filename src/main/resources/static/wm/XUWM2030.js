@@ -17,12 +17,7 @@ var VIEW= {
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
-        let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-        if(index==1 && ( btnId== "createBtn2"|| btnId== "copyBtn2"|| btnId== "editBtn2" || btnId== "customBtn2-1")){
-			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-			result.param = {drNo:checkItem[0].drNo};
-		}
-        else if(index ==0){                                            
+        if(index ==0){                                            
             AUIGrid.clearGridData(widget.grid[1]);    
         }
     },
@@ -48,12 +43,10 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                
-                
                 $('#drNoSP21').val('');
                 $('#customerCdSP21').val('');
-                //$('#locationCdSP21').jqxComboBox({disabled: true});
-                $('#locationCdSP21').val('');
+                $('#locationCdSP21').val(checkItem[0]['receiptLocationCd']);
+                $('#locationCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 10){       

@@ -8,8 +8,8 @@
 		     , MSO.SHIP_TO_NM	
 		     , MSO.SO_NO
 		     , MSO.SO_SEQ
-		     , MSO.STORAGE_LOCATION_CD
-             , MSO.STORAGE_LOCATION_NM
+		     , MSO.STORAGE_LOCATION_CD   AS SHIPPING_LOCATION_CD
+             , MSO.STORAGE_LOCATION_NM   AS SHIPPING_LOCATION_NM
 		     , MSO.ITEM_ID
 		     , MSO.ITEM_NM
 		     , MSO.ITEM_SPEC
@@ -21,7 +21,7 @@
 		     , MSO.ORDER_QTY
 		     , MSO.SHIPPING_QTY
 		     , MSO.CANCEL_QTY
-		     , MSO.REMAIN_QTY
+		     , (MSO.ORDER_QTY - MSO.CANCEL_QTY - DR_REQUEST_QTY )  AS REMAIN_QTY
 		     , MSO.CURRENCY_CD 
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSO.COMPANY_CD, MSO.DIVISION_CD, 'SM0017', MSO.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 		     , MSO.UNIT_PRICE 
@@ -32,14 +32,14 @@
 		     , MSO.SALES_ITEM_ID
 		     , MSO.SALES_ORDER_ID
 		     , MSO.SALES_ORDER_ID            AS KEY_ID
-		     , MSO.DR_REQUEST_QTY
+		     , MSO.DR_REQUEST_QTY		     AS SHIPPING_REQUEST_QTY
 		FROM   MOM_SALES_ORDER_V MSO
 		WHERE  MSO.COMPANY_CD  = #{companyCd , jdbcType=VARCHAR}
 		AND    MSO.DIVISION_CD = #{divisionCd , jdbcType=VARCHAR}
 		<if test="shipToCd != null and shipToCd != ''">
 		AND    MSO.SHIP_TO_CD  = #{shipToCd , jdbcType=VARCHAR}
 		</if>
-		AND    MSO.ORDER_QTY - NVL(MSO.DR_REQUEST_QTY,0) - NVL(MSO.CANCEL_QTY,0) > 0
+		AND    MSO.ORDER_QTY - MSO.DR_REQUEST_QTY - MSO.CANCEL_QTY > 0
 		<if test="soNo != null and soNo != ''">
 		AND   UPPER(MSO.SO_NO) LIKE '%' || UPPER(#{soNo, jdbcType=VARCHAR}) || '%'
 		</if>
@@ -73,6 +73,7 @@
 			                   , SO_NO
 			                   , SO_SEQ
 			                   , REFERENCE_NO
+			                   , REFERENCE_DTL_NO
 			                   , DELIVERY_REQUEST_ID
 			                   , DESCRIPTION
 			                   , DEL_YN
@@ -87,12 +88,13 @@
 			                   , #{item.itemId, jdbcType=VARCHAR}
 			                   , #{item.remainQty, jdbcType=NUMERIC}
 			                   , #{item.soUnit, jdbcType=VARCHAR}
-			                   , #{item.locationCd, jdbcType=VARCHAR}
+			                   , #{item.shippingLocationCd, jdbcType=VARCHAR}
 			                   , #{item.lcNo, jdbcType=VARCHAR}
 			                   , #{item.trackingNo, jdbcType=VARCHAR}
 			                   , #{item.cartonNo, jdbcType=VARCHAR}
 			                   , #{item.soNo, jdbcType=VARCHAR}
 			                   , #{item.soSeq, jdbcType=NUMERIC}
+			                   , #{item.soNo, jdbcType=VARCHAR}
 			                   , #{item.salesOrderId, jdbcType=VARCHAR}
 			                   , #{item.deliveryRequestId, jdbcType=VARCHAR}
 			                   , #{item.description, jdbcType=VARCHAR}
