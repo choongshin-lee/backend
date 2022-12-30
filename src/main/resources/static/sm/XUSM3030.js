@@ -34,9 +34,7 @@ var upBtn        = '<a id="upBtn" href="#" class="w-inline-block btntool widget-
 var INFINITE = 100000000;
 
 
-// 2020.04.12 hyjeong begins
 var singleRowIndex = undefined; 
-// 2020.04.12 hyjeong end
 var XUSM3030 = {
 	initParam		:  undefined,
 	searchParam		:  [['menuId','gridId']],
@@ -82,8 +80,6 @@ var XUSM3030 = {
 			}
 		}
 	},
-	// 2020.04.12 hyjeong end
-	
 	
 	gridGrid: function(queryId) {
 		var that = this;

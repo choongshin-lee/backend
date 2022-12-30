@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0180">
+    <select id="get_findBtn11" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+		SELECT MLM.USER_NO
+		     , MU.USER_NM
+		     , MLM.LOCATION_CD 
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.LOCATION_CD) FROM DUAL) AS LOCATION_NM
+		     , MLM.COMPANY_CD
+		     , MLM.DIVISION_CD
+		FROM   MOM_LOCATION_MANAGER MLM 
+		     , MOM_USER MU
+		WHERE  MLM.COMPANY_CD  = MU.COMPANY_CD
+		AND    MLM.DIVISION_CD = MU.DIVISION_CD
+		AND    MLM.USER_NO     = MU.USER_NO     
+		AND    MLM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+		AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+		AND    MLM.USE_YN       = 'Y'
+		<if test="locationCd != null and locationCd != ''">
+		AND    MLM.LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
+		</if>
+		<if test="userNm != null and userNm != ''">
+		AND    MU.USER_NM  = #{userNm, jdbcType=VARCHAR}
+		</if>
+    </select>
+</mapper>

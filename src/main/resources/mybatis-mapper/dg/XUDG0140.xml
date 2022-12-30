@@ -9,7 +9,7 @@
              , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.USER_NO) FROM DUAL) AS USER_NM
              , ROWIDTOCHAR(MLM.ROWID)            AS KEY_ID     
              , MLM.DIVISION_CD
-             , MLM.DIVISION_CD
+             , MLM.COMPANY_CD
         FROM   MOM_LOCATION_MANAGER MLM
              , MOM_LOCATION ML     
         WHERE  MLM.COMPANY_CD   = ML.COMPANY_CD(+)  
