@@ -13,9 +13,9 @@ var VIEW= {
 	copyCallInit: function(index,your,action,btnId,param,result) {
 		if(index ==0 && btnId =='copyBtn'){	
 			  $('#drNoDP1').val('');
-			  $('#drNameDP1').val('');
+			  $('#drNmDP1').val('');
 		}
-		else if(index ==1 && btnId =='copyBtn'){	
+		else if(index ==1 && btnId =='copyBtn'){	 
 			  $('#deliveryRequestIdDP2').val('');
 			  $('#seqDP2').val('');
 		}

@@ -37,6 +37,7 @@
 		     , MSO.SO_SEQ
 		     , MSO.SALES_ORDER_ID
 		     , MDD.DELIVERY_REQUEST_ID           AS REFERENCE_NO
+		     , MDD.LOCATION_USE_YN
 		FROM   MOM_DR_MST MDM
 		     , MOM_DR_DTL MDD
 		     , MOM_SALES_ORDER_V MSO
@@ -48,6 +49,7 @@
 		AND    MDD.REFERENCE_DTL_NO = MSO.SALES_ORDER_ID 
 		AND    MDM.INOUT_TYPE  	    = 'CR'
 		AND    MDD.STATE            = 'DRF'
+		AND    MDD.LOCATION_USE_YN  = 'Y'
 		AND    MDM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
 		AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}         
 		<if test="drNo != null and drNo != ''">

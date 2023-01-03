@@ -43,12 +43,12 @@
 		            WHERE  MDM.COMPANY_CD          = ML.COMPANY_CD(+)
 		            AND    MDM.DIVISION_CD         = ML.DIVISION_CD(+)
 		            AND    MDM.REQUEST_LOCATION_CD = ML.LOCATION_CD(+)
-		            AND    MDM.COMPANY_CD = MP.COMPANY_CD
-		            AND    MDM.DIVISION_CD  = MP.DIVISION_CD
-		            AND    MDM.CUSTOMER_CD = MP.PARTNER_CD
-		            AND    MDM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
-		            AND    MDM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
-		            AND    MDM.STATE        = 'DRG'
+		            AND    MDM.COMPANY_CD          = MP.COMPANY_CD(+)
+		            AND    MDM.DIVISION_CD         = MP.DIVISION_CD(+)
+		            AND    MDM.CUSTOMER_CD         = MP.PARTNER_CD(+)
+		            AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
+		            AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}	
+		            AND    MDM.STATE               = 'DRG'
 		            AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 		            <if test="drNo != null and drNo != ''">
 		            AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')	  
@@ -59,9 +59,6 @@
 		            <if test="locationNm != null and locationNm != ''">
 		            AND    (UPPER(ML.LOCATION_NM)  LIKE '%' || UPPER(#{locationNm, jdbcType=VARCHAR}) ||   '%')	  
 		            </if>	    
-		            <if test="state != null and state != ''">
-		            AND    MDM.STATE IN (${state})
-		            </if>	
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
