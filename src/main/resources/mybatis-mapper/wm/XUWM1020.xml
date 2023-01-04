@@ -75,7 +75,6 @@
 	         , MI.ITEM_TYPE
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
              , MDD.REQUEST_QTY
-             , MDD.CONFIRM_QTY
              , MDD.UNIT 
              , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
              , MDD.LOCATION_CD
@@ -147,11 +146,11 @@
         </foreach>
     </insert>
     <select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_UPSERT_DR_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+        { CALL MOM_STOCK_PKG.SP_UPSERT_DR_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                             , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                             , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                             , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                             , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
         <delete id="remove_createBtn2" parameterType="java.util.List">
         DELETE FROM MOM_PROC_DR_DTL
@@ -214,11 +213,11 @@
         </foreach>
     </insert>
     <select id="proc_createBtn2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_UPSERT_DR_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                           , 'ER'
-                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+        { CALL MOM_STOCK_PKG.SP_UPSERT_DR_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                             , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                             , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                             , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                             , 'ER'
+                                             , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
 </mapper>     

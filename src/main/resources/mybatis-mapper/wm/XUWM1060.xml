@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUWM1060">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+		    SELECT A.*
+		    FROM   (
+		</if>
+		            SELECT MDM.COMPANY_CD
+					     , MDM.DIVISION_CD
+					     , MDM.DR_NO
+					     , MDM.DR_NM
+					     , MDD.SEQ
+					     , MDD.DELIVERY_REQUEST_ID
+					     , MDM.INOUT_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'MM0012', MDM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
+					     , MDM.CUSTOMER_CD      AS PARTNER_CD
+					     , MP.PARTNER_NM  
+					     , MDM.FORWARDER_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.FORWARDER_CD) FROM DUAL) AS FORWARDER_NM
+					     , MDM.DERIVERY_TO_ADRESS
+					     , MDM.LOGISTICS_RESOURCE_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_LOGISTICS_RESOURCE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.LOGISTICS_RESOURCE_CD) FROM DUAL) AS LOGISTICS_RESOURCE_NM
+					     , MDM.PARTIAL_SHIPMENT_YN
+					     , MDM.SHIPPING_MARK
+					     , MDM.NAME_PLATE
+					     , MDM.INSPECTION_REPORT_YN
+					     , MDM.TRANSIT_INSURANCE_YN
+					     , TO_CHAR(MDM.SHIPPING_DUE_DATE ,'YYYY-MM-DD') AS SHIPPING_DUE_DATE
+					     , MDM.STATE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'WM0001', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+					     , MDM.REQUEST_LOCATION_CD 
+					     , ML.LOCATION_NM            AS REQUEST_LOCATION_NM
+					     , MDD.LOCATION_CD		     AS SHIPPING_LOCATION_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.LOCATION_CD) FROM DUAL)  AS SHIPPING_LOCATION_NM
+					     , MDD.ITEM_ID
+					     , MI.ITEM_NM
+					     , MI.ITEM_SPEC
+					     , MI.ITEM_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+					     , MDD.UNIT
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
+					     , MDD.REQUEST_QTY
+					     , MDD.PROGRESS_QTY
+					     , MDD.CANCEL_QTY
+					     , MDD.CANCEL_DATE
+					     , MDD.CANCEL_USER_NO
+					     , MDD.CURRENCY_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+					     , MDD.EXCHANGE_RATE
+					     , MDD.UNIT_PRICE
+					     , MDD.AMOUNT
+					     , MDD.LOCAL_AMOUNT
+					     , MDD.LC_NO
+					     , MDD.TRACKING_NO
+					     , MDD.CARTON_NO
+					     , MDD.REFERENCE_NO
+					     , MDD.REFERENCE_DTL_NO
+					     , MDD.LOCATION_USE_YN
+					     , MDD.DESCRIPTION
+					     , TO_CHAR(MDM.CONFIRM_DATE ,'YYYY-MM-DD') AS CONFIRM_DATE
+					     , MDM.CONFIRM_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD,MDM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
+					     , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
+					     , COUNT(*) OVER()                   AS TOTAL_COUNT
+					     , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDD.DELIVERY_REQUEST_ID) AS ROW_CNT
+					     , MDD.UPDATE_BY      AS UPDATE_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+					     , TO_CHAR(MDD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+					FROM   MOM_DR_MST MDM
+					     , MOM_DR_DTL MDD
+					     , MOM_ITEM MI
+					     , MOM_LOCATION ML
+		                 , MOM_PARTNER MP
+					WHERE  MDM.COMPANY_CD          = MDD.COMPANY_CD
+					AND    MDM.DIVISION_CD         = MDD.DIVISION_CD
+					AND    MDM.DR_NO               = MDD.DR_NO     
+					AND    MDD.COMPANY_CD          = MI.COMPANY_CD
+					AND    MDD.DIVISION_CD         = MI.DIVISION_CD
+					AND    MDD.ITEM_ID             = MI.ITEM_ID
+					AND    MDM.COMPANY_CD          = ML.COMPANY_CD(+)
+					AND    MDM.DIVISION_CD         = ML.DIVISION_CD(+)
+					AND    MDM.REQUEST_LOCATION_CD = ML.LOCATION_CD(+)
+					AND    MDM.COMPANY_CD          = MP.COMPANY_CD(+)
+					AND    MDM.DIVISION_CD         = MP.DIVISION_CD(+)
+					AND    MDM.CUSTOMER_CD         = MP.PARTNER_CD(+)
+					AND    MDM.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+					AND    MDM.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+					AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					<if test="drNo != null and drNo != ''">
+					AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')   
+					</if>
+					<if test="partnerNm != null and partnerNm != ''">
+					AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerNm, jdbcType=VARCHAR}) || '%')   
+					</if> 
+					<if test="requestLocationNm != null and requestLocationNm != ''">
+					AND    (UPPER(ML.LOCATION_NM)  LIKE '%' || UPPER(#{requestLocationNm, jdbcType=VARCHAR}) ||   '%')   
+					</if> 
+					<if test="inoutType != null and inoutType != ''">
+					AND    MDM.INOUT_TYPE  = #{inoutType, jdbcType=VARCHAR}
+					</if>
+                    <if test="state != null and state != ''">
+					AND    MDM.STATE  = #{state, jdbcType=VARCHAR}
+					</if>					
+		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+				       ) A
+				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+		</if>               
+    </select>   
+</mapper>     

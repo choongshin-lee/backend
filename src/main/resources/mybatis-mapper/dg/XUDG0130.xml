@@ -114,11 +114,11 @@
         </foreach>
     </insert>
     <select id="proc_customBtn21-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_UPSERT_DR_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-	                                       , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-	                                       , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-	                                       , #{divisionCd,  jdbcType=VARCHAR, mode=IN}		
-	                                       , 'CR'									  
-	                                       , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
+        { CALL MOM_STOCK_PKG.SP_UPSERT_DR_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+	                                         , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+	                                         , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+	                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}		
+	                                         , 'CR'									  
+	                                         , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>    
 </mapper>    

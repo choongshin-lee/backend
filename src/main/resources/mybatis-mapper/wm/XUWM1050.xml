@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUWM1040">
+<mapper namespace="com.mom.backend.XUWM1050">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -34,6 +34,9 @@
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		                 , TO_CHAR(MDM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 		                 , TO_CHAR(MDM.CREATE_DATE ,'YYYY-MM-DD') AS CREATE_DATE
+		                 , TO_CHAR(MDM.CONFIRM_DATE ,'YYYY-MM-DD') AS CONFIRM_DATE
+		                 , MDM.CONFIRM_USER_NO
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD,MDM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
 		                 , ROWIDTOCHAR(MDM.ROWID)            AS KEY_ID
 		                 , COUNT(*) OVER()   AS TOTAL_COUNT
 		                 , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDM.DR_NO) AS ROW_CNT
@@ -48,8 +51,8 @@
 		            AND    MDM.CUSTOMER_CD         = MP.PARTNER_CD(+)
 		            AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 		            AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}
-		            AND    MDM.STATE               = 'DRG'
-					AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+		            AND    MDM.STATE               = 'DRF'
+					AND    MDM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 		            <if test="drNo != null and drNo != ''">
 		            AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')	  
 		            </if>

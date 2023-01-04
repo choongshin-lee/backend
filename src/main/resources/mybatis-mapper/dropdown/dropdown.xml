@@ -442,5 +442,25 @@
 	GROUP BY MU.USER_NO
 	       , MU.USER_NM
 	ORDER BY MU.USER_NM     
-	</select>          
+	</select>  
+	<select id="get_DD00042" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	SELECT CODE
+	     , NVL((SELECT MOM_COMMON_PKG.FN_GET_MULTI_LANGUAGE(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR},#{langCd, jdbcType=VARCHAR},'CODE',#{groupCd, jdbcType=VARCHAR}|| '_' ||CODE)
+	            FROM   DUAL ),CODE ||'('|| CODE_NM ||')') AS LABEL
+	FROM   MOM_CODE
+	WHERE  DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+	AND    COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND    GROUP_CD    = 'MM0012'
+	AND    USE_YN      = 'Y'
+	<if test="attribute1 != null and attribute1 != ''">
+	AND     ATTRIBUTE1 = #{attribute1, jdbcType=VARCHAR} 
+	</if>
+	<if test="attribute2 != null and attribute2 != ''">
+	AND     ATTRIBUTE2 = #{attribute2, jdbcType=VARCHAR} 
+	</if>
+	<if test="attribute3 != null and attribute3 != ''">
+	AND     ATTRIBUTE3 = #{attribute3, jdbcType=VARCHAR} 
+	</if>
+	ORDER BY SORT_NO,LABEL
+	</select>         
 </mapper>
