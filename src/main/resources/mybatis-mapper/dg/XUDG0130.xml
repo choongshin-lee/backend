@@ -33,6 +33,7 @@
 		     , MSO.SALES_ORDER_ID
 		     , MSO.SALES_ORDER_ID            AS KEY_ID
 		     , MSO.DR_REQUEST_QTY		     AS SHIPPING_REQUEST_QTY
+		     , MSO.IO_TYPE
 		FROM   MOM_SALES_ORDER_V MSO
 		WHERE  MSO.COMPANY_CD  = #{companyCd , jdbcType=VARCHAR}
 		AND    MSO.DIVISION_CD = #{divisionCd , jdbcType=VARCHAR}
@@ -47,7 +48,6 @@
                                 FROM   MOM_IO_CATEGORY MIC
                                 WHERE  MIC.COMPANY_CD  = MSO.COMPANY_CD
                                 AND    MIC.DIVISION_CD = MSO.DIVISION_CD
-                                AND    MIC.IO_TYPE     = MSO.IO_TYPE
                                 AND    MIC.USE_YN      = 'Y' 
                                 AND    MIC.SHIPPING_YN = 'C')
 		ORDER BY MSO.SO_NO
@@ -70,6 +70,7 @@
                     		   , DIVISION_CD
 			                   , DR_NO
 			                   , SEQ
+			                   , IO_TYPE
 			                   , ITEM_ID
 			                   , REQUEST_QTY
 			                   , UNIT
@@ -92,6 +93,7 @@
 			                   , #{item.divisionCd, jdbcType=VARCHAR}         
 			                   , #{item.drNo, jdbcType=VARCHAR}
 			                   , #{item.seq, jdbcType=NUMERIC}
+			                   , #{item.ioType, jdbcType=VARCHAR}
 			                   , #{item.itemId, jdbcType=VARCHAR}
 			                   , #{item.remainQty, jdbcType=NUMERIC}
 			                   , #{item.soUnit, jdbcType=VARCHAR}

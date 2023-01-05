@@ -271,6 +271,12 @@
     <if test="purReceiveYn != null and purReceiveYn != ''">
     AND    PUR_RECEIVE_YN = #{purReceiveYn, jdbcType=VARCHAR} 
     </if>
+    <if test="shippingYn != null and shippingYn != ''">
+    AND    SHIPPING_YN = #{shippingYn, jdbcType=VARCHAR} 
+    </if>
+    <if test="exShippingYn != null and exShippingYn != ''">
+    AND    EX_SHIPPING_YN = #{exShippingYn, jdbcType=VARCHAR} 
+    </if>
     AND    USE_YN      = 'Y'
     ORDER BY LABEL
     </select>   
