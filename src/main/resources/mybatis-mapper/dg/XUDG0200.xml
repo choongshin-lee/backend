@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUDG0190">
+<mapper namespace="com.mom.backend.XUDG0200">
     <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
     SELECT MDM.COMPANY_CD
          , MDM.DIVISION_CD
@@ -10,10 +10,10 @@
          , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'MM0012', MDM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
          , MDD.IO_TYPE 
          , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)   AS IO_TYPE_NM
-         , MDM.CUSTOMER_CD                                                                                       
-         , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDM.CUSTOMER_CD) FROM DUAL) AS CUSTOMER_NM
          , MDD.LOCATION_CD  AS ISSUE_LOCATION_CD
          , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDD.LOCATION_CD) FROM DUAL) AS ISSUE_LOCATION_NM
+         , MDM.REQUEST_LOCATION_CD
+         , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDM.REQUEST_LOCATION_CD) FROM DUAL) AS REQUEST_LOCATION_NM 
          , MDD.CURRENCY_CD
          , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
          , MDD.ITEM_ID
@@ -36,7 +36,6 @@
          , MDD.REFERENCE_NO
          , MDD.REFERENCE_DTL_NO
          , MDD.LOCATION_USE_YN
-         , MDD.DELIVERY_REQUEST_ID
     FROM   MOM_DR_MST MDM
          , MOM_DR_DTL MDD
          , MOM_ITEM MI
@@ -49,13 +48,12 @@
     AND    MDD.STATE            = 'DRF'
     AND    MDD.LOCATION_USE_YN  = 'N'
     AND    MDM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
-    AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}    
-    AND    MDD.REQUEST_QTY - NVL(MDD.PROGRESS_QTY,0) > 0     
+    AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}         
     <if test="issueLocationCd != null and issueLocationCd != ''">
     AND    MDD.LOCATION_CD   = #{issueLocationCd, jdbcType=VARCHAR}
     </if>
-    <if test="customerCd != null and customerCd != ''">
-    AND    MDM.CUSTOMER_CD    = #{customerCd, jdbcType=VARCHAR}
+    <if test="requestLocationCd != null and requestLocationCd != ''">
+    AND    MDM.REQUEST_LOCATION_CD   = #{requestLocationCd, jdbcType=VARCHAR}
     </if>
     ORDER BY MDD.DR_NO
            , MDD.SEQ 
@@ -96,8 +94,8 @@
                             , #{item.deliveryOrderId, jdbcType=VARCHAR}
                             , #{item.drRequestQty, jdbcType=NUMERIC}
                             , #{item.issueWaitQty, jdbcType=NUMERIC}
-                            , #{item.drNo, jdbcType=VARCHAR}
-                            , #{item.deliveryRequestId, jdbcType=VARCHAR}
+                            , #{item.referenceNo, jdbcType=VARCHAR}
+                            , #{item.referenceDtlNo, jdbcType=VARCHAR}
                             , #{item.description, jdbcType=VARCHAR}
                             , #{item.delYn, jdbcType=VARCHAR}
                             , #{item.valMsg, jdbcType=VARCHAR}

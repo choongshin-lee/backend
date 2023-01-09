@@ -8,13 +8,13 @@
 		</if>
 		            SELECT MDM.COMPANY_CD
 					     , MDM.DIVISION_CD
+					     , MDM.DO_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'SM0027', MDM.DO_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DO_TYPE_NM
 					     , MDM.DO_NO
 					     , MDM.DO_NM
 					     , MDM.ISSUE_LOCATION_CD         
-					     , MLI.LOCATION_NM               AS ISSUE_LOCATION_NM
-					     , MDM.REQUEST_LOCATION_CD       
-					     , MLR.LOCATION_NM               AS REQUEST_LOCATION_NM
-					     , MDM.PARTNER_CD
+					     , MLI.LOCATION_NM          AS ISSUE_LOCATION_NM
+					     , MDM.PARTNER_CD	        AS CUSTOMER_CD
 					     , MP.PARTNER_NM            AS CUSTOMER_NM
 					     , TO_CHAR(MDM.ISSUE_DUE_DATE  ,'YYYY-MM-DD') AS ISSUE_DUE_DATE
 					     , MDM.DESCRIPTION
@@ -27,33 +27,27 @@
 					     , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDM.DO_NO) AS ROW_CNT
 					FROM   MOM_DELIVERY_ORDER_MST MDM
 					     , MOM_LOCATION MLI
-					     , MOM_LOCATION MLR
-						 , MOM_PARTNER MP
+                         , MOM_PARTNER MP
 					WHERE  MDM.COMPANY_CD          = MLI.COMPANY_CD
 					AND    MDM.DIVISION_CD         = MLI.DIVISION_CD
 					AND    MDM.ISSUE_LOCATION_CD   = MLI.LOCATION_CD
-					AND    MDM.COMPANY_CD          = MLR.COMPANY_CD
-					AND    MDM.DIVISION_CD         = MLR.DIVISION_CD
-					AND    MDM.REQUEST_LOCATION_CD = MLR.LOCATION_CD
 					AND    MDM.COMPANY_CD          = MP.COMPANY_CD
 					AND    MDM.DIVISION_CD         = MP.DIVISION_CD
 					AND    MDM.PARTNER_CD          = MP.PARTNER_CD
 					AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 					AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MDM.STATE               = 'DOG'
+					AND    MDM.DO_TYPE             = 'C'
 					AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					<if test="doNo != null and doNo != ''">
 					AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{doNo, jdbcType=VARCHAR}) || '%')   
 					</if>
-					<if test="partnerCd != null and partnerCd != ''">
-					AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCd, jdbcType=VARCHAR}) || '%')   
+					<if test="customerCd != null and customerCd != ''">
+					AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCd, jdbcType=VARCHAR}) || '%')   
 					</if> 
 					<if test="issueLocationCd != null and issueLocationCd != ''">
 					AND    (UPPER(MLI.LOCATION_NM)  LIKE '%' || UPPER(#{issueLocationCd, jdbcType=VARCHAR}) ||   '%')   
 					</if> 
-					<if test="requestLocationCd != null and requestLocationCd != ''">
-					AND    (UPPER(MLR.LOCATION_NM)  LIKE '%' || UPPER(#{requestLocationCd, jdbcType=VARCHAR}) ||   '%')   
-					</if>  	
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
@@ -71,6 +65,7 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
 		     , MDD.UNIT    AS UNIT
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
+		     , (SELECT MOM_STOCK_PKG.FN_GET_DR_REQUEST_QTY_BY_DO(MDD.COMPANY_CD, MDD.DIVISION_CD,MDD.REFERENCE_DTL_NO) FROM DUAL) AS DR_REQUEST_QTY
 		     , MDD.QTY            AS ISSUE_WAIT_QTY
 		     , MDD.CURRENCY_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
@@ -115,6 +110,7 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_DO_MST( COMPANY_CD
                             , DIVISION_CD
+                            , DO_TYPE
                             , DO_NO
                             , DO_NM
                             , ISSUE_LOCATION_CD
@@ -130,11 +126,12 @@
                             )
         VALUES              ( #{item.companyCd, jdbcType=VARCHAR}
                             , #{item.divisionCd, jdbcType=VARCHAR}
+                            , 'C'
                             , #{item.doNo, jdbcType=VARCHAR}
                             , #{item.doNm, jdbcType=VARCHAR}
                             , #{item.issueLocationCd, jdbcType=VARCHAR}
                             , #{item.requestLocationCd, jdbcType=VARCHAR}
-                            , #{item.partnerCd, jdbcType=VARCHAR}
+                            , #{item.customerCd, jdbcType=VARCHAR}
                             , #{item.issueDueDate, jdbcType=VARCHAR}
                             , #{item.description, jdbcType=VARCHAR}
                             , #{item.delYn, jdbcType=VARCHAR}
@@ -171,6 +168,7 @@
                             , SEQ
                             , DELIVERY_ORDER_ID
                             , QTY
+                            , ISSUE_WAIT_QTY
                             , REFERENCE_NO
                             , REFERENCE_DTL_NO
                             , DESCRIPTION
@@ -185,6 +183,7 @@
                             , #{item.doNo, jdbcType=VARCHAR}
                             , #{item.seq, jdbcType=NUMERIC}
                             , #{item.deliveryOrderId, jdbcType=VARCHAR}
+                            , #{item.drRequestQty, jdbcType=NUMERIC}
                             , #{item.issueWaitQty, jdbcType=NUMERIC}
                             , #{item.referenceNo, jdbcType=VARCHAR}
                             , #{item.referenceDtlNo, jdbcType=VARCHAR}

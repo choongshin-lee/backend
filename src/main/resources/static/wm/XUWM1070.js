@@ -40,9 +40,9 @@ var VIEW= {
                     return;
                 }
                 $('#issueLocationCdSP21').val(checkItem[0]['issueLocationCd']);
-                $('#requestLocationCdSP21').val(checkItem[0]['requestLocationCd']);
+                $('#customerCdSP21').val(checkItem[0]['customerCd']);
                 $('#issueLocationCdSP21').jqxComboBox({disabled: true});
-                $('#requestLocationCdSP21').jqxComboBox({disabled: true});
+                $('#customerCdSP21').jqxComboBox({disabled: true});
             }
         }
         else if(index == 20){         

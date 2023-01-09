@@ -59,6 +59,6 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0190', VIEW);	
+	momWidget.gridPopup.init(2,21,1,'XUDG0200', VIEW);	
 	VIEW.init();
 });
