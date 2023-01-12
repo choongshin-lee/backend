@@ -2100,6 +2100,14 @@ border-color: #d8dce3 !important;
 .gridArea-XUDG0140{
     height: 30rem; 
 }
+.gridPop-XUDG0210{
+	width: 100rem;
+    margin-top: 7vh !important;
+    margin-left: 40vh !important;
+}
+.gridArea-XUDG0210{
+    height: 30rem; 
+}
 .searcharea-gridPop-C8-R6 {
 	border: none;
 	background-color: white;
@@ -2285,6 +2293,19 @@ border-color: #d8dce3 !important;
     /*height: 47vh;*/ 
 }
 .gridPop-searcharea-XUDG0140{
+	border: none;
+    width: 100%;
+    position: relative;
+    background-color: rgb(248, 249, 250);
+    background-image: none;
+    background-position: left top;
+    background-size: auto;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    box-shadow: rgb(255 255 255 / 41%) 0px 1px 0px 0px inset;
+    /*height: 47vh;*/ 
+}
+.gridPop-searcharea-XUDG0210{
 	border: none;
     width: 100%;
     position: relative;

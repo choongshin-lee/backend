@@ -468,5 +468,5 @@
 	AND     ATTRIBUTE3 = #{attribute3, jdbcType=VARCHAR} 
 	</if>
 	ORDER BY SORT_NO,LABEL
-	</select>         
+	</select>
 </mapper>

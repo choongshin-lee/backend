@@ -11,8 +11,10 @@
 		     , MB.REQ_QTY 
 		     , MB.PHANTOM_FLAG  
 		     , MB.MRP_FLAG
-		     , MB.ISSUE_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0006', MB.ISSUE_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ISSUE_TYPE_NM  
+		     , MB.DEDUCT_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MB.COMPANY_CD,MB.DIVISION_CD, 'MD0006', MB.DEDUCT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS DEDUCT_TYPE_NM
+		     , MB.CHARGE_YN  
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MB.COMPANY_CD,MB.DIVISION_CD, 'MM0015', MB.CHARGE_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS CHARGE_YN_NM
 		     , TO_CHAR(MB.START_DATE,'YYYY-MM-DD') AS START_DATE
 		     , TO_CHAR(MB.END_DATE,'YYYY-MM-DD') AS END_DATE          
 		     , MB.SORT_NO  
@@ -25,11 +27,11 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM     
 		     , MB.UNIT
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME( MB.COMPANY_CD,MB.DIVISION_CD, MB.UNIT) FROM DUAL) AS UNIT_NM 
-		     , MI.IN_LOCATION_CD
+		     , MI.STORAGE_LOCATION_CD
 		     , MI.LOT_MANAGEMENT_YN
 		     , MI.PRICE_SYNC_YN
 			 , MI.PO_OVER_RECEIPT_RATE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MI.COMPANY_CD,MI.DIVISION_CD,MI.IN_LOCATION_CD) FROM DUAL) AS IN_LOCATION_NM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MB.COMPANY_CD,MB.DIVISION_CD,MI.STORAGE_LOCATION_CD) FROM DUAL) AS STORAGE_LOCATION_NM
 		     , (SELECT MOM_COMMON_PKG.FN_GET_PRIMARY_WORK_CENTER_CD(MB.COMPANY_CD, MB.DIVISION_CD, MB.CHILD_ITEM_ID) FROM DUAL) AS WORK_CENTER_CD
              , (SELECT MOM_COMMON_PKG.FN_GET_WORK_CENTER_NAME( MB.COMPANY_CD
                                                              , MB.DIVISION_CD
@@ -99,7 +101,8 @@
 						   , END_DATE
 						   , PHANTOM_FLAG
 						   , MRP_FLAG
-						   , ISSUE_TYPE
+						   , DEDUCT_TYPE
+						   , CHARGE_YN
 						   , SORT_NO
 						   , USE_YN
 						   , DESCRIPTION
@@ -119,7 +122,8 @@
             , TO_DATE(#{item.endDate,    jdbcType=VARCHAR},'YYYY-MM-DD')
             , #{item.phantomFlag,        jdbcType=VARCHAR}
             , #{item.mrpFlag,            jdbcType=VARCHAR}
-            , #{item.issueType,          jdbcType=VARCHAR}
+            , #{item.deductType,         jdbcType=VARCHAR}
+            , #{item.chargeYn,           jdbcType=VARCHAR}
             , #{item.sortNo,             jdbcType=NUMERIC}
             , #{item.useYn,              jdbcType=VARCHAR}
             , #{item.description,        jdbcType=VARCHAR}    
@@ -139,8 +143,9 @@
 			 , END_DATE          = #{item.endDate,            jdbcType=VARCHAR}
 			 , SORT_NO           = #{item.sortNo,             jdbcType=VARCHAR}
 			 , MRP_FLAG          = #{item.mrpFlag,            jdbcType=VARCHAR}
-			 , ISSUE_TYPE        = #{item.issueType,          jdbcType=VARCHAR}
-             , PHANTOM_FLAG      = #{item.phantomFlag,        jdbcType=VARCHAR}	         
+			 , DEDUCT_TYPE       = #{item.deductType,         jdbcType=VARCHAR}
+             , PHANTOM_FLAG      = #{item.phantomFlag,        jdbcType=VARCHAR}
+             , CHARGE_YN         = #{item.chargeYn,           jdbcType=VARCHAR}	         
              , USE_YN            = #{item.useYn,   		      jdbcType=VARCHAR}  
              , DESCRIPTION       = #{item.description,        jdbcType=VARCHAR}    
 	         , UPDATE_BY         = #{item.userId,             jdbcType=VARCHAR}
@@ -179,7 +184,8 @@
                           TO_DATE(#{endDate, jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS') as endDate,
                           NVL(#{phantomFlag, jdbcType=VARCHAR},'N') as phantomFlag,
                           NVL(#{mrpFlag, jdbcType=VARCHAR},'Y') as mrpFlag,
-                          NVL(#{issueType, jdbcType=VARCHAR},'A') as issueType,
+                          NVL(#{deductType, jdbcType=VARCHAR},'A') as deductType,
+                          NVL(#{chargeYn, jdbcType=VARCHAR},'N') as chargeYn,
                           #{sortNo, jdbcType=NUMERIC} as sortNo,
                           #{useYn, jdbcType=VARCHAR} as useYn,
                           #{description, jdbcType=VARCHAR} as description,
@@ -200,7 +206,8 @@
                           , END_DATE = PARAM.endDate
                           , PHANTOM_FLAG = PARAM.phantomFlag
                           , MRP_FLAG = PARAM.mrpFlag
-                          , ISSUE_TYPE = PARAM.issueType
+                          , DEDUCT_TYPE = PARAM.deductType
+                          , CHARGE_YN = PARAM.chargeYn
                           , SORT_NO = PARAM.sortNo
                           , USE_YN = PARAM.useYn
                           , DESCRIPTION = PARAM.description
@@ -219,7 +226,8 @@
                             , END_DATE
                             , PHANTOM_FLAG
                             , MRP_FLAG
-                            , ISSUE_TYPE
+                            , DEDUCT_TYPE
+                            , CHARGE_YN
                             , SORT_NO
                             , USE_YN
                             , DESCRIPTION
@@ -237,7 +245,8 @@
                             , PARAM.endDate
                             , PARAM.phantomFlag
                             , PARAM.mrpFlag
-                            , PARAM.issueType
+                            , PARAM.deductType
+                            , PARAM.chargeYn
                             , PARAM.sortNo
                             , PARAM.useYn
                             , PARAM.description
