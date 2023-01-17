@@ -15,26 +15,56 @@ var VIEW= {
 		if(index ==0 && btnId =='copyBtn'){	
 			  $('#workOrderIdDP1').val('');
 		}
+		else if(index ==1 && btnId =='copyBtn'){	 
+			  $('#operationSeqDP2').val('');
+			  $('#operationIdDP2').val('');
+			  $('#workStationCdDP2').val('');
+		}
 	},
 	cellClickCallBack: function(index,rowIndex,target,e) {
-	    var item = e.item;	
-		if(index==0){
-			widget.findBtnClicked(1, {borId:e.item['borId']}, true, 'CELLCLICK',menuId,VIEW);
-		}
-		else if(index == 100){
-		    if(target=='workCenterCd'){
-				$('#workCenterCd'+'DP1').val(item['workCenterCd']);
-				$('#borId'+'DP1').val(item['borId']);
-				$('#routingId'+'DP1').val(item['routingId']);
-			}
-		}
+	    if(index==0){
+		    var item = e.item;	
+		    setTimeout(function(){
+		        mom_ajax('R', 'DD.DD00023', {workCenterCd:item['workCenterCd']}, function(result, data) {
+		            if(result != 'SUCCESS') {
+		                momWidget.splashHide();
+			            return;							     
+		            }					       
+			        for(var i=0;i<widget.columnProperty[1].length;i++){
+			            if(widget.columnProperty[1][i]['columnId'] =='workStationCd'){
+				            widget.columnDropdown[1][widget.columnProperty[1][i]['columnId']]=data;
+			            }
+			        }
+			        widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);
+	            }, undefined, undefined, this, false);	
+		    }, 200);
+	    }
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) {		
 	    let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-        if(index ==0){                                            
+        if(index == 0){                                            
             AUIGrid.clearGridData(widget.grid[1]);    
         }
+	    else if(index == 100 && btnId == 'POPUPCLICK' ){  
+		    result.param = {itemId:$('#itemId'+'DP1').val()};
+		}
+	},
+	createCallInit: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우기 전에 호출되는 함수 
+		if(index ==1 && btnId =='createBtn'){
+			let checkedItem = widget.getCheckedRowItems(widget.grid[0]);	
+			if(checkedItem.length==0){
+                result.msg = '상단에서 작업지시번호 선택필수!';
+				result.result = 'WARN';
+				return;
+			}
+		}
 	},	
+	createCallBack: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 
+		if(index ==1 && btnId =='createBtn'){
+			let checkedItem = widget.getCheckedRowItems(widget.grid[0]);	
+			$('#workOrderIdDP'+(index+1)).val(checkedItem[0]['workOrderId']);
+		}
+	},
 	customCallInit: function(index,your,action,btnId,param,result) {
 	    if(index == 0){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
 	        let checkedItem = AUIGrid.getCheckedRowItems(widget.grid[index]);
@@ -53,19 +83,7 @@ var VIEW= {
 	        }
 	    }
     },	
-    savePopCallInit: function(index,your,action,btnId,param,result) {
-	    if(index ==0 && btnId =='saveBtnDP'&& $('#defaultPop1').attr('btnid')=='editBtn1'){		           
-			 let checkedItem = widget.getCheckedRowItems(widget.grid[index],true);
-			 if(checkedItem.length == 0){
-				result.result='WARN'
-				return;
-			 }
-			 param[0].workOrderId =checkedItem[0]['workOrderId'];
-			 result.param =  param;
-	    }
-	},
 };
-
 $(document).ready(function(event){	
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	

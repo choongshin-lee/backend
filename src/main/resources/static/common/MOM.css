@@ -2267,7 +2267,7 @@ border-color: #d8dce3 !important;
     padding: 0.5rem !important;
 }
 .gridPop-searcharea-XXDG0120{
-	 border: none;
+    border: none;
     width: 100%;
     position: relative;
     background-color: rgb(248, 249, 250);
@@ -2278,9 +2278,10 @@ border-color: #d8dce3 !important;
     background-attachment: scroll;
     box-shadow: rgb(255 255 255 / 41%) 0px 1px 0px 0px inset;
     height: 70vh; 
+    padding: 0.5rem !important;
 }
 .gridPop-searcharea-XUDG0130{
-	 border: none;
+    border: none;
     width: 100%;
     position: relative;
     background-color: rgb(248, 249, 250);
@@ -5441,6 +5442,7 @@ input:focus{
     margin-top: 0.2rem; 
 }
 .tabcontentarea1 {
+    height: 100%;
     margin-bottom: 0px;
     background: #f0f0f5;
     height:auto !important; 

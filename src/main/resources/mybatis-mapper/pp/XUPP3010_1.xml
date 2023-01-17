@@ -22,11 +22,11 @@
 				     , MWO.WORK_CENTER_CD
 				     , MWC.WORK_CENTER_NM
 				     , MWO.CONSUME_LOCATION_CD
-				     , (SELECT MOM_COMMON_PKG.fn_get_location_name(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_LOCATION_CD) FROM DUAL) AS CONSUME_LOCATION_NM  
+				     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_LOCATION_CD) FROM DUAL) AS CONSUME_LOCATION_NM  
 				     , MWO.GOOD_LOCATION_CD
-				     , (SELECT MOM_COMMON_PKG.fn_get_location_name(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.GOOD_LOCATION_CD) FROM DUAL) AS GOOD_LOCATION_NM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.GOOD_LOCATION_CD) FROM DUAL) AS GOOD_LOCATION_NM
 				     , MWO.DEFECT_LOCATION_CD
-				     , (SELECT MOM_COMMON_PKG.fn_get_location_name(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.DEFECT_LOCATION_CD) FROM DUAL) AS DEFECT_LOCATION_NM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.DEFECT_LOCATION_CD) FROM DUAL) AS DEFECT_LOCATION_NM
 				     , MWO.ROUTING_ID
 				     , (SELECT MOM_COMMON_PKG.FN_GET_ROUTING_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.ROUTING_ID) FROM DUAL) AS ROUTING_NM
 				     , MWO.WO_STATE
@@ -96,19 +96,25 @@
 	    </if> 
 	</select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-	    SELECT MBP.OPERATION_SEQ
-		     , MBP.OPERATION_ID
-		     , (SELECT MOM_COMMON_PKG.FN_GET_OPERATION_NAME(MBP.COMPANY_CD, MBP.DIVISION_CD, MBP.OPERATION_ID) FROM DUAL) AS OPERATION_NM
-		     , MBP.WORK_STATION_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_WORK_STATION_NAME(MBP.COMPANY_CD, MBP.DIVISION_CD, MBP.WORK_STATION_CD) FROM DUAL) AS WORK_STATION_NM
-		     , MBP.INSPECTION_YN
-		     , MBP.FINAL_OPERATION_YN
-		     , MBP.MILESTONE
-		FROM   MOM_BOR_PATH MBP
-		WHERE  MBP.COMPANY_CD   =  #{companyCd, jdbcType=VARCHAR}
-		AND    MBP.DIVISION_CD  =  #{divisionCd, jdbcType=VARCHAR}	 
-		AND    MBP.BOR_ID       =  #{borId, jdbcType=VARCHAR}	 
-	    ORDER BY MBP.OPERATION_SEQ
+	    SELECT MWP.OPERATION_SEQ
+		     , MWP.OPERATION_ID
+		     , (SELECT MOM_COMMON_PKG.FN_GET_OPERATION_NAME(MWP.COMPANY_CD, MWP.DIVISION_CD, MWP.OPERATION_ID) FROM DUAL) AS OPERATION_NM
+		     , MWP.WORK_STATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_WORK_STATION_NAME(MWP.COMPANY_CD, MWP.DIVISION_CD, MWP.WORK_STATION_CD) FROM DUAL) AS WORK_STATION_NM
+		     , MWP.INSPECTION_YN
+		     , MWP.FINAL_OPERATION_YN
+		     , MWP.MILESTONE
+		     , MWP.UPDATE_BY       AS UPDATE_USER_NO
+		     , MWP.OPERATION_ID    AS KEY_ID
+		     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWP.COMPANY_CD, MWP.DIVISION_CD, MWP.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+		     , TO_CHAR(MWP.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+		     , MWP.DESCRIPTION
+		     , MWP.WORK_ORDER_ID
+		FROM   MOM_WO_OPERATION_PATH MWP
+		WHERE  MWP.COMPANY_CD     =  #{companyCd, jdbcType=VARCHAR}
+		AND    MWP.DIVISION_CD    =  #{divisionCd, jdbcType=VARCHAR}	 
+		AND    MWP.WORK_ORDER_ID  =  #{workOrderId, jdbcType=VARCHAR}	 
+	    ORDER BY MWP.OPERATION_SEQ
     </select>
     <delete id="remove_createBtn1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_WORK_ORDER
@@ -165,5 +171,59 @@
 			                                         , #{divisionCd, jdbcType=VARCHAR, mode=IN}	
 			                                         , #{actionMode, jdbcType=VARCHAR, mode=IN}											  
 			                                         , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
-    </select>   
+    </select> 
+    <delete id="remove_createBtn2" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_WO_OPERATION_PATH
+          <where>
+              <foreach collection="list" item="item" open="" close="" separator="OR">
+            (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+               AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+               AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+            )
+              </foreach>
+          </where>
+    </delete>  
+    <insert id="create_createBtn2" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_WO_OPERATION_PATH( COMPANY_CD
+                                       , DIVISION_CD
+                                       , WORK_ORDER_ID 
+                                       , OPERATION_SEQ 
+                                       , OPERATION_ID 
+                                       , WORK_STATION_CD 
+                                       , INSPECTION_YN 
+                                       , FINAL_OPERATION_YN 
+                                       , MILESTONE 
+                                       , DESCRIPTION
+                                       , VAL_MSG
+                                       , MULTI_MSG
+                                       , CREATE_BY
+                                       , CREATE_DATE
+                                       )
+        VALUES                         ( #{item.companyCd, jdbcType=VARCHAR}  
+                                       , #{item.divisionCd, jdbcType=VARCHAR}         
+                                       , #{item.workOrderId, jdbcType=VARCHAR}
+                                       , #{item.operationSeq, jdbcType=NUMERIC}
+                                       , #{item.operationId, jdbcType=VARCHAR}
+                                       , #{item.workStationCd, jdbcType=VARCHAR}
+                                       , #{item.inspectionYn, jdbcType=NUMERIC}
+                                       , #{item.finalOperationYn, jdbcType=VARCHAR}
+                                       , #{item.milestone, jdbcType=VARCHAR}
+                                       , #{item.description, jdbcType=VARCHAR}
+                                       , #{item.valMsg, jdbcType=VARCHAR}
+                                       , #{item.multiMsg, jdbcType=VARCHAR}
+                                       , #{item.userId, jdbcType=VARCHAR}
+                                       , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                       )
+        </foreach>
+    </insert>
+    <select id="proc_createBtn2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WO_PKG.SP_UPSERT_WO_OPERATION_PATH( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                     , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                     , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                     , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                                     , #{workOrderId, jdbcType=VARCHAR, mode=IN} 
+                                                     , #{actionType,  jdbcType=VARCHAR, mode=IN} 
+                                                     , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>  
 </mapper>

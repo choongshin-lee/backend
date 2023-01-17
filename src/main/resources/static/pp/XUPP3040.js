@@ -9,6 +9,11 @@ var VIEW= {
 	},
 	event: function(e) {
 	},
+	copyCallInit: function(index,your,action,btnId,param,result) {
+		if(index ==1 && btnId =='copyBtn'){	 
+		    $('#itemIdDP2').val('');
+		}
+	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         let checkItem = widget.getCheckedRowItems(widget.grid[0]);
         if(index==1 && ( btnId== "createBtn2"|| btnId== "copyBtn2"|| btnId== "editBtn2" || btnId== "customBtn2-1")){
