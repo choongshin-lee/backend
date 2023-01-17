@@ -13,23 +13,21 @@ var VIEW= {
 	},
 	cellClickCallBack: function(index,rowIndex,target,e) {
 		if(index == 0){
-			 momWidget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);
+		    momWidget.findBtnClicked(1, {woResultId:e.item['woResultId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
-	
-	
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) {
-		if(index==1 && btnId== "customBtn2-1"){
+		let checkItem = widget.getCheckedRowItems(widget.grid[0]);
+        if(index ==0){                                            
+            AUIGrid.clearGridData(widget.grid[1]);    
+        }
+		/*else if(index==1 && btnId== "customBtn2-1"){
 			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
 			result.param = {workOrderId:checkItem[0].workOrderId};
 			  					
-		}
-
-		
+		}*/
 	}
-	
 };
-
 $(document).ready(function(event){	
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	

@@ -68,6 +68,7 @@
 				    AND    MWO.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 				    AND    MWO.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 				    AND    MWO.WO_START_TIME BETWEEN TO_DATE(#{woStartDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{woStartDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+				    AND    MWO.ROUTING_ID  IS NULL  
 				   <if test="itemIdNm != null and itemIdNm != ''">
 				    AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
 				    </if>
