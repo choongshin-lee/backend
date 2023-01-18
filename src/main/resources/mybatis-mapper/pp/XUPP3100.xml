@@ -23,8 +23,8 @@
 					                  WHERE  MII.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 					                  AND    MII.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
 					                  AND    MII.IO_DATE     BETWEEN TO_DATE(#{deductStartDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD') AND  TO_DATE(#{deductStartDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 23.9997/24 
-					                  AND    MII.IO_CATEGORY     = 'O'
-					                  AND    MII.IO_TYPE = 'M00070'
+					                  AND    MII.IO_CATEGORY = 'O'
+					                  AND    MII.IO_TYPE     = 'M00070'
 					                  <if test="workOrderId != null and workOrderId != ''">
 					                  AND    MII.WORK_ORDER_ID = #{workOrderId, jdbcType=VARCHAR}
 					                  </if>
@@ -42,9 +42,6 @@
 					     , MI.ITEM_NM        AS DEDUCT_ITEM_NM    
 					     , MI.ITEM_SPEC      AS DEDUCT_ITEM_SPEC
 					     , MI.ITEM_TYPE      AS DEDUCT_ITEM_TYPE
-					     , MI.LOT_MANAGEMENT_YN
-					     , MI.PRICE_SYNC_YN  
-					     , MI.PO_OVER_RECEIPT_RATE 
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(CD.COMPANY_CD, CD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DEDUCT_ITEM_TYPE_NM 
 					     , CD.LOCATION_CD    
 					     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(CD.COMPANY_CD, CD.DIVISION_CD, CD.LOCATION_CD) FROM DUAL) AS LOCATION_NM     

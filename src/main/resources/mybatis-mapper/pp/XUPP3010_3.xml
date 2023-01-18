@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUPP3010_2">
+<mapper namespace="com.mom.backend.XUPP3010_3">
     <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
         SELECT A.*
@@ -82,7 +82,7 @@
 				<if test="workCenterCdNm != null and workCenterCdNm != ''">
 				AND    (UPPER(MWO.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MWC.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR})) 
 				</if>	
-				AND    MWO.WO_STATE  = 'G'
+				AND    MWO.WO_STATE  = 'F'
 				<if test="outsourcingYn != null and outsourcingYn != ''">
 				AND    MWO.OUTSOURCING_YN =  #{outsourcingYn, jdbcType=VARCHAR}
 				</if>	
@@ -138,7 +138,7 @@
                                 , #{item.divisionCd, jdbcType=VARCHAR}
                                 , #{item.workOrderId, jdbcType=VARCHAR}
                                 , #{item.description, jdbcType=VARCHAR}
-                                , 'N'
+                                , 'Y'
                                 , #{item.valMsg, jdbcType=VARCHAR}
                                 , #{item.multiMsg, jdbcType=VARCHAR}
                                 , #{item.userId, jdbcType=VARCHAR}
