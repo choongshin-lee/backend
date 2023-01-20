@@ -8,7 +8,7 @@
 		    </if>	    
 				    SELECT MWR.WORK_ORDER_ID
 				         , MWR.WO_RESULT_ID
-					     , MWR.WORK_ORDER_ID || '_' || MWR.WO_RESULT_ID AS KEY_ID
+					     , MWR.WO_RESULT_ID AS KEY_ID
 					     , MWO.ITEM_ID     
 					     , MI.ITEM_NM
 					     , MI.ITEM_SPEC
@@ -38,6 +38,8 @@
 					     , MWO.COMPANY_CD
 					     , MWO.DIVISION_CD
 					     , MWO.OUTSOURCING_YN
+					     , COUNT(*) OVER() AS TOTAL_COUNT
+			             , ROW_NUMBER() OVER(PARTITION BY MWR.COMPANY_CD,MWR.DIVISION_CD ORDER BY MWR.WO_RESULT_ID  ) AS ROW_COUNT
 					FROM   MOM_WO_RESULT MWR
 					     , MOM_WORK_ORDER MWO
 					     , MOM_ITEM MI

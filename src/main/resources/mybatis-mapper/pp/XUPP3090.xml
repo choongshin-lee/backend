@@ -114,44 +114,45 @@
 		</if>  		
 	</select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-	    SELECT MDL.COMPANY_CD
-		     , MDL.DIVISION_CD
-		     , MDL.WORK_ORDER_ID
-		     , MWR.WO_RESULT_ID
-		     , MWO.CONSUME_LOCATION_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_LOCATION_CD) FROM DUAL) AS CONSUME_LOCATION_NM
-			 , NVL((SELECT MOM_STOCK_PKG.FN_GET_ITEM_LOCATION_STOCK_QTY(MDL.COMPANY_CD, MDL.DIVISION_CD, MDL.ITEM_ID, MWO.CONSUME_LOCATION_CD) FROM DUAL),0) AS CURRENT_STOCK_QTY
-		     , MDL.ITEM_ID
-		     , MI.ITEM_NM
-		     , MI.ITEM_SPEC
-		     , MI.ITEM_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDL.COMPANY_CD, MDL.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , NVL(MWR.GOOD_QTY, 0)   AS GOOD_QTY
-		     , NVL(NWR.DEFECT_QTY,0)  AS DEFECT_QTY 
-		     , MDL.REQ_QTY
-		     , (NVL(MWR.GOOD_QTY,0) + NVL(NWR.DEFECT_QTY,0) ) * MDL.REQ_QTY AS DEDUCT_QTY
-		     , MDL.DESCRIPTION
-		     , MDL.UPDATE_BY     AS UPDATE_USER_NO 
-		     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDL.COMPANY_CD, MDL.DIVISION_CD, MDL.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-		     , TO_CHAR(MDL.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-		FROM   MOM_WO_RESULT MWR
-		     , MOM_WORK_ORDER MWO
-		     , MOM_MATERIAL_DEDUCT_LIST MDL
-		     , MOM_ITEM MI
-		WHERE  MWR.COMPANY_CD    = MWO.COMPANY_CD
-		AND    MWR.DIVISION_CD   = MWO.DIVISION_CD
-		AND    MWR.WORK_ORDER_ID = MWO.WORK_ORDER_ID     
-		AND    MWO.COMPANY_CD    = MDL.COMPANY_CD
-		AND    MWO.DIVISION_CD   = MDL.DIVISION_CD
-		AND    MWO.WORK_ORDER_ID = MDL.WORK_ORDER_ID
-		AND    MDL.COMPANY_CD    = MI.COMPANY_CD
-		AND    MDL.DIVISION_CD   = MI.DIVISION_CD
-		AND    MDL.ITEM_ID       = MI.ITEM_ID
-		AND    MWR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
-		AND    MWR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
-		AND    MWR.WO_RESULT_ID  = #{woResultId, jdbcType=VARCHAR} 
-		AND    MWI.DEDUCT_YN     = 'M'
-		AND    MDL.CANCEL_YN     = 'N'   
+        SELECT MWL.COMPANY_CD
+	         , MWL.DIVISION_CD
+	         , MWL.WORK_ORDER_ID
+	         , MWL.WO_RESULT_ID
+	         , MWO.CONSUME_LOCATION_CD  AS DEDUCT_LOCATION_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_LOCATION_CD) FROM DUAL) AS DEDUCT_LOCATION_NM
+	         , NVL((SELECT MOM_STOCK_PKG.FN_GET_ITEM_LOCATION_STOCK_QTY(MWL.COMPANY_CD, MWL.DIVISION_CD, MWL.ITEM_ID, MWO.CONSUME_LOCATION_CD) FROM DUAL),0) AS CURRENT_STOCK_QTY
+	         , MWL.ITEM_ID
+	         , MI.ITEM_NM
+	         , MI.ITEM_SPEC
+	         , MI.ITEM_TYPE
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+	         , MWL.WO_RESULT_TYPE
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWL.COMPANY_CD, MWL.DIVISION_CD, 'PP0002', MWL.WO_RESULT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_RESULT_TYPE_NM
+	         , DECODE( MWL.WO_RESULT_TYPE, 'G', MWR.GOOD_QTY , MWR.DEFECT_QTY)  AS RESULT_QTY
+	         , MWL.REQ_QTY
+	         , MWL.DEDUCT_QTY  
+	         , MWL.DEDUCT_CLOSE_FLAG
+	         , ROWIDTOCHAR(MWL.ROWID)            AS KEY_ID
+	         , MWL.UPDATE_BY     AS UPDATE_USER_NO 
+	       ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWL.COMPANY_CD, MWL.DIVISION_CD, MWL.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+	       , TO_CHAR(MWL.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE 
+	    FROM   MOM_WO_RESULT_DEDUCT_LIST MWL
+	         , MOM_WO_RESULT  MWR
+	         , MOM_WORK_ORDER MWO
+	         , MOM_ITEM MI
+	    WHERE  MWL.COMPANY_CD    = MWR.COMPANY_CD
+	    AND    MWL.DIVISION_CD   = MWR.DIVISION_CD
+	    AND    MWL.WO_RESULT_ID  = MWR.WO_RESULT_ID  
+	    AND    MWL.COMPANY_CD    = MWO.COMPANY_CD
+	    AND    MWL.DIVISION_CD   = MWO.DIVISION_CD
+	    AND    MWL.WORK_ORDER_ID = MWO.WORK_ORDER_ID 
+	    AND    MWL.COMPANY_CD    = MI.COMPANY_CD
+	    AND    MWL.DIVISION_CD   = MI.DIVISION_CD
+	    AND    MWL.ITEM_ID       = MI.ITEM_ID   
+	    AND    MWR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+	    AND    MWR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+	    AND    MWR.WO_RESULT_ID  = #{woResultId, jdbcType=VARCHAR} 
+        AND    MWL.DEDUCT_CLOSE_FLAG = 'N' 
     </select>
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_ITEM_DEDUCT
@@ -167,34 +168,34 @@
     <insert id="create_customBtn2-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_ITEM_DEDUCT( COMPANY_CD
-                         , DIVISION_CD
-                         , WORK_ORDER_ID
-                         , WO_RESULT_ID 
-                         , CONSUME_LOCATION_CD
-                         , ITEM_ID
-                         , GOOD_QTY 
-                         , DEFECT_QTY 
-                         , REQ_QTY 
-                         , DESCRIPTION
-                         , VAL_MSG
-                         , MULTI_MSG
-                         , CREATE_BY
-                         , CREATE_DATE )
-        VALUES           ( #{item.companyCd, jdbcType=VARCHAR}
-                         , #{item.divisionCd, jdbcType=VARCHAR}
-                         , #{item.workOrderId, jdbcType=VARCHAR}
-                         , #{item.woResultId , jdbcType=VARCHAR}
-                         , #{item.consumeLocationCd, jdbcType=VARCHAR}
-                         , #{item.itemId, jdbcType=VARCHAR}
-                         , #{item.goodQty, jdbcType=NUMERIC}
-                         , #{item.defectQty, jdbcType=NUMERIC}
-                         , #{item.reqQty, jdbcType=NUMERIC}
-                         , #{item.description, jdbcType=VARCHAR}
-                         , #{item.valMsg, jdbcType=VARCHAR}
-                         , #{item.multiMsg, jdbcType=VARCHAR}
-                         , #{item.userId, jdbcType=VARCHAR}
-                         , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-                         )
+                                 , DIVISION_CD
+                                 , WORK_ORDER_ID
+                                 , WO_RESULT_ID 
+                                 , ITEM_ID
+                                 , DEDUCT_LOCATION_CD
+                         		 , WO_RESULT_TYPE 
+                                 , DEDUCT_QTY 
+                                 , ACTION_TYPE 
+		                         , DESCRIPTION
+		                         , VAL_MSG
+		                         , MULTI_MSG
+		                         , CREATE_BY
+		                         , CREATE_DATE )
+        VALUES                   ( #{item.companyCd, jdbcType=VARCHAR}
+                                 , #{item.divisionCd, jdbcType=VARCHAR}
+                                 , #{item.workOrderId, jdbcType=VARCHAR}
+                                 , #{item.woResultId , jdbcType=VARCHAR}
+                                 , #{item.itemId, jdbcType=VARCHAR}
+                                 , #{item.deductLocationCd, jdbcType=VARCHAR}
+                                 , #{item.woResultType, jdbcType=VARCHAR}
+                                 , #{item.deductQty, jdbcType=NUMERIC}
+                                 , #{item.actionType, jdbcType=NUMERIC}
+		                         , #{item.description, jdbcType=VARCHAR}
+		                         , #{item.valMsg, jdbcType=VARCHAR}
+		                         , #{item.multiMsg, jdbcType=VARCHAR}
+		                         , #{item.userId, jdbcType=VARCHAR}
+		                         , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+		                         )
         </foreach>
     </insert>
     <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  

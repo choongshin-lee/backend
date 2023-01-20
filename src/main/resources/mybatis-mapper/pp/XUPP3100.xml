@@ -101,6 +101,7 @@
 						                , DIVISION_CD
 						                , ITEM_INOUT_ID
 						                , CANCEL_ITEM_INOUT_ID
+						                , WO_RESULT_ID  
 						                , DESCRIPTION
 						                , VAL_MSG
 						                , MULTI_MSG
@@ -110,6 +111,7 @@
 						                , #{item.divisionCd, jdbcType=VARCHAR}
 						                , #{item.itemInoutId, jdbcType=VARCHAR}
 						                , #{item.cancelItemInoutId, jdbcType=VARCHAR}
+						                , #{item.woResultId, jdbcType=VARCHAR}
 						                , #{item.description, jdbcType=VARCHAR}
 						                , #{item.valMsg, jdbcType=VARCHAR}
 						                , #{item.multiMsg, jdbcType=VARCHAR}
@@ -121,7 +123,7 @@
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
         { CALL MOM_WO_PKG.SP_CANCEL_ITEM_DEDUCT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 					                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-					                           , #{companyCd,   javaType=string,  jdbcType=VARCHAR , mode=IN}
+					                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 					                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  
 					                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>  
