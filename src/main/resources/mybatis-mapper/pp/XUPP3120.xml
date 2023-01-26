@@ -102,8 +102,8 @@
 						              , #{item.divisionCd, jdbcType=VARCHAR}
 						              , #{item.workOrderId, jdbcType=VARCHAR}
 						              , #{item.woResultId, jdbcType=VARCHAR}
-						              , #{item.resultGoodQty, jdbcType=NUMERIC}
-						              , #{item.resultDefectQty, jdbcType=NUMERIC}
+						              , #{item.goodQty, jdbcType=NUMERIC}
+						              , #{item.defectQty, jdbcType=NUMERIC}
 						              , #{item.description, jdbcType=VARCHAR}
 						              , #{item.valMsg, jdbcType=VARCHAR}
 						              , #{item.multiMsg, jdbcType=VARCHAR}

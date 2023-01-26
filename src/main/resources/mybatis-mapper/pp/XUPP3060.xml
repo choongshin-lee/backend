@@ -100,39 +100,39 @@
 	</select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         WITH C_PATH AS ( SELECT MWP.COMPANY_CD
-                            , MWP.DIVISION_CD
-                          , MWP.WORK_ORDER_ID
-                          , MWP.WO_RESULT_ID
-                          , MWP.OPERATION_ID
-                          , MWP.STATE
-                          , MWP.WORK_DAY
-                          , MWP.START_TIME
-                          , MWP.END_TIME
-                          , MWP.GOOD_QTY
-                          , MWP.DEFECT_QTY
-                          , MWP.DESCRIPTION
-                          , MWP.UPDATE_BY
-                          , MWP.UPDATE_DATE
-                          , MWO.WO_QTY 
-                          , MWO.GOOD_QTY AS TOTAL_GOOD_QTY
-                          , MWO.DEFECT_QTY  AS TOTAL_DEFECT_QTY
-                          , MWO.CLOSE_QTY  AS TOTAL_CLOSE_QTY
-                     FROM   MOM_WO_RESULT_OP_PATH MWP
-                          , MOM_WORK_ORDER   MWO
-                     WHERE  MWP.COMPANY_CD     = MWO.COMPANY_CD 
-                     AND    MWP.DIVISION_CD    = MWO.DIVISION_CD  
-                     AND    MWP.WORK_ORDER_ID  = MWO.WORK_ORDER_ID  
-                     AND    MWP.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
-                     AND    MWP.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
-                     AND    MWP.WORK_ORDER_ID  = #{workOrderId, jdbcType=VARCHAR}
-                     AND    MWP.WO_RESULT_ID   = ( SELECT MWR.WO_RESULT_ID
-                                                   FROM    MOM_WO_RESULT MWR
-                                                   WHERE   MWR.COMPANY_CD     = MWP.COMPANY_CD 
-                                                   AND     MWR.DIVISION_CD    = MWP.DIVISION_CD 
-                                                   AND     MWR.WORK_ORDER_ID  = MWP.WORK_ORDER_ID 
-                                                   AND     MWR.STATE          = 'R'
-                                                 )
-                   )
+	                          , MWP.DIVISION_CD
+	                          , MWP.WORK_ORDER_ID
+	                          , MWP.WO_RESULT_ID
+	                          , MWP.OPERATION_ID
+	                          , MWP.STATE
+	                          , MWP.WORK_DAY
+	                          , MWP.START_TIME
+	                          , MWP.END_TIME
+	                          , MWP.GOOD_QTY
+	                          , MWP.DEFECT_QTY
+	                          , MWP.DESCRIPTION
+	                          , MWP.UPDATE_BY
+	                          , MWP.UPDATE_DATE
+	                          , MWO.WO_QTY 
+	                          , MWO.GOOD_QTY AS TOTAL_GOOD_QTY
+	                          , MWO.DEFECT_QTY  AS TOTAL_DEFECT_QTY
+	                          , MWO.CLOSE_QTY   AS TOTAL_CLOSE_QTY
+	                     FROM   MOM_WO_OPERATION_RESULT MWP
+	                          , MOM_WORK_ORDER   MWO
+	                     WHERE  MWP.COMPANY_CD     = MWO.COMPANY_CD 
+	                     AND    MWP.DIVISION_CD    = MWO.DIVISION_CD  
+	                     AND    MWP.WORK_ORDER_ID  = MWO.WORK_ORDER_ID  
+	                     AND    MWP.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+	                     AND    MWP.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
+	                     AND    MWP.WORK_ORDER_ID  = #{workOrderId, jdbcType=VARCHAR}
+	                     AND    MWP.WO_RESULT_ID   = ( SELECT MWR.WO_RESULT_ID
+	                                                   FROM    MOM_WO_RESULT MWR
+	                                                   WHERE   MWR.COMPANY_CD     = MWP.COMPANY_CD 
+	                                                   AND     MWR.DIVISION_CD    = MWP.DIVISION_CD 
+	                                                   AND     MWR.WORK_ORDER_ID  = MWP.WORK_ORDER_ID 
+	                                                   AND     MWR.STATE          = 'R'
+	                                                 )
+	                   )
         SELECT A.COMPANY_CD
              , A.DIVISION_CD
              , A.WORK_ORDER_ID
