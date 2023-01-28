@@ -130,7 +130,7 @@
 	                                                   WHERE   MWR.COMPANY_CD     = MWP.COMPANY_CD 
 	                                                   AND     MWR.DIVISION_CD    = MWP.DIVISION_CD 
 	                                                   AND     MWR.WORK_ORDER_ID  = MWP.WORK_ORDER_ID 
-	                                                   AND     MWR.WO_RESULT_TYPE = MWP.WO_RESULT_TYPE
+	                                                   AND     MWR.WO_RESULT_TYPE = MWP.WO_RESULT_TYPE 
 	                                                   AND     MWR.STATE          = 'R'
 	                                                 )
 	                   )
