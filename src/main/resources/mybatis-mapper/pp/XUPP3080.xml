@@ -99,16 +99,16 @@
 	</select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 		SELECT MWR.WO_RESULT_ID
-			 , MWR.WO_RESULT_ID AS KEY_ID
+			 , ROWIDTOCHAR(MWR.ROWID)  AS KEY_ID
+			 , MWR.WO_RESULT_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWR.COMPANY_CD, MWR.DIVISION_CD, 'PP0013', MWR.WO_RESULT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_RESULT_TYPE_NM
 		     , TO_CHAR(MWR.WORK_DAY ,'YYYY-MM-DD')   AS RESULT_CREATE_DATE
 		     , TO_CHAR(MWR.START_TIME ,'YYYY-MM-DD HH24:MI:SS') AS START_TIME
 		     , TO_CHAR(MWR.END_TIME ,'YYYY-MM-DD HH24:MI:SS')   AS END_TIME
 		     , MWR.WORK_CENTER_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_WORK_CENTER_NAME(MWR.COMPANY_CD, MWR.DIVISION_CD, MWR.WORK_CENTER_CD) FROM DUAL) AS WORK_CENTER_NM
-		     , MWR.GOOD_QTY
-		     , MWR.DEFECT_QTY 
-		     , DECODE(MWR.STATE, 'C', (MWR.GOOD_QTY * -1), NULL) AS GOOD_CANCEL_QTY
-		     , DECODE(MWR.STATE, 'C', (MWR.DEFECT_QTY * -1), NULL) AS DEFECT_CANCEL_QTY
+		     , MWR.RESULT_QTY
+		     , DECODE(MWR.STATE, 'C', (MWR.RESULT_QTY * -1), NULL) AS CANCEL_QTY
 		     , MWR.SHIFT_CD   AS SHIFT_DETAIL_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_SHIFT_DETAIL_NAME(MWR.COMPANY_CD, MWR.DIVISION_CD, MWR.SHIFT_CD) FROM DUAL)  AS SHIFT_DETAIL_NM
 		     , MWR.STATE     AS RESULT_STATE
@@ -127,35 +127,9 @@
 		AND    MWR.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
 		AND    MWR.WORK_ORDER_ID   = #{workOrderId, jdbcType=VARCHAR}
 		ORDER BY MWR.WO_RESULT_ID
+		       , MWR.WO_RESULT_TYPE DESC
     </select>
-	<insert id="create_customBtn2-1" parameterType="java.util.List">
-        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_WO_RESULT_CANCEL( COMPANY_CD
-						              , DIVISION_CD
-						              , WORK_ORDER_ID
-						              , WO_RESULT_ID
-						              , GOOD_QTY
-						              , DEFECT_QTY
-						              , DESCRIPTION
-						              , VAL_MSG
-						              , MULTI_MSG
-						              , CREATE_BY
-						              , CREATE_DATE )
-        VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
-					                  , #{item.divisionCd, jdbcType=VARCHAR}
-					                  , #{item.workOrderId, jdbcType=VARCHAR}
-					                  , #{item.woResultId, jdbcType=VARCHAR}
-					                  , #{item.goodQty, jdbcType=NUMERIC}
-					                  , #{item.defectQty, jdbcType=NUMERIC}
-					                  , #{item.description, jdbcType=VARCHAR}
-					                  , #{item.valMsg, jdbcType=VARCHAR}
-					                  , #{item.multiMsg, jdbcType=VARCHAR}
-					                  , #{item.userId, jdbcType=VARCHAR}
-					                  , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-                                      )
-        </foreach>
-    </insert>
-    <delete id="remove_customBtn2-1" parameterType="java.util.List">
+	<delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_WO_RESULT_CANCEL
         <where>
         <foreach collection="list" item="item" open="" close="" separator="OR">
@@ -166,6 +140,33 @@
         </foreach>
         </where>
     </delete> 
+	<insert id="create_customBtn2-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_WO_RESULT_CANCEL( COMPANY_CD
+						              , DIVISION_CD
+						              , WORK_ORDER_ID
+						              , WO_RESULT_ID
+						              , WO_RESULT_TYPE
+						              , RESULT_QTY
+						              , DESCRIPTION
+						              , VAL_MSG
+						              , MULTI_MSG
+						              , CREATE_BY
+						              , CREATE_DATE )
+        VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
+					                  , #{item.divisionCd, jdbcType=VARCHAR}
+					                  , #{item.workOrderId, jdbcType=VARCHAR}
+					                  , #{item.woResultId, jdbcType=VARCHAR}
+					                  , #{item.woResultType, jdbcType=VARCHAR}
+					                  , #{item.resultQty, jdbcType=NUMERIC}
+					                  , #{item.description, jdbcType=VARCHAR}
+					                  , #{item.valMsg, jdbcType=VARCHAR}
+					                  , #{item.multiMsg, jdbcType=VARCHAR}
+					                  , #{item.userId, jdbcType=VARCHAR}
+					                  , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                      )
+        </foreach>
+    </insert>
     <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
         { CALL MOM_WO_PKG.SP_CANCEL_WO_RESULT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 					                         , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}

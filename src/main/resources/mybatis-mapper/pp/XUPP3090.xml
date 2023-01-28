@@ -9,26 +9,27 @@
 			        WITH C_RESULT AS ( SELECT MWR.COMPANY_CD
 					                        , MWR.DIVISION_CD
 					                        , MWR.WO_RESULT_ID
+					                        , MWR.WO_RESULT_TYPE
 					                        , MWR.WORK_ORDER_ID
 					                        , MWR.WORK_CENTER_CD
 					                        , MWR.START_TIME
 					                        , MWR.END_TIME
-					                        , MWR.GOOD_QTY
-					                        , MWR.DEFECT_QTY
-					                        , MWR.GOOD_QTY + NVL(MWR.DEFECT_QTY, 0) AS DEDUCT_QTY
+					                        , MWR.RESULT_QTY
 					                        , MWR.DEDUCT_CLOSE_FLAG
-					                        , MWR.UPDATE_BY     AS UPDATE_USER_NO 
+					                        , MWR.UPDATE_BY                                     AS UPDATE_USER_NO 
 					                        , TO_CHAR(MWR.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 					                   FROM   MOM_WO_RESULT MWR
 					                   WHERE  MWR.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
 	 	  					           AND    MWR.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
 									   AND    MWR.START_TIME BETWEEN TO_DATE(#{woResultDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{woResultDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					                   AND    MWR.STATE          = 'E'       
-					                   AND    MWR.DEDUCT_CLOSE_FLAG = 'N' )
+									   AND    MWR.STATE          = 'E'       
+                                       AND    MWR.DEDUCT_CLOSE_FLAG = 'N'  )
 					SELECT MWR.COMPANY_CD
 					     , MWR.DIVISION_CD
 					     , MWR.WO_RESULT_ID
-					     , MWR.WO_RESULT_ID  AS KEY_ID
+					     , MWR.WO_RESULT_TYPE
+                         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWR.COMPANY_CD, MWR.DIVISION_CD, 'PP0013', MWR.WO_RESULT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_RESULT_TYPE_NM
+					     , ROWIDTOCHAR(MWR.ROWID)  AS KEY_ID
 					     , MWR.WORK_ORDER_ID
 					     , MWO.WO_TYPE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'PP0002', MWO.WO_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_TYPE_NM 
@@ -53,9 +54,7 @@
 					     , MWO.WO_STATE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'PP0003', MWO.WO_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_STATE_NM
 					     , MWO.WO_QTY
-					     , MWR.GOOD_QTY
-					     , MWR.DEFECT_QTY
-					     , MWR.GOOD_QTY + NVL(MWR.DEFECT_QTY, 0) AS DEDUCT_QTY
+					     , MWR.RESULT_QTY
 					     , TO_CHAR(MWR.START_TIME  ,'YYYY-MM-DD')  AS START_TIME
 					     , TO_CHAR(MWR.END_TIME  ,'YYYY-MM-DD')    AS END_TIME
 					     , MWO.OUTSOURCING_YN
@@ -118,6 +117,8 @@
 	         , MWL.DIVISION_CD
 	         , MWL.WORK_ORDER_ID
 	         , MWL.WO_RESULT_ID
+	         , MWL.WO_RESULT_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWL.COMPANY_CD, MWL.DIVISION_CD, 'PP0013', MWL.WO_RESULT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_RESULT_TYPE_NM
 	         , MWO.CONSUME_LOCATION_CD  AS DEDUCT_LOCATION_CD
 	         , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_LOCATION_CD) FROM DUAL) AS DEDUCT_LOCATION_NM
 	         , NVL((SELECT MOM_STOCK_PKG.FN_GET_ITEM_LOCATION_STOCK_QTY(MWL.COMPANY_CD, MWL.DIVISION_CD, MWL.ITEM_ID, MWO.CONSUME_LOCATION_CD) FROM DUAL),0) AS CURRENT_STOCK_QTY
@@ -128,7 +129,7 @@
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
 	         , MWL.WO_RESULT_TYPE
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWL.COMPANY_CD, MWL.DIVISION_CD, 'PP0002', MWL.WO_RESULT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_RESULT_TYPE_NM
-	         , DECODE( MWL.WO_RESULT_TYPE, 'G', MWR.GOOD_QTY , MWR.DEFECT_QTY)  AS RESULT_QTY
+	         , MWR.RESULT_QTY
 	         , MWL.REQ_QTY
 	         , MWL.DEDUCT_QTY  
 	         , MWL.DEDUCT_CLOSE_FLAG
@@ -140,19 +141,21 @@
 	         , MOM_WO_RESULT  MWR
 	         , MOM_WORK_ORDER MWO
 	         , MOM_ITEM MI
-	    WHERE  MWL.COMPANY_CD    = MWR.COMPANY_CD
-	    AND    MWL.DIVISION_CD   = MWR.DIVISION_CD
-	    AND    MWL.WO_RESULT_ID  = MWR.WO_RESULT_ID  
-	    AND    MWL.COMPANY_CD    = MWO.COMPANY_CD
-	    AND    MWL.DIVISION_CD   = MWO.DIVISION_CD
-	    AND    MWL.WORK_ORDER_ID = MWO.WORK_ORDER_ID 
-	    AND    MWL.COMPANY_CD    = MI.COMPANY_CD
-	    AND    MWL.DIVISION_CD   = MI.DIVISION_CD
-	    AND    MWL.ITEM_ID       = MI.ITEM_ID   
-	    AND    MWR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
-	    AND    MWR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
-	    AND    MWR.WO_RESULT_ID  = #{woResultId, jdbcType=VARCHAR} 
-        AND    MWL.DEDUCT_CLOSE_FLAG = 'N' 
+	    WHERE  MWL.COMPANY_CD     = MWR.COMPANY_CD
+	    AND    MWL.DIVISION_CD    = MWR.DIVISION_CD
+	    AND    MWL.WO_RESULT_ID   = MWR.WO_RESULT_ID  
+	    AND    MWL.WO_RESULT_TYPE = MWR.WO_RESULT_TYPE
+	    AND    MWL.COMPANY_CD     = MWO.COMPANY_CD
+	    AND    MWL.DIVISION_CD    = MWO.DIVISION_CD
+	    AND    MWL.WORK_ORDER_ID  = MWO.WORK_ORDER_ID 
+	    AND    MWL.COMPANY_CD     = MI.COMPANY_CD
+	    AND    MWL.DIVISION_CD    = MI.DIVISION_CD
+	    AND    MWL.ITEM_ID        = MI.ITEM_ID   
+	    AND    MWL.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+	    AND    MWL.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
+	    AND    MWL.WO_RESULT_ID   = #{woResultId, jdbcType=VARCHAR} 
+	    AND    MWL.WO_RESULT_TYPE = #{woResultType, jdbcType=VARCHAR} 
+	    AND    MWL.DEDUCT_CLOSE_FLAG = 'N'
     </select>
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_ITEM_DEDUCT

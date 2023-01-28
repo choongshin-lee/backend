@@ -13,7 +13,7 @@ var VIEW= {
 	},
 	cellClickCallBack: function(index,rowIndex,target,e) {
 		if(index == 0){
-		    momWidget.findBtnClicked(1, {woResultId:e.item['woResultId']}, true, 'CELLCLICK',menuId,VIEW);
+		    momWidget.findBtnClicked(1, {woResultId:e.item['woResultId'],woResultType:e.item['woResultType']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) {

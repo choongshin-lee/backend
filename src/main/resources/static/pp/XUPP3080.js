@@ -16,7 +16,7 @@ var VIEW= {
 		    widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
-	customCallInit: function(index,your,action,btnId,param,result) {
+	/*customCallInit: function(index,your,action,btnId,param,result) {
 		if(index == 1){
 			if( action =='D' && btnId == 'customBtn2-1'){
 				for(let i=0,max=param.length; i<max;i++){
@@ -28,7 +28,7 @@ var VIEW= {
 			    }
 			}
 		}
-	},
+	},*/
 	searchCallInit: function(index,your,action,btnId,param,result,event) {
 		if(index==1 && btnId== "customBtn2-1"){
 			let checkItem = widget.getCheckedRowItems(widget.grid[0]);

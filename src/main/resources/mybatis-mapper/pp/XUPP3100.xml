@@ -9,7 +9,8 @@
 					WITH C_DEDUCT AS (SELECT MII.ITEM_ID
 					                       , TO_CHAR(MII.IO_DATE, 'YYYY-MM-DD') AS IO_DATE
 					                       , MII.LOCATION_CD
-					                       , MII.WO_RESULT_ID  
+					                       , MII.WO_RESULT_ID 
+					                       , MII.WO_RESULT_TYPE
 					                       , MII.WORK_ORDER_ID
 					                       , MII.QTY 
 					                       , MII.UNIT
@@ -18,7 +19,6 @@
 					                       , MII.COMPANY_CD
 					                       , MII.DIVISION_CD
 					                       , MII.ITEM_INOUT_ID
-					                       , MII.WO_RESULT_TYPE
 					                  FROM   MOM_ITEM_INOUT MII
 					                  WHERE  MII.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 					                  AND    MII.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
@@ -102,6 +102,7 @@
 						                , ITEM_INOUT_ID
 						                , CANCEL_ITEM_INOUT_ID
 						                , WO_RESULT_ID  
+						                , WO_RESULT_TYPE
 						                , DESCRIPTION
 						                , VAL_MSG
 						                , MULTI_MSG
@@ -112,6 +113,7 @@
 						                , #{item.itemInoutId, jdbcType=VARCHAR}
 						                , #{item.cancelItemInoutId, jdbcType=VARCHAR}
 						                , #{item.woResultId, jdbcType=VARCHAR}
+						                , #{item.woResultType, jdbcType=VARCHAR}
 						                , #{item.description, jdbcType=VARCHAR}
 						                , #{item.valMsg, jdbcType=VARCHAR}
 						                , #{item.multiMsg, jdbcType=VARCHAR}
