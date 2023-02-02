@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0220">
+    <select id="get_findBtn11" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    SELECT MP.PARTNER_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MP.COMPANY_CD,MP.DIVISION_CD,'MD0018', MP.PARTNER_TYPE, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS PARTNER_TYPE_NM 
+	         , MP.PARTNER_CD
+	         , MP.PARTNER_NM	   
+		     , MP.DO_INVOICE_YN
+		     , ROWIDTOCHAR(MP.ROWID)            AS KEY_ID
+		     , MP.DESCRIPTION
+		FROM   MOM_PARTNER MP
+		WHERE  MP.COMPANY_CD   =  #{companyCd, jdbcType=VARCHAR} 
+		AND    MP.DIVISION_CD  =  #{divisionCd, jdbcType=VARCHAR}
+		AND    MP.USE_YN       = 'Y'
+		<if test="partnerType != null and partnerType != ''">
+		AND    MP.PARTNER_TYPE IN (${partnerType}) 
+		</if>	
+		<if test="partnerCdNm != null and partnerCdNm != ''">
+		AND    (UPPER(MP.PARTNER_CD ) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM ) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')
+		</if>
+    </select>
+</mapper>

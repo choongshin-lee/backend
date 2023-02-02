@@ -110,7 +110,7 @@
 	     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE,#{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
 	     , MI.PURCHASE_UNIT
 	     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.PURCHASE_UNIT) FROM DUAL) AS PURCHASE_UNIT_NM
-	     , MPD.PO_REQUEST_QTY
+	     , MPD.PO_QTY            AS PO_REQUEST_QTY
 	     , MPD.UNIT_PRICE
 	     , MPD.AMOUNT
 	     , MPD.LOCAL_AMOUNT
@@ -122,7 +122,8 @@
 	     , MPD.PRICE_SYNC_YN
 	     , MPD.PO_OVER_RECEIPT_RATE
 	     , MPD.DESCRIPTION
-	     , MPD.PO_REFERENCE_NO        
+	     , MPD.REFERENCE_NO            AS PR_NO
+		 , MPD.REFERENCE_DTL_NO        AS PURCHASE_REQUEST_ID       
 	     , MPD.PURCHASE_ORDER_ID
 	     , TO_CHAR(ROWNUM)        AS KEY_ID 
     FROM   MOM_PO_DTL MPD
@@ -254,9 +255,10 @@
 			                , PO_NO
 			                , PO_SEQ
 			                , PURCHASE_ORDER_ID
-			                , PO_REFERENCE_NO
+			                , REFERENCE_NO
+			                , REFERENCE_DTL_NO
 			                , ITEM_ID
-			                , PO_REQUEST_QTY
+			                , PO_QTY
 			                , REF_UNIT_PRICE
 			                , CONFIRM_UNIT_PRICE
 			                , DEPARTURE_LOCATION_CD
@@ -276,7 +278,8 @@
 			                , #{item.poNo, jdbcType=VARCHAR}
 			                , #{item.poSeq, jdbcType=NUMERIC}
 			                , #{item.purchaseOrderId, jdbcType=VARCHAR}
-			                , #{item.poReferenceNo, jdbcType=VARCHAR}
+			                , #{item.prNo, jdbcType=VARCHAR}
+			                , #{item.purchaseRequestId, jdbcType=VARCHAR}
 			                , #{item.itemId, jdbcType=VARCHAR}
 			                , #{item.poRequestQty, jdbcType=NUMERIC}
 			                , #{item.refUnitPrice, jdbcType=NUMERIC}

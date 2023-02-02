@@ -2108,6 +2108,11 @@ border-color: #d8dce3 !important;
 .gridArea-XUDG0210{
     height: 30rem; 
 }
+.gridPop-XUDG0220{
+	width: 110rem;
+    margin-top: 7vh !important;
+    margin-left: 40vh !important;
+}
 .searcharea-gridPop-C8-R6 {
 	border: none;
 	background-color: white;

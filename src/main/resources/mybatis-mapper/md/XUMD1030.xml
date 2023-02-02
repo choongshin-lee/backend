@@ -22,12 +22,13 @@
 		             , MP.ADDRESS
 		             , MP.REPRESENTATIVE_NM
 		             , MP.PARTNER_USER_NM
+		             , MP.DO_INVOICE_YN
 		             , MP.USE_YN
 		             , MP.DESCRIPTION
-		             , MP.UPDATE_BY
-		             , MP.UPDATE_DATE
-		             , ROWIDTOCHAR(MP.ROWID) AS GRID_ID
-		             , ( SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MP.COMPANY_CD,MP.DIVISION_CD,MP.UPDATE_BY) FROM DUAL) AS UPDATE_BY_NM
+		             , MP.UPDATE_BY                                      AS UPDATE_USER_NO
+		             , ( SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MP.COMPANY_CD,MP.DIVISION_CD,MP.UPDATE_BY) FROM DUAL) AS UPDATE_USER_NM
+		             , TO_CHAR(MP.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+		             , ROWIDTOCHAR(MP.ROWID)  AS GRID_ID
 		             , MP.PARTNER_CD     AS KEY_ID
 		             , COUNT(*) OVER() AS TOTAL_COUNT
 		             , ROW_NUMBER() OVER(PARTITION BY MP.COMPANY_CD,MP.DIVISION_CD ORDER BY MP.PARTNER_CD  ) AS ROW_COUNT	     
@@ -52,7 +53,7 @@
 		</if>  													
 	</select>
     <insert id="create_createBtn1" parameterType="java.util.List">  
-        INSERT INTO MOM_PARTNER(  COMPANY_CD
+        INSERT INTO MOM_PARTNER( COMPANY_CD
 							   , DIVISION_CD
 							   , PARTNER_CD
 							   , PARTNER_NM
@@ -67,6 +68,7 @@
 							   , ADDRESS
 							   , REPRESENTATIVE_NM
 							   , PARTNER_USER_NM
+							   , DO_INVOICE_YN
 							   , USE_YN
 							   , DESCRIPTION
 							   , CREATE_BY
@@ -89,11 +91,12 @@
 				               , #{item.faxNo,         jdbcType=VARCHAR}
 				               , #{item.email,         jdbcType=VARCHAR}
 				               , #{item.address,       jdbcType=INTEGER}
-				               , #{item.representativeNm,      jdbcType=VARCHAR}
-				               , #{item.partnerUserNm,         jdbcType=VARCHAR}
-				               , #{item.useYn,   				 jdbcType=VARCHAR}  
-				               , #{item.description,           jdbcType=VARCHAR}    
-				               , TRIM(#{item.userId,           jdbcType=VARCHAR})
+				               , #{item.representativeNm,    jdbcType=VARCHAR}
+				               , #{item.partnerUserNm,       jdbcType=VARCHAR}
+				               , #{item.doInvoiceYn,         jdbcType=VARCHAR}
+				               , #{item.useYn,   			 jdbcType=VARCHAR}  
+				               , #{item.description,         jdbcType=VARCHAR}    
+				               , TRIM(#{item.userId,         jdbcType=VARCHAR})
 				               , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
 				               , TRIM(#{item.userId,   jdbcType=VARCHAR})
 				               , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})  
@@ -114,6 +117,7 @@
              , EMAIL             = #{item.email,            jdbcType=VARCHAR}
              , REPRESENTATIVE_NM = #{item.representativeNm, jdbcType=VARCHAR}
              , PARTNER_USER_NM   = #{item.partnerUserNm,    jdbcType=VARCHAR}
+             , DO_INVOICE_YN     = #{item.doInvoiceYn,      jdbcType=VARCHAR}
              , ADDRESS           = #{item.address,          jdbcType=VARCHAR}
 		     , USE_YN 		     = #{item.useYn,            jdbcType=VARCHAR}
  		     , DESCRIPTION       = #{item.description,      jdbcType=VARCHAR}
@@ -155,7 +159,8 @@
                             #{email, jdbcType=VARCHAR} as email,
                             #{address, jdbcType=VARCHAR} as address,
                             #{representativeNm, jdbcType=VARCHAR} as representativeNm,
-                            #{partnerUserNm, jdbcType=VARCHAR} as partnerUserNm,
+                            #{partnerUserNm, jdbcType=VARCHAR}    as partnerUserNm,
+                            #{doInvoiceYn,   jdbcType=VARCHAR}    as doInvoiceYn,
                             #{useYn, jdbcType=VARCHAR} as useYn,
                             #{description, jdbcType=VARCHAR} as description,
                             #{userId, jdbcType=VARCHAR} as createBy,
@@ -180,7 +185,8 @@
                , EMAIL = PARAM.email
                , ADDRESS = PARAM.address
                , REPRESENTATIVE_NM = PARAM.representativeNm
-               , PARTNER_USER_NM = PARAM.partnerUserNm
+               , PARTNER_USER_NM   = PARAM.partnerUserNm
+               , DO_INVOICE_YN     = PARAM.doInvoiceYn
                , USE_YN = PARAM.useYn
                , DESCRIPTION = PARAM.description
                , UPDATE_BY = PARAM.updateBy
@@ -201,6 +207,7 @@
                  , ADDRESS
                  , REPRESENTATIVE_NM
                  , PARTNER_USER_NM
+                 , DO_INVOICE_YN
                  , USE_YN
                  , DESCRIPTION
                  , CREATE_BY
@@ -222,6 +229,7 @@
                  , PARAM.address
                  , PARAM.representativeNm
                  , PARAM.partnerUserNm
+                 , PARAM.doInvoiceYn
                  , PARAM.useYn
                  , PARAM.description
                  , PARAM.createBy

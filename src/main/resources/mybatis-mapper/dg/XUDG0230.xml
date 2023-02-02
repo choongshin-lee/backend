@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0230">
+    <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    SELECT MUP.ITEM_ID
+		     , MI.ITEM_NM
+		     , MUP.PARTNER_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MUP.COMPANY_CD,MUP.DIVISION_CD,MUP.PARTNER_CD) FROM DUAL) AS PARTNER_NM
+		     , MUP.CURRENCY_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MUP.COMPANY_CD, MUP.DIVISION_CD, 'SM0017', MUP.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+		     , MI.STORAGE_LOCATION_CD AS DEPARTURE_LOCATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MI.COMPANY_CD,MI.DIVISION_CD,MI.STORAGE_LOCATION_CD) FROM DUAL) AS DEPARTURE_LOCATION_NM
+		     , MI.TEST_REPORT_FLAG
+		     , MI.IQC_FLAG
+		     , MI.LOT_MANAGEMENT_YN
+		     , MI.PRICE_SYNC_YN
+		     , MI.PO_OVER_RECEIPT_RATE
+		     , MUP.UNIT_PRICE 
+		     , ROWIDTOCHAR(MUP.ROWID)            AS KEY_ID
+		FROM   MOM_UNIT_PRICE MUP
+		     , MOM_ITEM MI
+		WHERE  MUP.COMPANY_CD     = MI.COMPANY_CD(+)
+		AND    MUP.DIVISION_CD    = MI.DIVISION_CD(+)
+		AND    MUP.ITEM_ID        = MI.ITEM_ID(+)
+		AND    MUP.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+		AND    MUP.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR} 
+		AND    MUP.PRICE_CATEGORY = 'P' 
+		AND    MUP.PARTNER_CD     = #{partnerCd, jdbcType=VARCHAR} 
+		AND    MUP.CURRENCY_CD    = #{currencyCd, jdbcType=VARCHAR} 
+		<if test="itemId != null and itemId != ''">
+		AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemId , jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemId , jdbcType=VARCHAR}))
+		</if>
+		AND    TRUNC(MOM_COMMON_PKG.FN_GET_LOCAL_TIME(MUP.COMPANY_CD, MUP.DIVISION_CD)) BETWEEN MUP.START_DATE AND MUP.END_DATE
+    </select>
+</mapper>

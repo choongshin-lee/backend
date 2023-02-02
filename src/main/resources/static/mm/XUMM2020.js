@@ -12,127 +12,85 @@ var VIEW= {
 	event: function(e) {
 	
 	},
-	editCallInit: function(index,your,action,btnId,param,result) { // 수정팝업 뜨기전에 호출
-		if(index ==0 && btnId =='editBtn'){	
-			 let checkedItem = widget.getCheckedRowItems(widget.grid[index]);		
-              VIEW.partnerCd = checkedItem[0]['vendorCd'];
-		}
-		
-	 
-
-	},
 	copyCallInit: function(index,your,action,btnId,param,result) { // 복사팝업 뜨기전에 호출
 		if(index ==0 && btnId =='copyBtn'){	
-			 $('#poNoDP1').val('');
-			 let checkedItem = widget.getCheckedRowItems(widget.grid[index]);		
-              VIEW.partnerCd = checkedItem[0]['vendorCd'];
-              
+		    $('#poNoDP1').val('');
 		}
-		else if(index ==1 && btnId =='copyBtn'){	
-		 //VIEW.itemId = $('#itemIdDP2').val();
-		 $('#itemIdDP2').val('');
-		}
-	   
-
-	},
-	savePopCallInit: function(index,your,action,btnId,param,result) { // 팝업저장 직전 호출
-	      if(index ==0 && (btnId =='createBtn' || btnId =='editBtn' || btnId =='copyBtn')){	    			
-			 param[0].partnerCd =VIEW.partnerCd;
-			 result.param =  param;
-		    
-	     }
-	     else if(index ==1 && (btnId =='createBtn' || btnId =='editBtn' || btnId =='copyBtn')){
-		     
-			 param[0].itemId =VIEW.itemId;
-			 result.param =  param;
-	     }
-	  
-	
-	  
 	},
 	createCallInit: function(index,your,action,btnId,param,result) { //등록버튼 팝업띄우기 전에 호출되는 함수 
-		if(index ==0 && btnId =='createBtn'){			
-		
-		}
-	
-
-	},
-	 createCallBack: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 
-		if(index ==1 && btnId =='createBtn'){
+	    if(index ==1 && btnId =='createBtn'){
 			let checkedItem = widget.getCheckedRowItems(widget.grid[0]);	
 			if(checkedItem.length==0){
-                widget.messageBox({type: 'warning', width: '400', height: '145', html: '상단에서 데이터 발주번호 선택해주세요! '});
-                $('#' +'defaultPop'+(index+1)).modal('hide');
-                return;
+                result.msg = '상단에서 발주번호 선택필수!';
+				result.result = 'WARN';
+				return;
 			}
-			
-				$('#poNoDP'+(index+1)).val(checkedItem[0]['poNo']);
-			
-			
+		}
+	},
+	createCallBack: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 
+		if(index ==1 && btnId =='createBtn'){
+			let checkedItem = widget.getCheckedRowItems(widget.grid[0]);	
+   		    $('#poNoDP'+(index+1)).val(checkedItem[0]['poNo']);
 		}
 	},
     searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
-        if(index==1){
-			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-			result.param = {poNo:checkItem[0].poNo};
-			  					
-		} 
-        if(index==200){
-			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-			result.param = {currencyCd:checkItem[0].currencyCd,partnerCd:checkItem[0].vendorCd,priceCategory:checkItem[0].priceCategory};
-			  					
-		} 
-		if(index==0 ){	                                               //20221027 LCS 추가 
+        if(index==0 ){	                                              
 			AUIGrid.clearGridData(widget.grid[1]);	
-			  					
-		} 
+		}
 	},
     cellClickCallBack: function(index,rowIndex,target,e) {				
-		if(index==100){ //드롭다운 그리드 100번고정
-			$('#vendorCdDP1').val(e.item.partnerCd+'('+e.item.partnerNm+')');
-			$('#doInvoiceYnDP1').val(e.item.doInvoiceYn);
-            VIEW.partnerCd = e.item.partnerCd;
-		}
-		else if(index==200){
-			$('#itemIdDP'+(2)).val(e.item.itemId+'('+e.item.itemNm+')');
-			$('#departureLocationCdDP'+(2)).val(e.item.departureLocationCd);
-			$('#unitPriceDP'+(2)).val(e.item.unitPrice);
-			$('#testReportFlagDP'+(2)).val(e.item.testReportFlag);
-			$('#iqcFlagDP'+(2)).val(e.item.iqcFlag);
-			$('#lotManagementYnDP'+(2)).val(e.item.lotManagementYn);
-			$('#priceSyncYnDP'+(2)).val(e.item.priceSyncYn);
-			$('#poOverReceiptRateDP'+(2)).val(e.item.poOverReceiptRate);
-			VIEW.itemId = e.item.itemId;
-		
-		}
-		else if(index==0){
+		if(index==0){
 			widget.findBtnClicked(1, {poNo:e.item['poNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
-		
-			
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
-		if(index == 0 ){
-			if(action =='D' || btnId == 'customBtn1-2'){
-			   /* for(var i=0,max=param.length; i<max;i++){
-					 if(param[i].poUserNo == undefined || param[i].poUserNo == ''){
-							result.msg = '발주담당자를 지정하지 않은 데이터가 있습니다!';
-							result.result = 'WARN';
-							return;
-					 }		    
-			    }*/
-	
-		   }
-		}
-		
-	}
-	
+	    if(index == 0){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
+	        let checkedItem = AUIGrid.getCheckedRowItems(widget.grid[index]);
+	        if(btnId == 'partnerCdDP1'){   
+	             $('#partnerTypeSP11').val('');
+	             $('#partnerCdNmSP11').val('');  
+	        }
+	    }
+        else if(index == 10){       
+	        if(btnId == 'customBtn11-1'){// 팝업에서 커스텀버튼(선택) 눌렀을떄 호출
+	            let checkItem = widget.getCheckedRowItems(widget.grid[index]);
+	            $('#partnerCd'+'DP1').val(checkItem[0]['partnerCd']);       
+	            $('#doInvoiceYn'+'DP1').val(checkItem[0]['doInvoiceYn']);
+	            widget.modalHide('#','gridPop-partnerCdDP1','2');
+	        }
+	    }
+	    else if(index == 1){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
+	        let checkItem = widget.getCheckedRowItems(widget.grid[0]);
+	        if(btnId == 'itemIdDP2'){   
+	            $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
+	            $('#currencyCdSP21').val(checkItem[0]['currencyCd']);
+	            $('#itemIdSP21').val('');  
+	            $('#partnerCdSP21').jqxComboBox({disabled: true});
+	            $('#currencyCdSP21').jqxComboBox({disabled: true});
+	        }
+	    }
+	    else if(index == 20){       
+	        if(btnId == 'customBtn21-1'){// 팝업에서 커스텀버튼(선택) 눌렀을떄 호출
+	            let checkItem = widget.getCheckedRowItems(widget.grid[index]);
+	            $('#itemId'+'DP2').val(checkItem[0]['itemId']);       
+	            $('#unitPrice'+'DP2').val(checkItem[0]['unitPrice']);
+	            $('#departureLocationCd'+'DP2').val(checkItem[0]['departureLocationCd']);
+	            $('#testReportFlag'+'DP2').val(checkItem[0]['testReportFlag']);
+	            $('#iqcFlag'+'DP2').val(checkItem[0]['iqcFlag']);
+	            $('#lotManagementYn'+'DP2').val(checkItem[0]['lotManagementYn']);
+	            $('#priceSyncYn'+'DP2').val(checkItem[0]['priceSyncYn']);
+	            $('#poOverReceiptRate'+'DP2').val(checkItem[0]['poOverReceiptRate']);
+	            widget.modalHide('#','gridPop-itemIdDP2','2');
+	        }
+	    }
+    },
 };
 
 $(document).ready(function(event){	
 	momSetup.init();	
 	momWidget.init(1, menuId, VIEW,'GRID');	
 	momWidget.init(2, menuId, VIEW,'GRID');	
-
+    momWidget.gridPopup.init(1,11,1,'XUDG0220', VIEW); 
+    momWidget.gridPopup.init(2,21,1,'XUDG0230', VIEW);
 	VIEW.init();
 });
