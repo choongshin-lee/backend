@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUMM1070">
+<mapper namespace="com.mom.backend.XUMM1070_1">
 	<select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -68,7 +68,7 @@
 					AND     MPD.COMPANY_CD   = MI.COMPANY_CD
 					AND     MPD.DIVISION_CD  = MI.DIVISION_CD
 					AND     MPD.ITEM_ID      = MI.ITEM_ID
-					AND     MPD.STATE        = 'PRR'                    -- 확정건 
+					AND     MPD.STATE        = 'PRR'              
 					AND     MPD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
 					AND     MPD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
 					AND     MPD.RECEIVE_DATE  BETWEEN TO_DATE(#{receiveDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{receiveDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999  
