@@ -59,7 +59,7 @@
 	                      , MI.ITEM_NM		
 	                      , MI.ITEM_SPEC 		
 	                      , MI.ITEM_TYPE		
-	                      , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, 'KR') FROM DUAL)  AS ITEM_TYPE_NM		
+	                      , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM		
 	                      , MPID.UNIT_PRICE		
 	                      , MPID.AMOUNT		
 	                      , MPID.LOCAL_AMOUNT		

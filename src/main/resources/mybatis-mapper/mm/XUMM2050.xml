@@ -33,8 +33,8 @@
 					     , MPD.PO_OVER_RECEIPT_RATE
 					     , MI.MAKER
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0007', MI.MAKER, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAKER_NM
-					     , MPM.VENDOR_CD
-					     , MP.PARTNER_NM       AS VENDOR_NM
+					     , MP.PARTNER_CD
+                         , MP.PARTNER_NM
 					     , MPM.PO_REFERENCE_TYPE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'MM0005', MPM.PO_REFERENCE_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PO_REFERENCE_TYPE_NM     
 					     , MPM.PO_TYPE
@@ -79,8 +79,8 @@
 			        <if test="itemIdNm != null and itemIdNm != ''">
 				    AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
 				    </if>
-					<if test="vendorCdNm != null and vendorCdNm != ''">
-					AND    (UPPER(MPM.VENDOR_CD) LIKE '%' || UPPER(#{vendorCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{vendorCdNm, jdbcType=VARCHAR}) || '%')    
+					<if test="partnerCdNm != null and partnerCdNm != ''">
+					AND    (UPPER(MPM.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
 					</if>	
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A

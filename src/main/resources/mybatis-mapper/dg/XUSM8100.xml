@@ -14,8 +14,8 @@
 	     , A.RECEIVE_QTY
 	     , (A.PO_OVER_RECEIPT_QTY -  A.RECEIVE_QTY) AS REMAIN_QTY
 	     , ''                              AS RECEIVE_REQUEST_QTY
-	     , A.VENDOR_CD
-	     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(A.COMPANY_CD,A.DIVISION_CD,A.VENDOR_CD) FROM DUAL) AS VENDOR_NM
+	     , A.VENDOR_CD   	               AS PARTNER_CD
+	     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(A.COMPANY_CD,A.DIVISION_CD,A.VENDOR_CD) FROM DUAL) AS PARTNER_NM
 	     , A.DEPARTURE_LOCATION_CD
 	     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(A.COMPANY_CD,A.DIVISION_CD,A.DEPARTURE_LOCATION_CD) FROM DUAL) AS DEPARTURE_LOCATION_NM
 	     , A.IQC_FLAG
@@ -65,8 +65,8 @@
 	             , MPD.ITEM_ID
 	             , TO_CHAR(MPM.PO_DUE_DATE ,'YYYY-MM-DD')            AS PO_DUE_DATE     
 	             , TO_CHAR(MPD.DELIVER_CONFIRM_DATE ,'YYYY-MM-DD')   AS DELIVER_CONFIRM_DATE     
-	             , MPD.CONFIRM_QTY           AS PO_QTY
-	             , MPD.CONFIRM_QTY + NVL(DECODE(NVL(MPD.PO_OVER_RECEIPT_RATE,0), 0, 0, (MPD.CONFIRM_QTY * ( MPD.PO_OVER_RECEIPT_RATE / 100) )),0) AS PO_OVER_RECEIPT_QTY
+	             , MPD.PO_QTY         
+	             , MPD.PO_QTY + NVL(DECODE(NVL(MPD.PO_OVER_RECEIPT_RATE,0), 0, 0, (MPD.PO_QTY * ( MPD.PO_OVER_RECEIPT_RATE / 100) )),0) AS PO_OVER_RECEIPT_QTY
 	             , NVL(MPD.PROGRESS_QTY,0)    AS  DEPATURE_QTY
 	             , MPM.CURRENCY_CD
 	             , MPD.UNIT_PRICE
@@ -115,8 +115,8 @@
 	        AND    MPM.DO_INVOICE_YN = 'N'
 	        AND    MPC.MARKET_CD = DECODE(#{inoutType, jdbcType=VARCHAR}, 'RD', 'D', 'O')
 	        AND    MPD.STATE         = 'POF'  --확정
-	        <if test="vendorCd != null and vendorCd != ''">
-	        AND    MPM.VENDOR_CD     = #{vendorCd, jdbcType=VARCHAR}
+	        <if test="partnerCd != null and partnerCd != ''">
+	        AND    MPM.VENDOR_CD     = #{partnerCd, jdbcType=VARCHAR}
 	        </if>
 	        <if test="departureLocationCd != null and departureLocationCd != ''">
 	        AND    MPD.DEPARTURE_LOCATION_CD = #{departureLocationCd, jdbcType=VARCHAR}

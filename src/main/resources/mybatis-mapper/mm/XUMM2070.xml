@@ -45,27 +45,31 @@
 					     , MPD.IQC_FLAG
 					     , MI.MAKER
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0007', MI.MAKER, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAKER_NM
-					     , MPM.VENDOR_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD,MPM.DIVISION_CD,MPM.VENDOR_CD) FROM DUAL) AS VENDOR_NM
+					     , MP.PARTNER_CD
+                         , MP.PARTNER_NM
 					     , MPD.PURCHASE_ORDER_ID
 					     , MPD.PURCHASE_ORDER_ID AS KEY_ID
 					     , MPD.COMPANY_CD
 					     , MPD.DIVISION_CD
 					FROM   MOM_PO_MST MPM 
 					     , MOM_PO_DTL MPD  
+					     , MOM_PARTNER MP
 					     , MOM_ITEM MI
 					     , MOM_PO_CATEGORY MPC
 					WHERE  MPM.COMPANY_CD    = MPD.COMPANY_CD
 					AND    MPM.DIVISION_CD   = MPD.DIVISION_CD
 					AND    MPM.PO_NO         = MPD.PO_NO
+					AND    MPM.COMPANY_CD    = MP.COMPANY_CD
+                    AND    MPM.DIVISION_CD   = MP.DIVISION_CD
+		            AND    MPM.VENDOR_CD     = MP.PARTNER_CD
 					AND    MPM.COMPANY_CD    = MI.COMPANY_CD
 					AND    MPM.DIVISION_CD   = MI.DIVISION_CD
 					AND    MPD.ITEM_ID       = MI.ITEM_ID
 					AND    MPM.COMPANY_CD    = MPC.COMPANY_CD
 					AND    MPM.DIVISION_CD   = MPC.DIVISION_CD
 					AND    MPM.PO_TYPE       = MPC.PO_TYPE 
-					<if test="vendorCd != null and vendorCd != ''">
-					AND    MPM.VENDOR_CD     = #{vendorCd, jdbcType=VARCHAR} -- 로그인업체고정
+					<if test="partnerCdNm != null and partnerCdNm != ''">
+					AND    (UPPER(MPM.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
 					</if>
 					AND    MPM.DO_INVOICE_YN = 'Y'
 					AND    MPC.MARKET_CD     = 'D'

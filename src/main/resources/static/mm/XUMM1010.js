@@ -26,7 +26,7 @@ var VIEW= {
 			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
 			result.param = {prNo:checkItem[0].prNo};
 		}
-		else if(index ==0) {                                            //2022102 LCS 추가 
+		else if(index ==0) {                                            
 		  AUIGrid.clearGridData(widget.grid[1]);  	
 	    }
 	},

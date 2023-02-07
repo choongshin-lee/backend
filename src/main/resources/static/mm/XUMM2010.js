@@ -72,9 +72,12 @@ var VIEW= {
 
 $(document).ready(function(event){	
 	momSetup.init();
-	momWidget.init(1, menuId, VIEW,'GRID');	
-	momWidget.init(2, menuId, VIEW,'GRID');	
+	//momWidget.init(1, menuId, VIEW,'GRID');	
+	//momWidget.init(2, menuId, VIEW,'GRID');	
+	momWidget.init(1, menuId, VIEW);	
+	momWidget.init(2, menuId, VIEW);
 	momWidget.gridPopup.init(1,11,1,'XUDG0220', VIEW); 
 	momWidget.gridPopup.init(2,21,1,'XUSM8060', VIEW);
+		
 	VIEW.init();
 });
