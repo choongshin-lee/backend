@@ -35,7 +35,7 @@ var VIEW= {
             VIEW.partnerCd = e.item.partnerCd;
 		}
 		else if(index==0){
-			widget.findBtnClicked(1, {poNo:e.item['poNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {returnNo:e.item['returnNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
@@ -58,7 +58,7 @@ var VIEW= {
 		    }
 		    else if(btnId == 'customBtn2-2'){
 			    for(var i=0,max=param.length; i<max;i++){
-				    param[i]['inoutNo'] = checkItem[0]['departureNo'];
+				    param[i]['inoutNo'] = checkItem[0]['returnNo'];
 			    }
 		    }
 		}
@@ -77,6 +77,6 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW,'GRID');	
 	momWidget.init(2, menuId, VIEW,'GRID');	
-	momWidget.init(2, 'XUSM8110', VIEW,'DG');
+	momWidget.gridPopup.init(2,21,1,'XUSM8110', VIEW);
 	VIEW.init();
 });

@@ -12,15 +12,14 @@ var VIEW= {
 	
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
-        if(index==0 ){	                                               //20221027 LCS 추가 
+        if(index==0 ){	                                               
 		  AUIGrid.clearGridData(widget.grid[1]);
 		} 
 	},
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			let checkItem = widget.getCheckedRowItems(widget.grid[0]);                                                //20221021 LCS 추가
-			widget.findBtnClicked(1, {inoutNo:checkItem[0].inoutNo }, true, 'CELLCLICK', menuId, VIEW);               //20221021 LCS 추가 
-			//widget.findBtnClicked(1, {poNo:e.item['poNo']}, true, 'CELLCLICK',menuId,VIEW);	                      //20221021 LCS 삭제 
+			let checkItem = widget.getCheckedRowItems(widget.grid[0]);                                                
+			widget.findBtnClicked(1, {inoutNo:checkItem[0].inoutNo }, true, 'CELLCLICK', menuId, VIEW);                
 		}
 	},
 };
