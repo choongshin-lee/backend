@@ -103,7 +103,7 @@
         </foreach>
     </insert>
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_STOCK_PKG.SP_CLOSE_DR( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+        { CALL MOM_STOCK_PKG.SP_DR_CLOSE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
                                         , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
                                         , #{companyCd,   jdbcType=VARCHAR, mode=IN}
                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
