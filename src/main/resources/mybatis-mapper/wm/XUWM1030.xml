@@ -10,8 +10,8 @@
 		                 , MDM.DIVISION_CD
 		                 , MDM.DR_NO
 		                 , MDM.DR_NM
-		                 , MDM.INOUT_TYPE
-		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'MM0012', MDM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
+		                 , MDM.PROCESS_CD
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
 		                 , MDM.REQUEST_LOCATION_CD
 		                 , ML.LOCATION_NM           AS REQUEST_LOCATION_NM
 		                 , MDM.CUSTOMER_CD
@@ -34,7 +34,7 @@
 		            AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 		            AND    MDM.DIVISION_CD  	   = #{divisionCd, jdbcType=VARCHAR}	
 		            AND    MDM.STATE               = 'DRG'
-		            AND    MDM.INOUT_TYPE          = 'RR'
+		            AND    MDM.PROCESS_CD          = 'RR'
 		            AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 		            <if test="drNo != null and drNo != ''">
 		            AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')	  
@@ -102,7 +102,7 @@
                             , DIVISION_CD
                             , DR_NO
                             , DR_NM
-                            , INOUT_TYPE
+                            , PROCESS_CD
                             , REQUEST_LOCATION_CD
                             , CUSTOMER_CD
                             , SHIPPING_DUE_DATE
@@ -117,7 +117,7 @@
                             , #{item.divisionCd, jdbcType=VARCHAR}
                             , #{item.drNo, jdbcType=VARCHAR}
                             , #{item.drNm, jdbcType=VARCHAR}
-                            , #{item.inoutType, jdbcType=VARCHAR}
+                            , #{item.processCd, jdbcType=VARCHAR}
                             , #{item.requestLocationCd, jdbcType=VARCHAR}
                             , #{item.customerCd, jdbcType=VARCHAR}
                             , #{item.shippingDueDate, jdbcType=VARCHAR}
@@ -204,7 +204,7 @@
                                              , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
                                              , #{companyCd,   jdbcType=VARCHAR, mode=IN}
                                              , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                             , 'ER'
+                                             , 'RR'
                                              , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
 </mapper>     

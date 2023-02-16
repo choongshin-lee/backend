@@ -13,7 +13,7 @@ var VIEW= {
 		      result.param = {borId:checkItem[0].borId};
 			  					
 		}
-		else if(index==0){				                        //20221027 LCS 추가 
+		else if(index==0){				                        
 		  AUIGrid.clearGridData(widget.grid[1]);
 		} 
 	},

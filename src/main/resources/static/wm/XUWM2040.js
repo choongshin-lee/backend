@@ -41,8 +41,8 @@ var VIEW= {
 	        let checkedItem = AUIGrid.getCheckedRowItems(widget.grid[index]);
 	        if(btnId == 'receiptLocationCdDP1'){   
 	             $('#receiptLocationCdSP11').val('');
-	             $('#processTypeIdSP11').val('IBR');  
-	             $('#processTypeIdSP11').jqxComboBox({disabled: true});
+	             $('#processTypeSP11').val('ITS');  
+	             $('#processTypeSP11').jqxComboBox({disabled: true});
 	        }
 	    }
         else if(index == 1){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
@@ -53,10 +53,9 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#receiveNoSP21').val('');
-                $('#partnerCdSP21').val('');
-                //$('#locationCdSP21').jqxComboBox({disabled: true});
-                $('#locationCdSP21').val('');
+                $('#drNoSP21').val('');
+                $('#locationCdSP21').val(checkItem[0]['receiptLocationCd']);
+                $('#locationCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 10){       
@@ -82,7 +81,7 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
-	momWidget.gridPopup.init(1,11,1,'XUDG0140', VIEW); 
-	momWidget.gridPopup.init(2,21,1,'XUDG0160', VIEW);
+	//momWidget.gridPopup.init(1,11,1,'XUDG0140', VIEW); 
+	momWidget.gridPopup.init(2,21,1,'XUDG0240', VIEW);
 	VIEW.init();
 });

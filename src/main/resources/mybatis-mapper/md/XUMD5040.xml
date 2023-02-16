@@ -10,8 +10,8 @@
                      , MLP.DIVISION_CD
                      , MLP.LOCATION_CD
                      , ML.LOCATION_NM
-                     , MLP.PROCESS_TYPE_ID
-                     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLP.COMPANY_CD,MLP.DIVISION_CD, 'MD0028', MLP.PROCESS_TYPE_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS PROCESS_TYPE_NM
+                     , MLP.PROCESS_TYPE
+                     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MLP.COMPANY_CD, MLP.DIVISION_CD, MLP.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
                      , MLP.USE_YN
                      , MLP.DESCRIPTION
                      , MLP.UPDATE_BY      AS UPDATE_USER_NO
@@ -19,7 +19,7 @@
                      , TO_CHAR(MLP.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
                      , ROWIDTOCHAR(MLP.ROWID)            AS KEY_ID
                      , COUNT(*) OVER()   AS TOTAL_COUNT
-                     , ROW_NUMBER() OVER(PARTITION BY MLP.COMPANY_CD,MLP.DIVISION_CD ORDER BY MLP.LOCATION_CD, MLP.PROCESS_TYPE_ID) AS ROW_CNT
+                     , ROW_NUMBER() OVER(PARTITION BY MLP.COMPANY_CD,MLP.DIVISION_CD ORDER BY MLP.LOCATION_CD, MLP.PROCESS_TYPE) AS ROW_CNT
                 FROM   MOM_LOCATION_PROCESS_TYPE MLP 
                      , MOM_LOCATION ML
                 WHERE  MLP.COMPANY_CD  = ML.COMPANY_CD
@@ -30,8 +30,8 @@
                 <if test="locationCdNm != null and locationCdNm != ''">
                 AND    (UPPER(MLP.LOCATION_CD) LIKE '%' || UPPER(#{locationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{locationCdNm, jdbcType=VARCHAR}) || '%')    
                 </if>
-                <if test="processTypeId != null and processTypeId != ''">
-                AND    MLP.PROCESS_TYPE_ID = #{processTypeId, jdbcType=VARCHAR}
+                <if test="processType != null and processType != ''">
+                AND    MLP.PROCESS_TYPE = #{processType, jdbcType=VARCHAR}
                 </if>
                 <if test="useYn != null and useYn != ''">
                 AND    MLP.USE_YN = #{useYn, jdbcType=VARCHAR}
@@ -57,7 +57,7 @@
         INTO MOM_PROC_LOCATION_PROCESS( COMPANY_CD
                                       , DIVISION_CD
                                       , LOCATION_CD 
-                                      , PROCESS_TYPE_ID 
+                                      , PROCESS_TYPE 
                                       , USE_YN
                                       , DESCRIPTION
                                       , DEL_YN
@@ -69,7 +69,7 @@
         VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
                                       , #{item.divisionCd, jdbcType=VARCHAR}
                                       , #{item.locationCd, jdbcType=VARCHAR}
-                                      , #{item.processTypeId , jdbcType=VARCHAR}
+                                      , #{item.processType, jdbcType=VARCHAR}
                                       , #{item.useYn, jdbcType=VARCHAR}
                                       , #{item.description, jdbcType=VARCHAR}
                                       , #{item.delYn, jdbcType=VARCHAR}
@@ -112,7 +112,7 @@
         INTO MOM_PROC_LOCATION_PROCESS( COMPANY_CD
                                       , DIVISION_CD
                                       , LOCATION_CD 
-                                      , PROCESS_TYPE_ID 
+                                      , PROCESS_TYPE 
                                       , USE_YN
                                       , DESCRIPTION
                                       , DEL_YN
@@ -124,7 +124,7 @@
         VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
                                       , #{item.divisionCd, jdbcType=VARCHAR}
                                       , #{item.locationCd, jdbcType=VARCHAR}
-                                      , #{item.processTypeId , jdbcType=VARCHAR}
+                                      , #{item.processType , jdbcType=VARCHAR}
                                       , #{item.useYn, jdbcType=VARCHAR}
                                       , #{item.description, jdbcType=VARCHAR}
                                       , 'N'

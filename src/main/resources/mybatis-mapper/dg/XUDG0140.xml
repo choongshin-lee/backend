@@ -27,7 +27,7 @@
 									  WHERE  MLM.COMPANY_CD      = MLM.COMPANY_CD
 									  AND    MLM.DIVISION_CD     = MLM.DIVISION_CD
 									  AND    MLT.USE_YN          = 'Y'
-									  AND    MLT.PROCESS_TYPE_ID = #{processTypeId, jdbcType=VARCHAR})
+									  AND    MLT.PROCESS_TYPE    = #{processType, jdbcType=VARCHAR})
 		</if>
 		
     </select>

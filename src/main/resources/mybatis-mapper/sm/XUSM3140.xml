@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUSM3140">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+        SELECT MPT.COMPANY_CD
+		     , MPT.DIVISION_CD
+		     , MPT.PROCESS_TYPE
+		     , MPT.PROCESS_TYPE_NM
+		     , MPT.BOUNDARY_TYPE_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPT.COMPANY_CD, MPT.DIVISION_CD, 'MD0026', MPT.BOUNDARY_TYPE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS BOUNDARY_TYPE_NM  
+		     , MPT.ACTION_TYPE_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPT.COMPANY_CD, MPT.DIVISION_CD, 'MD0027', MPT.ACTION_TYPE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS ACTION_TYPE_NM
+		     , MPT.PICKING_YN
+             , MPT.UNLOADING_YN
+		     , MPT.USE_YN
+		     , MPT.UPDATE_BY   AS UPDATE_USER_NO
+		     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPT.COMPANY_CD, MPT.DIVISION_CD, MPT.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+		     , TO_CHAR(MPT.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+		     , MPT.DESCRIPTION
+		     , ROWIDTOCHAR(MPT.ROWID)  AS KEY_ID
+		FROM   MOM_PROCESS_TYPE MPT
+		WHERE  MPT.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+		AND    MPT.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+		<if test="processTypeNm != null and processTypeNm != ''">
+		AND    UPPER(MPT.PROCESS_TYPE_NM) LIKE '%' || UPPER(#{processTypeNm, jdbcType=VARCHAR}) || '%' 
+		</if> 
+		<if test="boundaryTypeCd != null and boundaryTypeCd != ''">
+		AND    MPT.BOUNDARY_TYPE_CD IN (${boundaryTypeCd})
+		</if>
+		<if test="actionTypeCd != null and actionTypeCd != ''">
+		AND    MPT.ACTION_TYPE_CD IN (${actionTypeCd})
+		</if>
+		<if test="useYn != null and useYn != ''">
+		AND    MPT.USE_YN      = #{useYn, jdbcType=VARCHAR}
+		</if>
+    </select>
+    <delete id="remove_customBtn1-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_PROCESS_TYPE
+        <where>
+        <foreach collection="list" item="item" open="" close="" separator="OR">
+        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+        )
+        </foreach>
+        </where>
+    </delete>
+    <insert id="create_customBtn1-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_PROCESS_TYPE( COMPANY_CD
+								  , DIVISION_CD
+								  , PROCESS_TYPE
+								  , PROCESS_TYPE_NM
+								  , BOUNDARY_TYPE_CD
+								  , ACTION_TYPE_CD
+								  , PICKING_YN
+                                  , UNLOADING_YN
+								  , USE_YN
+								  , DESCRIPTION
+								  , DEL_YN
+								  , VAL_MSG
+								  , MULTI_MSG
+								  , CREATE_BY
+								  , CREATE_DATE )
+        VALUES                    ( #{item.companyCd, jdbcType=VARCHAR}
+	                              , #{item.divisionCd, jdbcType=VARCHAR}
+	                              , #{item.processType, jdbcType=VARCHAR}
+	                              , #{item.processTypeNm, jdbcType=VARCHAR}
+	                              , #{item.boundaryTypeCd, jdbcType=VARCHAR}
+	                              , #{item.actionTypeCd, jdbcType=VARCHAR}
+	                              , #{item.pickingYn, jdbcType=VARCHAR}
+	                              , #{item.unloadingYn, jdbcType=VARCHAR}
+	                              , #{item.useYn, jdbcType=VARCHAR}
+	                              , #{item.description, jdbcType=VARCHAR}
+	                              , #{item.delYn, jdbcType=VARCHAR}
+	                              , #{item.valMsg, jdbcType=VARCHAR}
+	                              , #{item.multiMsg, jdbcType=VARCHAR}
+	                              , #{item.userId, jdbcType=VARCHAR}
+	                              , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+	                              )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+	    { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_PROCESS_TYPE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+	                                                	 , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                         , #{companyCd,   jdbcType=VARCHAR , mode=IN}
+                                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}   
+                                                         , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>  
+</mapper>

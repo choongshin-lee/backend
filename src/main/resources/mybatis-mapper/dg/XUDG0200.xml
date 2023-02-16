@@ -6,8 +6,8 @@
          , MDM.DIVISION_CD
          , MDM.DR_NO     
          , MDD.SEQ         
-         , MDM.INOUT_TYPE
-         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'MM0012', MDM.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
+         , MDM.PROCESS_CD
+         , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
          , MDD.IO_TYPE 
          , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)   AS IO_TYPE_NM
          , MDD.LOCATION_CD  AS ISSUE_LOCATION_CD
@@ -48,7 +48,15 @@
     AND    MDD.STATE            = 'DRF'
     AND    MDD.LOCATION_USE_YN  = 'N'
     AND    MDM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
-    AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}         
+    AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}  
+    AND    MDD.REQUEST_QTY - NVL(MDD.PROGRESS_QTY,0) > 0     
+    AND    EXISTS ( SELECT '*'
+                    FROM   MOM_PROCESS MP           
+                    WHERE  MP.COMPANY_CD   = MDM.COMPANY_CD
+                    AND    MP.DIVISION_CD  = MDM.DIVISION_CD
+                    AND    MP.PROCESS_CD   = MDM.PROCESS_CD
+                    AND    MP.PROCESS_TYPE = 'ITS'
+                    AND    MP.USE_YN       = 'Y')       
     <if test="issueLocationCd != null and issueLocationCd != ''">
     AND    MDD.LOCATION_CD   = #{issueLocationCd, jdbcType=VARCHAR}
     </if>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUDG0170">
+<mapper namespace="com.mom.backend.XUDG0240">
     <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
 		SELECT MDM.COMPANY_CD
 		     , MDM.DIVISION_CD
@@ -10,12 +10,8 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
 		     , MDD.IO_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
-		     , MDM.CUSTOMER_CD   
-		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDM.CUSTOMER_CD) FROM DUAL)  AS CUSTOMER_NM
-		     , MDD.LOCATION_CD
+		     , MDD.LOCATION_CD   
 		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDD.LOCATION_CD) FROM DUAL) AS LOCATION_NM
-		     , MDD.CURRENCY_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 		     , MDD.ITEM_ID
 		     , MI.ITEM_NM
 		     , MI.ITEM_SPEC
@@ -25,11 +21,6 @@
              , (SELECT MOM_COMMON_PKG.fn_get_unit_name(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT) FROM DUAL) AS UNIT_NM          
 		     , MDD.REQUEST_QTY   AS DR_REQUEST_QTY
 		     , MDD.REQUEST_QTY - NVL(MDD.PROGRESS_QTY,0)   AS RECEIVE_WAIT_QTY
-		     , MDD.UNIT_PRICE
-		     , MDD.CURRENCY_CD
-		     , MDD.EXCHANGE_RATE
-		     , MDD.AMOUNT
-		     , MDD.LOCAL_AMOUNT
 		     , MDD.DESCRIPTION
 		     , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
 		     , MDD.REFERENCE_NO  
@@ -49,7 +40,7 @@
 	                                     FROM   MOM_PROCESS MP
 	                                     WHERE  MP.COMPANY_CD   = MDM.COMPANY_CD
 	                                     AND    MP.DIVISION_CD  = MDM.DIVISION_CD
-	                                     AND    MP.PROCESS_TYPE = 'OBS'    
+	                                     AND    MP.PROCESS_TYPE = 'ITS'    
 	                                     AND    MP.USE_YN       = 'Y')  
 		AND    MDD.STATE            = 'DRF'
 		AND    MDD.LOCATION_USE_YN  = 'Y'
@@ -60,9 +51,6 @@
 		</if>
 		<if test="locationCd != null and locationCd != ''">
 		AND    MDD.LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
-		</if>
-		<if test="customerCd != null and customerCd != ''">
-		AND    MDM.CUSTOMER_CD   = #{customerCd, jdbcType=VARCHAR}
 		</if>
 		ORDER BY MDD.DR_NO
 		       , MDD.SEQ 

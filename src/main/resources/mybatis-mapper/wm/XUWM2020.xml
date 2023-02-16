@@ -46,7 +46,7 @@
 					AND    MLM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 					AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					AND    MLM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					AND    MLM.STATE           = 'G'
+					AND    MLM.STATE           = 'LRG'
 					<if test="processTypeId != null and processTypeId != ''">
 					AND    MLM.PROCESS_TYPE_ID  = #{processTypeId, jdbcType=VARCHAR}
 					</if>     

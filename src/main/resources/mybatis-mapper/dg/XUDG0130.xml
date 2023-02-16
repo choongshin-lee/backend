@@ -44,12 +44,12 @@
 		<if test="soNo != null and soNo != ''">
 		AND    UPPER(MSO.SO_NO) LIKE '%' || UPPER(#{soNo, jdbcType=VARCHAR}) || '%'
 		</if>
-		AND    MSO.IO_TYPE IN ( SELECT MIC.IO_TYPE 
-                                FROM   MOM_IO_CATEGORY MIC
-                                WHERE  MIC.COMPANY_CD  = MSO.COMPANY_CD
-                                AND    MIC.DIVISION_CD = MSO.DIVISION_CD
-                                AND    MIC.USE_YN      = 'Y' 
-                                AND    MIC.SHIPPING_YN = 'C')
+		AND    MSO.IO_TYPE IN ( SELECT MPM.IO_TYPE 
+							    FROM   MOM_PROCESS_IO_MAPPING MPM
+							    WHERE  MPM.COMPANY_CD  = MSO.COMPANY_CD
+							    AND    MPM.DIVISION_CD = MSO.DIVISION_CD
+							    AND    MPM.PROCESS_CD  = 'CR'
+							    AND    MPM.USE_YN      = 'Y' )
 		ORDER BY MSO.SO_NO
 		       , MSO.SO_SEQ
     </select>  

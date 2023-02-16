@@ -8,8 +8,8 @@
 		</if>
 		            SELECT MDM.COMPANY_CD
 					     , MDM.DIVISION_CD
-					     , MDM.DO_TYPE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'SM0027', MDM.DO_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DO_TYPE_NM
+					     , MDM.PROCESS_TYPE
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 					     , MDM.DO_NO
 					     , MDM.DO_NM
 					     , MDM.ISSUE_LOCATION_CD         
@@ -44,8 +44,8 @@
 					AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MDM.STATE               = 'DOG'
 					AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					<if test="doType != null and doType != ''">
-					AND    MDM.DO_TYPE  = #{doType, jdbcType=VARCHAR}
+					<if test="processType != null and processType != ''">
+					AND    MDM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
 					</if>
 					<if test="doNo != null and doNo != ''">
 					AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{doNo, jdbcType=VARCHAR}) || '%')   
@@ -84,8 +84,6 @@
 		     , MDD.UNIT_PRICE
 		     , MDD.AMOUNT
 		     , MDD.LOCAL_AMOUNT 
-		     , MDD.INOUT_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MM0012', MDD.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
 		     , MDD.IO_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
 		     , MDD.REFERENCE_NO

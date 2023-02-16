@@ -402,14 +402,16 @@
     WHERE  MLT.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
     AND    MLT.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
     AND    MLT.USE_YN      = 'Y'
-    <if test="processTypeId != null and processTypeId != ''">
-	AND    MLT.ACTION_TYPE_ID = (SELECT MC.ATTRIBUTE1
-								 FROM   MOM_CODE MC
-								 WHERE  MC.COMPANY_CD   = MLT.COMPANY_CD
-								 AND    MC.DIVISION_CD  = MLT.DIVISION_CD 
-								 AND    MC.GROUP_CD     = 'MD0028'
-								 AND    MC.CODE         = #{processTypeId, jdbcType=VARCHAR} 
-								 AND    MC.USE_YN       = 'Y')
+    <if test="receiptTypeCd != null and receiptTypeCd != ''">
+    AND    MLT.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}  
+    </if>
+    <if test="processType != null and processType != ''">
+	AND    MLT.ACTION_TYPE_ID = (SELECT MPT.ACTION_TYPE_CD
+							     FROM   MOM_PROCESS_TYPE MPT
+							     WHERE  MPT.COMPANY_CD   = MLT.COMPANY_CD
+							     AND    MPT.DIVISION_CD  = MLT.DIVISION_CD 
+							     AND    MPT.PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
+							     AND    MPT.USE_YN = 'Y')
 	</if>
     ORDER BY RECEIPT_TYPE_NM    
     </select>      
@@ -469,4 +471,72 @@
 	</if>
 	ORDER BY SORT_NO,LABEL
 	</select>
+	<select id="get_DD00043" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
+    SELECT PROCESS_CD       AS CODE 
+         , PROCESS_CD    ||'('|| PROCESS_NM      ||')' AS LABEL
+    FROM   MOM_PROCESS  
+    WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    <if test="processType != null and processType != ''">
+    AND    PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
+    </if>
+    AND    USE_YN      = 'Y'
+    ORDER BY PROCESS_CD
+    </select>
+    <select id="get_DD00044" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+    SELECT MIC.IO_TYPE AS CODE                  
+         , MIC.IO_TYPE ||'('|| MIC.IO_TYPE_NM ||')' AS LABEL
+    FROM   MOM_PROCESS_IO_MAPPING  MPIM
+         , MOM_IO_CATEGORY MIC
+    WHERE  MPIM.COMPANY_CD = MIC.COMPANY_CD
+    AND    MPIM.DIVISION_CD = MIC.DIVISION_CD
+    AND    MPIM.IO_TYPE     = MIC.IO_TYPE     
+    AND    MPIM.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+    AND    MPIM.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    <if test="processCd != null and processCd != ''">
+    AND    MPIM.PROCESS_CD  = #{processCd, jdbcType=VARCHAR} 
+    </if>
+    AND    MPIM.USE_YN      = 'Y'
+    ORDER BY MPIM.SORT_NO, MPIM.IO_TYPE
+    </select>    
+    <select id="get_DD00045" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
+    SELECT PROCESS_TYPE        AS CODE 
+         , PROCESS_TYPE    ||'('|| PROCESS_TYPE_NM      ||')' AS LABEL
+    FROM   MOM_PROCESS_TYPE  
+    WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+    <if test="processType != null and processType != ''">
+    AND    PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
+    </if> 
+    <if test="boundaryTypeCd  != null and boundaryTypeCd != ''">
+    AND    BOUNDARY_TYPE_CD  = #{boundaryTypeCd, jdbcType=VARCHAR} 
+    </if>
+    <if test="actionTypeCd   != null and actionTypeCd != ''">
+    AND    ACTION_TYPE_CD   = #{actionTypeCd, jdbcType=VARCHAR} 
+    </if>
+    AND    USE_YN      = 'Y'
+    ORDER BY PROCESS_TYPE
+    </select>   
+    <select id="get_DD00046" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
+	SELECT MLP.LOCATION_CD   AS CODE 
+	     , MLP.LOCATION_CD ||'('|| ML.LOCATION_NM      ||')' AS LABEL
+	FROM   MOM_LOCATION_PROCESS_TYPE MLP
+	     , MOM_LOCATION ML
+	WHERE  MLP.COMPANY_CD  = ML.COMPANY_CD
+	AND    MLP.DIVISION_CD = ML.DIVISION_CD
+	AND    MLP.LOCATION_CD = ML.LOCATION_CD
+	AND    MLP.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND    MLP.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+	<if test="processType != null and processType != ''">
+	AND    MLP.PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
+	</if>
+	<if test="pickingYn != null and pickingYn != ''">
+	AND    MLP.PICKING_YN =  #{pickingYn, jdbcType=VARCHAR} 
+	</if>  
+	<if test="unloadingYn != null and unloadingYn != ''">
+	AND    MLP.UNLOADING_YN  =  #{unloadingYn, jdbcType=VARCHAR} 
+	</if>  
+	AND    MLP.USE_YN      = 'Y'
+	ORDER BY ML.LOCATION_NM 
+	</select>     
 </mapper>

@@ -7,7 +7,6 @@
 		    FROM   (
 		</if>
 		            SELECT MDO.*
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'SM0027', MDO.DO_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DO_TYPE_NM
 					     , MLR.LOCATION_NM   AS REQUEST_LOCATION_NM                                      
 					     , MLI.LOCATION_NM   AS ISSUE_LOCATION_NM
 					     , MP.PARTNER_NM     AS CUSTOMER_NM
@@ -19,8 +18,6 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'IC0004', MDO.MAIN_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAIN_STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'IC0005', MDO.DTL_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DTL_STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'SM0017', MDO.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'MM0012', MDO.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
-                         , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, MDO.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
 					     , MDO.DELIVERY_ORDER_ID                         AS KEY_ID
 					     , COUNT(*) OVER()                               AS TOTAL_COUNT
 					     , ROW_NUMBER() OVER(PARTITION BY MDO.COMPANY_CD,MDO.DIVISION_CD ORDER BY MDO.DELIVERY_ORDER_ID) AS ROW_CNT
@@ -46,8 +43,8 @@
 					AND    MDO.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MDO.DTL_STATE            = 'DOF'
 					AND    MDO.REMAIN_QTY           > 0
-					<if test="doType != null and doType != ''">
-					AND    MDO.DO_TYPE  = #{doType, jdbcType=VARCHAR}
+					<if test="processType != null and processType != ''">
+					AND    MDO.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
 					</if>
 					<if test="doNo != null and doNo != ''">
 					AND    (UPPER(MDO.DO_NO) LIKE '%' || UPPER(#{doNo, jdbcType=VARCHAR}) || '%')   
