@@ -45,7 +45,7 @@
 					AND    MLM.RECEIPT_TYPE_CD = MLR.RECEIPT_TYPE_CD(+)
 					AND    MLM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 					AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
-					AND    MLM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					AND    MLM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MLM.STATE           = 'LRF'
 					AND   0 = (SELECT COUNT(*)
 			                   FROM   MOM_LOCATION_RECEIPT_DTL  MLD

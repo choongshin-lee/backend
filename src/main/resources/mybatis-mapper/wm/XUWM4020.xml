@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUWM4010">
+<mapper namespace="com.mom.backend.XUWM4020">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -24,7 +24,7 @@
 					     , TO_CHAR(MPM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 					     , ROWIDTOCHAR(MPM.ROWID)            AS KEY_ID
 					     , MPM.PICKING_TYPE
-					     , MPM.SEARCH_NM  AS ITEM_ID
+					     , MPM.SEARCH_NM     AS RECEIPT_ID
 					     , COUNT(*) OVER()   AS TOTAL_COUNT
 					     , ROW_NUMBER() OVER(PARTITION BY MPM.COMPANY_CD,MPM.DIVISION_CD ORDER BY MPM.PICKING_ID) AS ROW_CNT
 					FROM   MOM_LOCATION_PICKING_MST MPM
@@ -36,7 +36,7 @@
 					AND    MPM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MPM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MPM.STATE        = 'LPG'
-					AND    MPM.PICKING_TYPE = 'I'
+					AND    MPM.PICKING_TYPE = 'R'
 					<if test="pickingId != null and pickingId != ''">
 					AND    (UPPER(MPM.PICKING_ID) LIKE '%' || UPPER(#{pickingId, jdbcType=VARCHAR}) || '%')    
 					</if>
@@ -49,8 +49,8 @@
 					<if test="pickingLocationCdNm != null and pickingLocationCdNm != ''">
 					AND    (UPPER(MPM.LOCATION_CD) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
-					<if test="itemId != null and itemId != ''">
-					AND    UPPER(MPM.SEARCH_NM) LIKE '%' || UPPER(#{itemId, jdbcType=VARCHAR})     
+					<if test="receiptId != null and receiptId != ''">
+					AND    UPPER(MPM.SEARCH_NM) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR})     
 					</if> 
 		        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
@@ -94,7 +94,7 @@
               <foreach collection="list" item="item" open="" close="" separator="OR">
             (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
                AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-               AND  PICKING_TYPE = 'I'
+               AND  PICKING_TYPE = 'R'
                AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
             )
               </foreach>
@@ -124,7 +124,7 @@
                                           , #{item.pickingLocationCd, jdbcType=VARCHAR}
                                           , #{item.processType, jdbcType=VARCHAR}
                                           , #{item.receiptTypeCd, jdbcType=VARCHAR}
-                                          , 'I'
+                                          , 'R'
                                           , #{item.description, jdbcType=VARCHAR}
                                           , #{item.delYn, jdbcType=VARCHAR}
                                           , #{item.valMsg, jdbcType=VARCHAR}
@@ -139,7 +139,7 @@
                                                          , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
                                                          , #{companyCd,   jdbcType=VARCHAR, mode=IN}
                                                          , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                                         , 'I'  
+                                                         , 'R'  
                                                          , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select>  
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
@@ -148,7 +148,7 @@
 	        <foreach collection="list" item="item" open="" close="" separator="OR">
 	        (       COMPANY_CD   = #{item.companyCd, jdbcType=VARCHAR}
 	           AND  DIVISION_CD  = #{item.divisionCd, jdbcType=VARCHAR}
-	           AND  PICKING_TYPE = 'I'
+	           AND  PICKING_TYPE = 'R'
 	           AND  CREATE_BY    = #{item.userId, jdbcType=VARCHAR}
 	        )
 	        </foreach>
@@ -176,7 +176,7 @@
 	                                      )
 	    VALUES                            ( #{item.companyCd, jdbcType=VARCHAR}  
 	                                      , #{item.divisionCd, jdbcType=VARCHAR}   
-	                                      , 'I'      
+	                                      , 'R'      
 	                                      , #{item.pickingId, jdbcType=VARCHAR}
 	                                      , #{item.seq, jdbcType=NUMERIC}
 	                                      , #{item.itemId, jdbcType=VARCHAR}
@@ -198,7 +198,7 @@
 	                                                     , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 	                                                     , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 	                                                     , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
-	                                                     , 'I'  
+	                                                     , 'R'  
 	                                                     , #{userId,      jdbcType=VARCHAR, mode=IN} )}             
 	</select> 
 </mapper>    

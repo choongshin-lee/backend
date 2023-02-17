@@ -1,4 +1,4 @@
-var menuId = 'XUWM4010';
+var menuId = 'XUWM4020';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -37,7 +37,7 @@ var VIEW= {
                 $('#receiptTypeCdSP21').val(checkItem[0]['receiptTypeCd']);
                 $('#processTypeSP21').val(checkItem[0]['processType']);
                 $('#receiptLocationCdSP21').val(checkItem[0]['pickingLocationCd']);
-                $('#itemIdSP21').val('');
+                $('#receiptIdSP21').val('');
                 $('#receiptTypeCdSP21').jqxComboBox({disabled: true});
                 $('#processTypeSP21').jqxComboBox({disabled: true});
                 $('#receiptLocationCdSP21').jqxComboBox({disabled: true});
@@ -57,6 +57,6 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0250', VIEW);	
+	momWidget.gridPopup.init(2,21,1,'XUDG0260', VIEW);	
 	VIEW.init();
 });

@@ -16,6 +16,9 @@
 	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'MD0038', MLR.RECEIPT_STEP_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS RECEIPT_STEP_NM
 	                 , MLR.ACTION_TYPE_ID
 	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'MD0027', MLR.ACTION_TYPE_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ACTION_TYPE_NM
+	                 , MLR.PICKING_ITEM_YN
+		             , MLR.PICKING_RECEIPT_YN
+                     , MLR.UNLOADING_YN
 	                 , MLR.USE_YN
 	                 , MLR.DESCRIPTION
 	                 , MLR.UPDATE_BY      AS UPDATE_USER_NO
@@ -67,6 +70,9 @@
                                       , LOGISTICS_USE_CD
                                       , RECEIPT_STEP_ID
                                       , ACTION_TYPE_ID
+                                      , PICKING_ITEM_YN
+								      , PICKING_RECEIPT_YN
+                                      , UNLOADING_YN
                                       , USE_YN
                                       , DESCRIPTION
                                       , DEL_YN
@@ -82,6 +88,9 @@
                                     , #{item.logisticsUseCd, jdbcType=VARCHAR}
                                     , #{item.receiptStepId, jdbcType=VARCHAR}
                                     , #{item.actionTypeId, jdbcType=VARCHAR}
+                                    , #{item.pickingItemYn, jdbcType=VARCHAR}
+	                                , #{item.pickingReceiptYn, jdbcType=VARCHAR}
+	                                , #{item.unloadingYn, jdbcType=VARCHAR}
                                     , #{item.useYn, jdbcType=VARCHAR}
                                     , #{item.description, jdbcType=VARCHAR}
                                     , #{item.delYn, jdbcType=VARCHAR}
@@ -128,6 +137,9 @@
                                       , LOGISTICS_USE_CD
                                       , RECEIPT_STEP_ID
                                       , ACTION_TYPE_ID
+                                      , ACTION_TYPE_ID
+                                      , PICKING_ITEM_YN
+								      , PICKING_RECEIPT_YN
                                       , USE_YN
                                       , DESCRIPTION
                                       , DEL_YN
@@ -143,6 +155,9 @@
                                     , #{item.logisticsUseCd, jdbcType=VARCHAR}
                                     , #{item.receiptStepId, jdbcType=VARCHAR}
                                     , #{item.actionTypeId, jdbcType=VARCHAR}
+                                    , #{item.pickingItemYn, jdbcType=VARCHAR}
+	                                , #{item.pickingReceiptYn, jdbcType=VARCHAR}
+	                                , #{item.unloadingYn, jdbcType=VARCHAR}
                                     , #{item.useYn, jdbcType=VARCHAR}
                                     , #{item.description, jdbcType=VARCHAR}
                                     , 'N'

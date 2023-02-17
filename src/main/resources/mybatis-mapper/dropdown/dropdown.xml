@@ -405,6 +405,15 @@
     <if test="receiptTypeCd != null and receiptTypeCd != ''">
     AND    MLT.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}  
     </if>
+    <if test="pickingItemYn != null and pickingItemYn != ''">
+	AND    PICKING_ITEM_YN =  #{pickingItemYn, jdbcType=VARCHAR} 
+	</if>  
+	<if test="pickingReceiptYn != null and pickingReceiptYn != ''">
+	AND    PICKING_RECEIPT_YN =  #{pickingReceiptYn, jdbcType=VARCHAR} 
+	</if>  
+	<if test="pickingYn != null and pickingYn != ''">
+	AND    (PICKING_ITEM_YN =  #{pickingYn, jdbcType=VARCHAR} OR  PICKING_RECEIPT_YN =  #{pickingYn, jdbcType=VARCHAR}) 
+	</if>  
     <if test="processType != null and processType != ''">
 	AND    MLT.ACTION_TYPE_ID = (SELECT MPT.ACTION_TYPE_CD
 							     FROM   MOM_PROCESS_TYPE MPT
@@ -514,6 +523,18 @@
     <if test="actionTypeCd   != null and actionTypeCd != ''">
     AND    ACTION_TYPE_CD   = #{actionTypeCd, jdbcType=VARCHAR} 
     </if>
+    <if test="pickingItemYn != null and pickingItemYn != ''">
+	AND    PICKING_ITEM_YN =  #{pickingItemYn, jdbcType=VARCHAR} 
+	</if>  
+	<if test="pickingReceiptYn != null and pickingReceiptYn != ''">
+	AND    PICKING_RECEIPT_YN =  #{pickingReceiptYn, jdbcType=VARCHAR} 
+	</if>  
+	<if test="pickingYn != null and pickingYn != ''">
+	AND    (PICKING_ITEM_YN =  #{pickingYn, jdbcType=VARCHAR} OR  PICKING_RECEIPT_YN =  #{pickingYn, jdbcType=VARCHAR}) 
+	</if>  
+	<if test="unloadingYn != null and unloadingYn != ''">
+	AND    UNLOADING_YN  =  #{unloadingYn, jdbcType=VARCHAR} 
+	</if>  
     AND    USE_YN      = 'Y'
     ORDER BY PROCESS_TYPE
     </select>   
@@ -530,12 +551,6 @@
 	<if test="processType != null and processType != ''">
 	AND    MLP.PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
 	</if>
-	<if test="pickingYn != null and pickingYn != ''">
-	AND    MLP.PICKING_YN =  #{pickingYn, jdbcType=VARCHAR} 
-	</if>  
-	<if test="unloadingYn != null and unloadingYn != ''">
-	AND    MLP.UNLOADING_YN  =  #{unloadingYn, jdbcType=VARCHAR} 
-	</if>  
 	AND    MLP.USE_YN      = 'Y'
 	ORDER BY ML.LOCATION_NM 
 	</select>     
