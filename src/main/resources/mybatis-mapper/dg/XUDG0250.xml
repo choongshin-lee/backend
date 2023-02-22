@@ -29,7 +29,6 @@
 		     , MLD.UPDATE_BY
 		     , MLD.UPDATE_DATE
 		     , ROWIDTOCHAR(MLD.ROWID)            AS KEY_ID
-		     , #{pickingId, jdbcType=VARCHAR}	 AS PICKING_ID
 		FROM   MOM_LOCATION_RECEIPT_MST MLM
 		     , MOM_LOCATION_RECEIPT_DTL MLD
 		     , MOM_ITEM MI

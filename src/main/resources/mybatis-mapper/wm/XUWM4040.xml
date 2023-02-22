@@ -14,6 +14,8 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'WM0007', MPM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 					     , MPM.LOCATION_CD  AS PICKING_LOCATION_CD
 					     , ML.LOCATION_NM   AS PICKING_LOCATION_NM
+					     , MPM.AREA_CD
+                         , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.AREA_CD) FROM DUAL) AS AREA_NM
 					     , MPM.PROCESS_TYPE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 					     , MPM.RECEIPT_TYPE_CD
@@ -130,10 +132,10 @@
         </foreach>
     </insert>
     <select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_LP_CONFIRM_CANCEL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-		                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-		                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-		                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-		                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+        { CALL MOM_WMS_PKG.SP_PICKING_CONFIRM_CANCEL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+			                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+			                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select>  
 </mapper>    

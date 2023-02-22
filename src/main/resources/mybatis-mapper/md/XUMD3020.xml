@@ -37,7 +37,7 @@
 				     , TO_CHAR(MUP.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 				     , ROWIDTOCHAR(MUP.ROWID) AS KEY_ID
 				     , COUNT(*) OVER() AS TOTAL_COUNT
-				     , ROW_NUMBER() OVER(PARTITION BY MUP.COMPANY_CD,MUP.DIVISION_CD ORDER BY MUP.PARTNER_CD, MUP.ITEM_ID, MUP.CURRENCY_CD, TO_CHAR(MUP.START_DATE ,'YYYY-MM-DD') ) AS ROW_COUNT 
+				     , ROW_NUMBER() OVER(PARTITION BY MUP.COMPANY_CD,MUP.DIVISION_CD ORDER BY MUP.ITEM_ID, MUP.PARTNER_CD, MUP.CURRENCY_CD, TO_CHAR(MUP.START_DATE ,'YYYY-MM-DD') ) AS ROW_COUNT 
 				FROM   MOM_UNIT_PRICE MUP
 				     , MOM_ITEM MI
 				WHERE  MUP.COMPANY_CD  = MI.COMPANY_CD
@@ -66,10 +66,21 @@
 	    WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
 	    </if>  	    
     </select>
+    <select id="get_excelUpBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        SELECT NVL(MULTI_MSG,'PASS') AS VAL_MSG
+             , VAL_MSG               AS MULTI_MSG
+             , A      
+        FROM   MOM_PROC_UNIT_PRICE A
+        WHERE  COMPANY_CD     = #{companyCd , jdbcType=VARCHAR}
+        AND    DIVISION_CD    = #{divisionCd , jdbcType=VARCHAR}
+        AND    PRICE_CATEGORY = 'S'
+        AND    CREATE_BY      = #{userId , jdbcType=VARCHAR}
+        ORDER BY NO
+    </select> 
     <delete id="remove_createBtn1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_UNIT_PRICE
             <where>
-            <foreach collection="list" item="item" open="" close="" separator="OR">
+            <foreach collection="list" item="item" open="" close="" separator="OR"> 
 	        (       COMPANY_CD     = #{item.companyCd, jdbcType=VARCHAR}
 	           AND  DIVISION_CD    = #{item.divisionCd, jdbcType=VARCHAR}
 	           AND  PRICE_CATEGORY = #{item.priceCategory, jdbcType=VARCHAR}
@@ -167,6 +178,7 @@
 								 , MAIN_PARTNER_YN
 								 , CREATE_BY
 								 , CREATE_DATE
+								 , NO
                                  )
         VALUES                   ( #{item.companyCd, jdbcType=VARCHAR}
 				                 , #{item.divisionCd, jdbcType=VARCHAR}
@@ -181,6 +193,7 @@
 				                 , #{item.mainPartnerYn, jdbcType=VARCHAR}
 				                 , #{item.userId, jdbcType=VARCHAR}
 				                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+				                 , #{i}
 				                 )
         </foreach>
     </insert>  
