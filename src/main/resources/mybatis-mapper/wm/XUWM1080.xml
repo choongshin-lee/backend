@@ -43,6 +43,7 @@
 					AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 					AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MDM.STATE               = 'DOG'
+					AND    MDM.PROCESS_TYPE        IN ('ITS', 'OBS')
 					AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					<if test="processType != null and processType != ''">
 					AND    MDM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
@@ -119,6 +120,7 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
 	        INTO MOM_PROC_DO_CONFIRM( COMPANY_CD
 					                , DIVISION_CD
+					                , PROCESS_TYPE
 					                , DO_NO
 					                , DESCRIPTION
 					                , VAL_MSG
@@ -128,6 +130,7 @@
 	                                )
 	        VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
 	                                , #{item.divisionCd, jdbcType=VARCHAR}
+	                                , #{item.processType, jdbcType=VARCHAR}
 	                                , #{item.doNo, jdbcType=VARCHAR}
 	                                , #{item.description, jdbcType=VARCHAR}
 	                                , #{item.valMsg, jdbcType=VARCHAR}

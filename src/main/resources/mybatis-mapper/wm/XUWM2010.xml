@@ -14,8 +14,8 @@
 					     , ML.LOCATION_NM   AS RECEIPT_LOCATION_NM
 					     , MLM.LOCATION_USER_NO
 					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.LOCATION_USER_NO) FROM DUAL ) AS LOCATION_USER_NM
-					     , MLM.PROCESS_TYPE_ID
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'MD0028', MLM.PROCESS_TYPE_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PROCESS_TYPE_NM
+					     , MLM.PROCESS_TYPE
+                         , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 					     , MLM.RECEIPT_TYPE_CD
 					     , MLR.RECEIPT_TYPE_NM
 					     , MLR.LOGISTICS_USE_CD
@@ -47,16 +47,9 @@
 					AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					AND    MLM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MLM.STATE           = 'LRG'
-					AND    MLM.PROCESS_TYPE_ID IN ( SELECT MC.CODE
-					                                FROM   MOM_CODE MC
-					                                WHERE  MC.COMPANY_CD  = MLM.COMPANY_CD
-					                                AND    MC.DIVISION_CD = MLM.DIVISION_CD
-					                                AND    MC.GROUP_CD    = 'MD0028'
-					                                AND    MC.USE_YN      = 'Y'
-					                                AND    MC.ATTRIBUTE1  = 'R' )
-					<if test="processTypeId != null and processTypeId != ''">
-					AND    MLM.PROCESS_TYPE_ID  = #{processTypeId, jdbcType=VARCHAR}
-					</if>     
+					<if test="processType != null and processType != ''">
+					AND    MLM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
+					</if>        
 					<if test="receiptTypeCdNm != null and receiptTypeCdNm != ''">
 					AND    (UPPER(MLM.RECEIPT_TYPE_CD) LIKE '%' || UPPER(#{receiptTypeCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLR.RECEIPT_TYPE_NM) LIKE '%' || UPPER(#{receiptTypeCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
@@ -139,7 +132,7 @@
                                           , RECEIPT_NM
                                           , LOCATION_CD
                                           , LOCATION_USER_NO
-                                          , PROCESS_TYPE_ID
+                                          , PROCESS_TYPE
                                           , RECEIPT_TYPE_CD
                                           , DESCRIPTION
                                           , DEL_YN
@@ -154,7 +147,7 @@
                                           , #{item.receiptNm, jdbcType=VARCHAR}
                                           , #{item.receiptLocationCd, jdbcType=VARCHAR}
                                           , #{item.locationUserNo, jdbcType=VARCHAR}
-                                          , #{item.processTypeId, jdbcType=VARCHAR}
+                                          , #{item.processType, jdbcType=VARCHAR}
                                           , #{item.receiptTypeCd, jdbcType=VARCHAR}
                                           , #{item.description, jdbcType=VARCHAR}
                                           , #{item.delYn, jdbcType=VARCHAR}

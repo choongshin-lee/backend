@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUWM1100_1">
+<mapper namespace="com.mom.backend.XUWM5060">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -9,7 +9,6 @@
 		            SELECT MDO.*
 					     , MLR.LOCATION_NM   AS REQUEST_LOCATION_NM                                      
 					     , MLI.LOCATION_NM   AS ISSUE_LOCATION_NM
-					     , MP.PARTNER_NM     AS CUSTOMER_NM
 					     , MI.ITEM_NM
 					     , MI.ITEM_SPEC
 					     , MI.ITEM_TYPE
@@ -17,13 +16,12 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'IC0004', MDO.MAIN_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAIN_STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'IC0005', MDO.DTL_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DTL_STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'SM0017', MDO.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-					     , MDO.DELIVERY_ORDER_ID                         AS KEY_ID
+					     , MDO.TRANSIT_ORDER_ID                         AS KEY_ID
 					     , COUNT(*) OVER()                               AS TOTAL_COUNT
-					     , ROW_NUMBER() OVER(PARTITION BY MDO.COMPANY_CD,MDO.DIVISION_CD ORDER BY MDO.DELIVERY_ORDER_ID) AS ROW_CNT
-					FROM   MOM_DELIVERY_ORDER_V MDO
+					     , ROW_NUMBER() OVER(PARTITION BY MDO.COMPANY_CD,MDO.DIVISION_CD ORDER BY MDO.TRANSIT_ORDER_ID) AS ROW_CNT
+					FROM   MOM_TRANSIT_ORDER_V MDO
 					     , MOM_LOCATION MLR
 					     , MOM_LOCATION MLI
-					     , MOM_PARTNER  MP
 					     , MOM_ITEM     MI
 					WHERE  MDO.COMPANY_CD           = MLR.COMPANY_CD(+)
 					AND    MDO.DIVISION_CD          = MLR.DIVISION_CD(+)
@@ -31,9 +29,6 @@
 					AND    MDO.COMPANY_CD           = MLI.COMPANY_CD
 					AND    MDO.DIVISION_CD          = MLI.DIVISION_CD
 					AND    MDO.ISSUE_LOCATION_CD    = MLI.LOCATION_CD
-					AND    MDO.COMPANY_CD           = MP.COMPANY_CD
-					AND    MDO.DIVISION_CD          = MP.DIVISION_CD
-					AND    MDO.CUSTOMER_CD          = MP.PARTNER_CD
 					AND    MDO.COMPANY_CD           = MI.COMPANY_CD
 					AND    MDO.DIVISION_CD          = MI.DIVISION_CD
 					AND    MDO.ITEM_ID              = MI.ITEM_ID   
@@ -42,15 +37,9 @@
 					AND    MDO.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MDO.DTL_STATE            = 'DOF'
 					AND    MDO.REMAIN_QTY           > 0
-					<if test="processType != null and processType != ''">
-					AND    MDO.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
+					<if test="transitNo != null and transitNo != ''">
+					AND    (UPPER(MDO.TRANSIT_NO) LIKE '%' || UPPER(#{transitNo, jdbcType=VARCHAR}) || '%')   
 					</if>
-					<if test="doNo != null and doNo != ''">
-					AND    (UPPER(MDO.DO_NO) LIKE '%' || UPPER(#{doNo, jdbcType=VARCHAR}) || '%')   
-					</if>
-					<if test="customerCd != null and customerCd != ''">
-					AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCd, jdbcType=VARCHAR}) || '%')   
-					</if> 
 					<if test="issueLocationCd != null and issueLocationCd != ''">
 					AND    (UPPER(MLI.LOCATION_NM)  LIKE '%' || UPPER(#{issueLocationCd, jdbcType=VARCHAR}) ||   '%')   
 					</if> 
@@ -89,8 +78,8 @@
         VALUES                ( #{item.companyCd, jdbcType=VARCHAR}
                               , #{item.divisionCd, jdbcType=VARCHAR}
                               , #{item.processType, jdbcType=VARCHAR}
-                              , #{item.doNo, jdbcType=VARCHAR}
-                              , #{item.deliveryOrderId, jdbcType=VARCHAR}
+                              , #{item.transitNo, jdbcType=VARCHAR}
+                              , #{item.transitOrderId, jdbcType=VARCHAR}
                               , #{item.description, jdbcType=VARCHAR}
                               , #{item.valMsg, jdbcType=VARCHAR}
                               , #{item.multiMsg, jdbcType=VARCHAR}
