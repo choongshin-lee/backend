@@ -47,9 +47,7 @@
 					AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					AND    MLM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MLM.STATE           = 'LRG'
-					<if test="processType != null and processType != ''">
-					AND    MLM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
-					</if>        
+					AND    MLM.PROCESS_TYPE    = 'IBR'
 					<if test="receiptTypeCdNm != null and receiptTypeCdNm != ''">
 					AND    (UPPER(MLM.RECEIPT_TYPE_CD) LIKE '%' || UPPER(#{receiptTypeCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLR.RECEIPT_TYPE_NM) LIKE '%' || UPPER(#{receiptTypeCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
@@ -117,9 +115,10 @@
         DELETE FROM MOM_PROC_LOCATION_RECEIPT_MST
           <where>
               <foreach collection="list" item="item" open="" close="" separator="OR">
-            (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-               AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-               AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+            (       COMPANY_CD   = #{item.companyCd, jdbcType=VARCHAR}
+               AND  DIVISION_CD  = #{item.divisionCd, jdbcType=VARCHAR}
+               AND  PROCESS_TYPE = 'IBR'
+               AND  CREATE_BY    = #{item.userId, jdbcType=VARCHAR}
             )
               </foreach>
           </where>
@@ -147,7 +146,7 @@
                                           , #{item.receiptNm, jdbcType=VARCHAR}
                                           , #{item.receiptLocationCd, jdbcType=VARCHAR}
                                           , #{item.locationUserNo, jdbcType=VARCHAR}
-                                          , #{item.processType, jdbcType=VARCHAR}
+                                          , 'IBR'
                                           , #{item.receiptTypeCd, jdbcType=VARCHAR}
                                           , #{item.description, jdbcType=VARCHAR}
                                           , #{item.delYn, jdbcType=VARCHAR}

@@ -35,7 +35,6 @@
          , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
          , MDD.REFERENCE_NO
          , MDD.REFERENCE_DTL_NO
-         , MDD.LOCATION_USE_YN
          , MDD.DELIVERY_REQUEST_ID
     FROM   MOM_DR_MST MDM
          , MOM_DR_DTL MDD
@@ -47,7 +46,6 @@
     AND    MDD.DIVISION_CD      = MI.DIVISION_CD
     AND    MDD.ITEM_ID          = MI.ITEM_ID     
     AND    MDD.STATE            = 'DRF'
-    AND    MDD.LOCATION_USE_YN  = 'N'
     AND    MDM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
     AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}    
     AND    MDD.REQUEST_QTY - NVL(MDD.PROGRESS_QTY,0) > 0     

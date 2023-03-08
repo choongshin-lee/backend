@@ -100,6 +100,7 @@
 	          (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
 	             AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
 	             AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+	             AND  PROCESS_TYPE = 'OBS'
 	          )
 	            </foreach>
 	        </where>
@@ -145,6 +146,7 @@
                                              , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
                                              , #{companyCd,   jdbcType=VARCHAR, mode=IN}
                                              , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                             , 'OBS'
                                              , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
     <delete id="remove_customBtn2-1" parameterType="java.util.List">

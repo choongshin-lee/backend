@@ -43,10 +43,10 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#drNoSP21').val('');
+                $('#doNoSP21').val('');
                 $('#customerCdSP21').val('');
-                $('#locationCdSP21').val(checkItem[0]['receiptLocationCd']);
-                $('#locationCdSP21').jqxComboBox({disabled: true});
+                $('#issueLocationCdSP21').val(checkItem[0]['receiptLocationCd']);
+                $('#issueLocationCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 10){       

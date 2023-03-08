@@ -73,7 +73,7 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
-	momWidget.gridPopup.init(1,11,1,'XUDG0140', VIEW); 
+	//momWidget.gridPopup.init(1,11,1,'XUDG0140', VIEW); 
 	momWidget.gridPopup.init(2,21,1,'XUDG0160', VIEW);
 	VIEW.init();
 });

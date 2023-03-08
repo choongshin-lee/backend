@@ -4,7 +4,7 @@
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
-		    FROM   ( 
+		    FROM   (  
 		</if>
 		            SELECT MDM.COMPANY_CD
 		                 , MDM.DIVISION_CD
