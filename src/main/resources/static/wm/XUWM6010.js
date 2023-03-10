@@ -1,4 +1,4 @@
-var menuId = 'XUWM4010';
+var menuId = 'XUWM6010';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -12,7 +12,7 @@ var VIEW= {
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
         if(index ==0 && btnId =='copyBtn'){ 
-            $('#pickingIdDP1').val('');
+            $('#unloadingIdDP1').val('');
         }
     },
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
@@ -22,7 +22,7 @@ var VIEW= {
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {pickingId:e.item['pickingId']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {unloadingId:e.item['unloadingId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
@@ -35,7 +35,7 @@ var VIEW= {
                     return;
                 }
                 $('#receiptTypeCdSP21').val(checkItem[0]['receiptTypeCd']);
-                $('#receiptLocationCdSP21').val(checkItem[0]['pickingLocationCd']);
+                $('#receiptLocationCdSP21').val(checkItem[0]['unloadingLocationCd']);
                 $('#itemIdSP21').val('');
                 $('#receiptTypeCdSP21').jqxComboBox({disabled: true});
                 $('#receiptLocationCdSP21').jqxComboBox({disabled: true});
@@ -44,7 +44,7 @@ var VIEW= {
         else if(index == 20){         
             if(action='C'&& btnId == 'customBtn21-1'){ 
                 for(var i=0,max=param.length; i<max;i++){
-                    param[i]['pickingId'] = checkItem[0]['pickingId'];
+                    param[i]['unloadingId'] = checkItem[0]['unloadingId'];
                 }
             }
         }
@@ -55,6 +55,6 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0250', VIEW);	
+	momWidget.gridPopup.init(2,21,1,'XUDG0290', VIEW);	
 	VIEW.init();
 });

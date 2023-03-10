@@ -35,11 +35,9 @@ var VIEW= {
                     return;
                 }
                 $('#receiptTypeCdSP21').val(checkItem[0]['receiptTypeCd']);
-                $('#processTypeSP21').val(checkItem[0]['processType']);
                 $('#receiptLocationCdSP21').val(checkItem[0]['pickingLocationCd']);
                 $('#receiptIdSP21').val('');
                 $('#receiptTypeCdSP21').jqxComboBox({disabled: true});
-                $('#processTypeSP21').jqxComboBox({disabled: true});
                 $('#receiptLocationCdSP21').jqxComboBox({disabled: true});
             }
         }

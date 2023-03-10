@@ -408,6 +408,9 @@
     <if test="receiptTypeCd != null and receiptTypeCd != ''">
     AND    MLT.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}  
     </if>
+    <if test="actionTypeId != null and actionTypeId != ''">
+    AND    MLT.ACTION_TYPE_ID  = #{actionTypeId, jdbcType=VARCHAR}  
+    </if>
     <if test="pickingItemYn != null and pickingItemYn != ''">
 	AND    PICKING_ITEM_YN =  #{pickingItemYn, jdbcType=VARCHAR} 
 	</if>  
@@ -554,6 +557,14 @@
 	<if test="processType != null and processType != ''">
 	AND    MLP.PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
 	</if>
+	<if test="actionTypeCd != null and actionTypeCd != ''">
+	AND    MLP.PROCESS_TYPE IN (SELECT  MPT.PROCESS_TYPE
+    						    FROM    MOM_PROCESS_TYPE MPT
+                                WHERE   MPT.COMPANY_CD     = MLP.COMPANY_CD
+                                AND     MPT.DIVISION_CD    = MLP.DIVISION_CD
+                                AND     MPT.ACTION_TYPE_CD = #{actionTypeCd, jdbcType=VARCHAR} 
+                                AND     MPT.USE_YN         = 'Y' )
+    </if>
 	AND    MLP.USE_YN      = 'Y'
 	GROUP BY MLP.LOCATION_CD
            , ML.LOCATION_NM

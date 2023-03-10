@@ -53,7 +53,7 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#doNoSP21').val('');
+                $('#transitNoSP21').val('');
                 $('#issueLocationCdSP21').val(checkItem[0]['receiptLocationCd']);
                 $('#issueLocationCdSP21').jqxComboBox({disabled: true});
             }

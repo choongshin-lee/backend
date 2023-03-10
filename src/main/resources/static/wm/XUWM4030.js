@@ -17,7 +17,7 @@ var VIEW= {
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {picking_id:e.item['picking_id']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {pickingId:e.item['pickingId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 };

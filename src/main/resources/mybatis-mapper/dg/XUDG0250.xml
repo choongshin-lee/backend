@@ -42,69 +42,77 @@
 		AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}    
 		AND    MLD.STATE           = 'LRF'   -- 확정 대상
 		AND    MLM.LOCATION_CD     = #{receiptLocationCd, jdbcType=VARCHAR}
-		AND    MLM.PROCESS_TYPE    = #{processType, jdbcType=VARCHAR}
+		AND    MLM.PROCESS_TYPE    IN ( SELECT  MPT.PROCESS_TYPE
+                                        FROM    MOM_PROCESS_TYPE MPT
+                                	    WHERE   MPT.COMPANY_CD     = MLM.COMPANY_CD
+		                                AND     MPT.DIVISION_CD    = MLM.DIVISION_CD
+		                                AND     MPT.ACTION_TYPE_CD = 'S'
+		                                AND     MPT.USE_YN         = 'Y')
 		AND    MLM.RECEIPT_TYPE_CD = #{receiptTypeCd, jdbcType=VARCHAR}
-		<if test="itemId != null and itemId != ''">
-		AND    MLM.SEARCH_NM       = #{itemId, jdbcType=VARCHAR}
-		</if>  
+		AND    UPPER(MLD.ITEM_ID) LIKE '%' || UPPER(#{itemId, jdbcType=VARCHAR})     
     </select>
     <delete id="remove_customBtn21-1" parameterType="java.util.List">
-	    DELETE FROM MOM_PROC_LOCATION_PICKING_DTL
-	    <where>
-	        <foreach collection="list" item="item" open="" close="" separator="OR">
-	        (       COMPANY_CD   = #{item.companyCd, jdbcType=VARCHAR}
-	           AND  DIVISION_CD  = #{item.divisionCd, jdbcType=VARCHAR}
-	           AND  PICKING_TYPE = 'I'
-	           AND  CREATE_BY    = #{item.userId, jdbcType=VARCHAR}
-	        )
-	        </foreach>
-	    </where>
-	</delete>  
+        DELETE FROM MOM_PROC_LOCATION_EXEC_DTL
+            <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (     COMPANY_CD      = #{item.companyCd, jdbcType=VARCHAR}
+             AND  DIVISION_CD     = #{item.divisionCd, jdbcType=VARCHAR}
+             AND  EXEC_TASK_TYPE  = 'P'
+             AND  EXEC_GROUP_UNIT = 'I'
+             AND  CREATE_BY       = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+            </where>
+    </delete>  
 	<insert id="create_customBtn21-1" parameterType="java.util.List">
 	    <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-	    INTO MOM_PROC_LOCATION_PICKING_DTL( COMPANY_CD
-	                                      , DIVISION_CD
-	                                      , PICKING_TYPE
-	                                      , PICKING_ID
-	                                      , SEQ
-	                                      , ITEM_ID
-	                                      , UNIT
-	                                      , QTY
-	                                      , REFERENCE_NO
-	                                      , REFERENCE_DTL_NO
-	                                      , PICKING_DETAIL_ID
-	                                      , DESCRIPTION
-	                                      , DEL_YN
-	                                      , VAL_MSG
-	                                      , MULTI_MSG
-	                                      , CREATE_BY
-	                                      , CREATE_DATE
-	                                      )
-	    VALUES                            ( #{item.companyCd, jdbcType=VARCHAR}  
-	                                      , #{item.divisionCd, jdbcType=VARCHAR}   
-	                                      , 'I'      
-	                                      , #{item.pickingId, jdbcType=VARCHAR}
-	                                      , #{item.seq, jdbcType=NUMERIC}
-	                                      , #{item.itemId, jdbcType=VARCHAR}
-	                                      , #{item.unit, jdbcType=VARCHAR}
-	                                      , #{item.receiptId, jdbcType=VARCHAR}
-	                                      , #{item.receiptDetailId, jdbcType=VARCHAR}
-	                                      , #{item.pickingDetailId, jdbcType=VARCHAR}
-	                                      , #{item.description, jdbcType=VARCHAR}
-	                                      , #{item.delYn, jdbcType=VARCHAR}
-	                                      , #{item.valMsg, jdbcType=VARCHAR}
-	                                      , #{item.multiMsg, jdbcType=VARCHAR}
-	                                      , #{item.userId, jdbcType=VARCHAR}
-	                                      , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-	                                      )
+	    INTO MOM_PROC_LOCATION_EXEC_DTL( COMPANY_CD
+                                       , DIVISION_CD
+                                       , EXEC_TASK_TYPE
+                                       , EXEC_TASK_ID
+                                       , SEQ
+                                       , ITEM_ID
+                                       , UNIT
+                                       , QTY
+                                       , REFERENCE_NO
+                                       , REFERENCE_DTL_NO
+                                       , EXEC_TASK_DTL_ID
+                                       , EXEC_GROUP_UNIT
+                                       , DESCRIPTION
+                                       , DEL_YN
+                                       , VAL_MSG
+                                       , MULTI_MSG
+                                       , CREATE_BY
+                                       , CREATE_DATE
+                                       )
+        VALUES                         ( #{item.companyCd, jdbcType=VARCHAR}  
+                                       , #{item.divisionCd, jdbcType=VARCHAR}   
+                                       , 'P'
+                                       , #{item.pickingId, jdbcType=VARCHAR}
+                                       , #{item.seq, jdbcType=NUMERIC}
+                                       , #{item.itemId, jdbcType=VARCHAR}
+                                       , #{item.unit, jdbcType=VARCHAR}
+                                       , #{item.receiptQty, jdbcType=NUMERIC} 
+                                       , #{item.receiptId, jdbcType=VARCHAR}
+                                       , #{item.receiptDetailId, jdbcType=VARCHAR}
+                                       , #{item.pickingDetailId, jdbcType=VARCHAR}
+                                       , 'I'
+                                       , #{item.description, jdbcType=VARCHAR}
+                                       , #{item.delYn, jdbcType=VARCHAR}
+                                       , #{item.valMsg, jdbcType=VARCHAR}
+                                       , #{item.multiMsg, jdbcType=VARCHAR}
+                                       , #{item.userId, jdbcType=VARCHAR}
+                                       , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                       )
 	    </foreach>
 	</insert>
 	<select id="proc_customBtn21-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-	    { CALL MOM_WMS_PKG.SP_UPSERT_LOCATION_PICKING_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-	                                                     , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-	                                                     , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-	                                                     , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
-	                                                     , 'I'  
-	                                                     , #{userId,      jdbcType=VARCHAR, mode=IN} )}                   
+	    { CALL MOM_WMS_PKG.SP_UPSERT_LOCATION_EXEC_TASK_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
+                                                           , 'P'
+                                                           , 'I' 
+                                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                            
 	</select>    
 </mapper>
