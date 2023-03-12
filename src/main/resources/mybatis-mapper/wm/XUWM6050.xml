@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUWM4070">
+<mapper namespace="com.mom.backend.XUWM6050">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -8,13 +8,11 @@
 		</if>
 		            SELECT MLM.COMPANY_CD
 					     , MLM.DIVISION_CD
-					     , MLM.EXEC_GROUP_UNIT       AS PICKING_TYPE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'WM0009', MLM.EXEC_GROUP_UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PICKING_TYPE_NM   
-					     , MLM.EXEC_TASK_ID          AS PICKING_ID
+					     , MLM.EXEC_TASK_ID          AS UNLOADING_ID
 					     , MLD.SEQ
-					     , MLD.EXEC_TASK_DTL_ID      AS PICKING_DETAIL_ID
-					     , MLM.LOCATION_CD           AS PICKING_LOCATION_CD
-					     , ML.LOCATION_NM            AS PICKING_LOCATION_NM
+					     , MLD.EXEC_TASK_DTL_ID      AS UNLOADING_DETAIL_ID
+					     , MLM.LOCATION_CD           AS UNLOADING_LOCATION_CD
+					     , ML.LOCATION_NM            AS UNLOADING_LOCATION_NM
 					     , MLM.AREA_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.AREA_CD) FROM DUAL) AS AREA_NM
 					     , MLM.RECEIPT_TYPE_CD
@@ -28,7 +26,7 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
 					     , MLD.UNIT
 					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UNIT) FROM DUAL) AS UNIT_NM
-					     , MLD.QTY               AS PICKING_QTY
+					     , MLD.QTY               AS UNLOADING_QTY
 					     , MLD.REFERENCE_NO      AS RECEIPT_ID
 					     , MLD.REFERENCE_DTL_NO  AS RECEIPT_DETAIL_ID
 					     , MLD.DESCRIPTION
@@ -57,19 +55,16 @@
 					AND    MLM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
 					AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MLM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					AND    MLM.EXEC_TASK_TYPE  = 'P'   
-					<if test="pickingId != null and pickingId != ''">
-					AND    UPPER(MLM.EXEC_TASK_ID) LIKE '%' || UPPER(#{pickingId, jdbcType=VARCHAR}) || '%'    
+					AND    MLM.EXEC_TASK_TYPE  = 'R'   
+					<if test="unloadingId != null and unloadingId != ''">
+					AND    UPPER(MLM.EXEC_TASK_ID) LIKE '%' || UPPER(#{unloadingId, jdbcType=VARCHAR}) || '%'    
 					</if>
-					<if test="pickingLocationCdNm != null and pickingLocationCdNm != ''">
-					AND    (UPPER(MLM.LOCATION_CD) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%')    
+					<if test="unloadingLocationCdNm != null and unloadingLocationCdNm != ''">
+					AND    (UPPER(MLM.LOCATION_CD) LIKE '%' || UPPER(#{unloadingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{unloadingLocationCdNm, jdbcType=VARCHAR}) || '%')    
 					</if>   
 					<if test="receiptTypeCd != null and receiptTypeCd != ''">
 					AND    MLM.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}
 					</if>   
-					<if test="pickingType != null and pickingType != ''">
-					AND    MLM.PICKING_TYPE  = #{pickingType, jdbcType=VARCHAR}
-					</if> 
 					<if test="receiptId != null and receiptId != ''">
 					AND    UPPER(MLD.REFERENCE_DTL_NO) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%'    
 					</if>

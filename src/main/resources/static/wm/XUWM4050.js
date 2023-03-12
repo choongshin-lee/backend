@@ -19,7 +19,7 @@ var VIEW= {
 		if(index ==1 && btnId =='createBtn'){
 			let checkedItem = widget.getCheckedRowItems(widget.grid[0]);	
 			if(checkedItem.length==0){
-                result.msg = '상단에서 출고요청번호 선택필수!';
+                result.msg = '상단에서 피킹번호 선택필수!';
 				result.result = 'WARN';
 				return;
 			}
@@ -27,7 +27,7 @@ var VIEW= {
 	},
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {picking_id:e.item['picking_id']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {pickingDetailId:e.item['pickingDetailId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 };
