@@ -17,6 +17,8 @@
 					     , ML.LOCATION_NM            AS PICKING_LOCATION_NM
 					     , MLM.AREA_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.AREA_CD) FROM DUAL) AS AREA_NM
+					     , MLM.PROCESS_TYPE
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 					     , MLM.RECEIPT_TYPE_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_RECEIPT_TYPE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.RECEIPT_TYPE_CD) FROM DUAL)  AS RECEIPT_TYPE_NM
 					     , MLD.STATE
@@ -66,6 +68,9 @@
 					<if test="pickingLocationCdNm != null and pickingLocationCdNm != ''">
 					AND    (UPPER(MLM.LOCATION_CD) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%')    
 					</if>   
+				    <if test="processType != null and processType != ''">
+					AND    MLM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
+					</if>	
 					<if test="receiptTypeCd != null and receiptTypeCd != ''">
 					AND    MLM.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}
 					</if>   

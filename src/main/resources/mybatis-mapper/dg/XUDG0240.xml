@@ -3,64 +3,67 @@
 <mapper namespace="com.mom.backend.XUDG0240">
     <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
 		SELECT MDM.COMPANY_CD
-		     , MDM.DIVISION_CD
-		     , MDM.DO_NO      
-		     , MDD.SEQ         
-		     , MDM.PROCESS_TYPE          
-		     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
-		     , MDD.IO_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
-		     , MDM.PARTNER_CD    AS CUSTOMER_CD   
-		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PARTNER_CD) FROM DUAL)  AS CUSTOMER_NM
-		     , MDM.ISSUE_LOCATION_CD 
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.ISSUE_LOCATION_CD) FROM DUAL) AS ISSUE_LOCATION_NM
-		     , MDM.REQUEST_LOCATION_CD  
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.REQUEST_LOCATION_CD) FROM DUAL) AS REQUEST_LOCATION_NM
-		     , MDD.ITEM_ID
-		     , MI.ITEM_NM
-		     , MI.ITEM_SPEC
-		     , MI.ITEM_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MDD.UNIT
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT) FROM DUAL) AS UNIT_NM          
-		     , MDD.QTY                                     AS ISSUE_REQUEST_QTY
-		     , MDD.CURRENCY_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-		     , MDD.UNIT_PRICE
-		     , MDD.EXCHANGE_RATE
-		     , MDD.AMOUNT
-		     , MDD.LOCAL_AMOUNT
-		     , MDD.DESCRIPTION
-		     , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
-		     , MDD.REFERENCE_NO  
-		     , MDD.REFERENCE_DTL_NO
-		     , MDD.DELIVERY_ORDER_ID          
-		     , MDM.LOCATION_USE_YN
-		     , MDD.UPDATE_BY      AS UPDATE_USER_NO
-			 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-			 , TO_CHAR(MDD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-		FROM   MOM_DELIVERY_ORDER_MST MDM
-		     , MOM_DELIVERY_ORDER_DTL MDD
-		     , MOM_ITEM   MI
-		WHERE  MDM.COMPANY_CD       = MDD.COMPANY_CD
-		AND    MDM.DIVISION_CD      = MDD.DIVISION_CD
-		AND    MDM.DO_NO            = MDD.DO_NO  
-		AND    MDD.COMPANY_CD       = MI.COMPANY_CD
-		AND    MDD.DIVISION_CD      = MI.DIVISION_CD
-		AND    MDD.ITEM_ID          = MI.ITEM_ID        
-		AND    MDM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
-		AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}         
-		AND    MDM.PROCESS_TYPE     = 'ITS'
-		AND    MDM.STATE            = 'DOF'
-		AND    MDM.LOCATION_USE_YN  = 'Y'
-		<if test="doNo != null and doNo != ''">
-		AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{doNo, jdbcType=VARCHAR}) || '%')    
-		</if>
-		<if test="issueLocationCd != null and issueLocationCd != ''">
-		AND    MDM.ISSUE_LOCATION_CD   = #{issueLocationCd, jdbcType=VARCHAR}
-		</if>
-		ORDER BY MDD.DO_NO
-		       , MDD.SEQ 
+	         , MDM.DIVISION_CD
+	         , MDM.DR_NO     
+	         , MDD.SEQ         
+	         , MDM.PROCESS_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
+	         , MDD.IO_TYPE 
+	         , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)   AS IO_TYPE_NM
+	         , MDM.CUSTOMER_CD                                                                                       
+	         , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDM.CUSTOMER_CD) FROM DUAL) AS CUSTOMER_NM
+	         , MDD.LOCATION_CD  AS ISSUE_LOCATION_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDM.COMPANY_CD,MDM.DIVISION_CD,MDD.LOCATION_CD) FROM DUAL) AS ISSUE_LOCATION_NM
+	         , MDD.CURRENCY_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+	         , MDD.ITEM_ID
+	         , MI.ITEM_NM
+	         , MI.ITEM_SPEC
+	         , MI.ITEM_TYPE
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM          
+	         , MDD.UNIT
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
+	         , MDD.REQUEST_QTY   AS DR_REQUEST_QTY
+	         , MDD.REQUEST_QTY - NVL(MDD.PROGRESS_QTY,0)   AS ISSUE_WAIT_QTY
+	         , MDD.UNIT_PRICE
+	         , MDD.CURRENCY_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+	         , MDD.EXCHANGE_RATE
+	         , MDD.AMOUNT
+	         , MDD.LOCAL_AMOUNT
+	         , MDD.DESCRIPTION
+	         , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
+	         , MDD.REFERENCE_NO
+	         , MDD.REFERENCE_DTL_NO
+	         , MDD.DELIVERY_REQUEST_ID
+	    FROM   MOM_DR_MST MDM
+	         , MOM_DR_DTL MDD
+	         , MOM_ITEM MI
+	    WHERE  MDM.COMPANY_CD       = MDD.COMPANY_CD
+	    AND    MDM.DIVISION_CD      = MDD.DIVISION_CD
+	    AND    MDM.DR_NO            = MDD.DR_NO     
+	    AND    MDD.COMPANY_CD       = MI.COMPANY_CD
+	    AND    MDD.DIVISION_CD      = MI.DIVISION_CD
+	    AND    MDD.ITEM_ID          = MI.ITEM_ID     
+	    AND    MDD.STATE            = 'DRF'
+	    AND    MDM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+	    AND    MDM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}    
+	    AND    MDD.REQUEST_QTY - NVL(MDD.PROGRESS_QTY,0) > 0     
+	    AND    EXISTS ( SELECT '*'
+	                    FROM   MOM_PROCESS MP           
+	                    WHERE  MP.COMPANY_CD   = MDM.COMPANY_CD
+	                    AND    MP.DIVISION_CD  = MDM.DIVISION_CD
+	                    AND    MP.PROCESS_CD   = MDM.PROCESS_CD
+	                    AND    MP.PROCESS_TYPE = 'ITS'
+	                    AND    MP.USE_YN       = 'Y')
+	    <if test="issueLocationCd != null and issueLocationCd != ''">
+	    AND    MDD.LOCATION_CD   = #{issueLocationCd, jdbcType=VARCHAR}
+	    </if>
+	    <if test="drNo != null and drNo != ''">
+	    AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')   
+	    </if>
+	    ORDER BY MDD.DR_NO
+	           , MDD.SEQ 
     </select>
     <delete id="remove_customBtn21-1" parameterType="java.util.List">
 	    DELETE FROM MOM_PROC_LOCATION_RECEIPT_DTL
@@ -82,7 +85,6 @@
 	                                      , RECEIPT_ID
 	                                      , SEQ
 	                                      , IO_TYPE
-	                                      , PARTNER_CD
 	                                      , LOCATION_CD
 	                                      , ITEM_ID
 	                                      , UNIT
@@ -109,7 +111,6 @@
 	                                      , #{item.receiptId, jdbcType=VARCHAR}
 	                                      , #{item.seq, jdbcType=NUMERIC}
 	                                      , #{item.ioType, jdbcType=VARCHAR}
-	                                      , #{item.customerCd, jdbcType=VARCHAR}
 	                                      , #{item.issueLocationCd, jdbcType=VARCHAR}
 	                                      , #{item.itemId, jdbcType=VARCHAR}
 	                                      , #{item.unit, jdbcType=VARCHAR}
@@ -119,8 +120,8 @@
 	                                      , #{item.unitPrice, jdbcType=NUMERIC}
 	                                      , #{item.amount, jdbcType=NUMERIC}
 	                                      , #{item.localAmount, jdbcType=NUMERIC}
-	                                      , #{item.referenceNo, jdbcType=VARCHAR}
-	                                      , #{item.referenceDtlNo, jdbcType=VARCHAR}
+	                                      , #{item.drNo, jdbcType=VARCHAR}
+	                                      , #{item.deliveryRequestId, jdbcType=VARCHAR}
 	                                      , #{item.receiptDetailId, jdbcType=VARCHAR}
 	                                      , #{item.rcvLogisticUnitId, jdbcType=VARCHAR}
 	                                      , #{item.description, jdbcType=VARCHAR}

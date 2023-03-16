@@ -14,11 +14,8 @@
 	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'MD0020', MLR.LOGISTICS_USE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS LOGISTICS_USE_NM
 	                 , MLR.RECEIPT_STEP_ID
 	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'MD0038', MLR.RECEIPT_STEP_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS RECEIPT_STEP_NM
-	                 , MLR.ACTION_TYPE_ID
-	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'MD0027', MLR.ACTION_TYPE_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ACTION_TYPE_NM
-	                 , MLR.PICKING_ITEM_YN
-		             , MLR.PICKING_RECEIPT_YN
-                     , MLR.UNLOADING_YN
+	                 , MLR.ACTION_TYPE_CD
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'MD0027', MLR.ACTION_TYPE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ACTION_TYPE_NM
 	                 , MLR.USE_YN
 	                 , MLR.DESCRIPTION
 	                 , MLR.UPDATE_BY      AS UPDATE_USER_NO
@@ -39,8 +36,8 @@
 	            <if test="receiptStepId != null and receiptStepId != ''">
 	            AND    MLR.RECEIPT_STEP_ID  IN (${receiptStepId})
 	            </if>  
-	            <if test="actionTypeId != null and actionTypeId != ''">
-	            AND    MLR.ACTION_TYPE_ID  IN (${actionTypeId})
+	            <if test="actionTypeCd != null and actionTypeCd != ''">
+	            AND    MLR.ACTION_TYPE_CD  IN (${actionTypeCd})
 	            </if>  
 	            <if test="useYn != null and useYn != ''">
                 AND    MLR.USE_YN = #{useYn, jdbcType=VARCHAR}
@@ -69,10 +66,7 @@
                                       , RECEIPT_TYPE_NM
                                       , LOGISTICS_USE_CD
                                       , RECEIPT_STEP_ID
-                                      , ACTION_TYPE_ID
-                                      , PICKING_ITEM_YN
-								      , PICKING_RECEIPT_YN
-                                      , UNLOADING_YN
+                                      , ACTION_TYPE_CD
                                       , USE_YN
                                       , DESCRIPTION
                                       , DEL_YN
@@ -87,10 +81,7 @@
                                     , #{item.receiptTypeNm, jdbcType=VARCHAR}
                                     , #{item.logisticsUseCd, jdbcType=VARCHAR}
                                     , #{item.receiptStepId, jdbcType=VARCHAR}
-                                    , #{item.actionTypeId, jdbcType=VARCHAR}
-                                    , #{item.pickingItemYn, jdbcType=VARCHAR}
-	                                , #{item.pickingReceiptYn, jdbcType=VARCHAR}
-	                                , #{item.unloadingYn, jdbcType=VARCHAR}
+                                    , #{item.actionTypeCd, jdbcType=VARCHAR}
                                     , #{item.useYn, jdbcType=VARCHAR}
                                     , #{item.description, jdbcType=VARCHAR}
                                     , #{item.delYn, jdbcType=VARCHAR}
@@ -136,10 +127,7 @@
                                       , RECEIPT_TYPE_NM
                                       , LOGISTICS_USE_CD
                                       , RECEIPT_STEP_ID
-                                      , ACTION_TYPE_ID
-                                      , ACTION_TYPE_ID
-                                      , PICKING_ITEM_YN
-								      , PICKING_RECEIPT_YN
+                                      , ACTION_TYPE_CD
                                       , USE_YN
                                       , DESCRIPTION
                                       , DEL_YN
@@ -154,10 +142,7 @@
                                     , #{item.receiptTypeNm, jdbcType=VARCHAR}
                                     , #{item.logisticsUseCd, jdbcType=VARCHAR}
                                     , #{item.receiptStepId, jdbcType=VARCHAR}
-                                    , #{item.actionTypeId, jdbcType=VARCHAR}
-                                    , #{item.pickingItemYn, jdbcType=VARCHAR}
-	                                , #{item.pickingReceiptYn, jdbcType=VARCHAR}
-	                                , #{item.unloadingYn, jdbcType=VARCHAR}
+                                    , #{item.actionTypeCd, jdbcType=VARCHAR}
                                     , #{item.useYn, jdbcType=VARCHAR}
                                     , #{item.description, jdbcType=VARCHAR}
                                     , 'N'

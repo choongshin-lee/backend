@@ -43,10 +43,11 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#doNoSP21').val('');
-                $('#customerCdSP21').val('');
                 $('#issueLocationCdSP21').val(checkItem[0]['receiptLocationCd']);
+                $('#customerCdSP21').val(checkItem[0]['customerCd']);
+                $('#drNoSP21').val('');
                 $('#issueLocationCdSP21').jqxComboBox({disabled: true});
+                $('#customerCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 10){       
@@ -73,6 +74,6 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
 	//momWidget.gridPopup.init(1,11,1,'XUDG0140', VIEW); 
-	momWidget.gridPopup.init(2,21,1,'XUDG0170', VIEW);
+	momWidget.gridPopup.init(2,21,1,'XUDG0190', VIEW);
 	VIEW.init();
 });

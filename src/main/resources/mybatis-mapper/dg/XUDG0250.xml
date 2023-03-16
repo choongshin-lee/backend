@@ -42,12 +42,7 @@
 		AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}    
 		AND    MLD.STATE           = 'LRF'   -- 확정 대상
 		AND    MLM.LOCATION_CD     = #{receiptLocationCd, jdbcType=VARCHAR}
-		AND    MLM.PROCESS_TYPE    IN ( SELECT  MPT.PROCESS_TYPE
-                                        FROM    MOM_PROCESS_TYPE MPT
-                                	    WHERE   MPT.COMPANY_CD     = MLM.COMPANY_CD
-		                                AND     MPT.DIVISION_CD    = MLM.DIVISION_CD
-		                                AND     MPT.ACTION_TYPE_CD = 'S'
-		                                AND     MPT.USE_YN         = 'Y')
+		AND    MLM.PROCESS_TYPE    = #{processType, jdbcType=VARCHAR}
 		AND    MLM.RECEIPT_TYPE_CD = #{receiptTypeCd, jdbcType=VARCHAR}
 		AND    UPPER(MLD.ITEM_ID) LIKE '%' || UPPER(#{itemId, jdbcType=VARCHAR})     
     </select>

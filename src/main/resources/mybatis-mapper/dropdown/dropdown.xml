@@ -408,20 +408,11 @@
     <if test="receiptTypeCd != null and receiptTypeCd != ''">
     AND    MLT.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}  
     </if>
-    <if test="actionTypeId != null and actionTypeId != ''">
-    AND    MLT.ACTION_TYPE_ID  = #{actionTypeId, jdbcType=VARCHAR}  
+    <if test="actionTypeCd != null and actionTypeCd != ''">
+    AND    MLT.ACTION_TYPE_CD  = #{actionTypeCd, jdbcType=VARCHAR}  
     </if>
-    <if test="pickingItemYn != null and pickingItemYn != ''">
-	AND    PICKING_ITEM_YN =  #{pickingItemYn, jdbcType=VARCHAR} 
-	</if>  
-	<if test="pickingReceiptYn != null and pickingReceiptYn != ''">
-	AND    PICKING_RECEIPT_YN =  #{pickingReceiptYn, jdbcType=VARCHAR} 
-	</if>  
-	<if test="pickingYn != null and pickingYn != ''">
-	AND    (PICKING_ITEM_YN =  #{pickingYn, jdbcType=VARCHAR} OR  PICKING_RECEIPT_YN =  #{pickingYn, jdbcType=VARCHAR}) 
-	</if>  
     <if test="processType != null and processType != ''">
-	AND    MLT.ACTION_TYPE_ID = (SELECT MPT.ACTION_TYPE_CD
+	AND    MLT.ACTION_TYPE_CD = (SELECT MPT.ACTION_TYPE_CD
 							     FROM   MOM_PROCESS_TYPE MPT
 							     WHERE  MPT.COMPANY_CD   = MLT.COMPANY_CD
 							     AND    MPT.DIVISION_CD  = MLT.DIVISION_CD 
@@ -529,18 +520,6 @@
     <if test="actionTypeCd   != null and actionTypeCd != ''">
     AND    ACTION_TYPE_CD   = #{actionTypeCd, jdbcType=VARCHAR} 
     </if>
-    <if test="pickingItemYn != null and pickingItemYn != ''">
-	AND    PICKING_ITEM_YN =  #{pickingItemYn, jdbcType=VARCHAR} 
-	</if>  
-	<if test="pickingReceiptYn != null and pickingReceiptYn != ''">
-	AND    PICKING_RECEIPT_YN =  #{pickingReceiptYn, jdbcType=VARCHAR} 
-	</if>  
-	<if test="pickingYn != null and pickingYn != ''">
-	AND    (PICKING_ITEM_YN =  #{pickingYn, jdbcType=VARCHAR} OR  PICKING_RECEIPT_YN =  #{pickingYn, jdbcType=VARCHAR}) 
-	</if>  
-	<if test="unloadingYn != null and unloadingYn != ''">
-	AND    UNLOADING_YN  =  #{unloadingYn, jdbcType=VARCHAR} 
-	</if>  
     AND    USE_YN      = 'Y'
     ORDER BY PROCESS_TYPE
     </select>   

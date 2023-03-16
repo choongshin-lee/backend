@@ -15,6 +15,8 @@
 					     , ML.LOCATION_NM   AS PICKING_LOCATION_NM
 					     , MEM.AREA_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MEM.COMPANY_CD, MEM.DIVISION_CD, MEM.AREA_CD) FROM DUAL) AS AREA_NM
+					     , MEM.PROCESS_TYPE
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MEM.COMPANY_CD, MEM.DIVISION_CD, MEM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 					     , MEM.RECEIPT_TYPE_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_RECEIPT_TYPE_NAME(MEM.COMPANY_CD, MEM.DIVISION_CD, MEM .RECEIPT_TYPE_CD) FROM DUAL)  AS RECEIPT_TYPE_NM
 					     , MEM.DESCRIPTION
@@ -39,6 +41,9 @@
 					AND    MEM.EXEC_GROUP_UNIT = 'R'
 					<if test="pickingId != null and pickingId != ''">
 					AND    (UPPER(MEM.EXEC_TASK_ID) LIKE '%' || UPPER(#{pickingId, jdbcType=VARCHAR}) || '%')    
+					</if>
+					<if test="processType != null and processType != ''">
+					AND    MEM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
 					</if>
 					<if test="receiptTypeCd != null and receiptTypeCd != ''">
 					AND    MEM.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}
@@ -106,6 +111,7 @@
                                        , EXEC_TASK_ID
                                        , LOCATION_CD
                                        , AREA_CD
+                                       , PROCESS_TYPE
                                        , RECEIPT_TYPE_CD
                                        , EXEC_GROUP_UNIT
                                        , DESCRIPTION
@@ -121,6 +127,7 @@
                                        , #{item.pickingId, jdbcType=VARCHAR}
                                        , #{item.pickingLocationCd, jdbcType=VARCHAR}
                                        , #{item.areaCd, jdbcType=VARCHAR}
+                                       , #{item.processType, jdbcType=VARCHAR}
                                        , #{item.receiptTypeCd, jdbcType=VARCHAR}
                                        , 'R'
                                        , #{item.description, jdbcType=VARCHAR}
