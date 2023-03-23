@@ -166,6 +166,9 @@
     <if test="locationUseYn != null and locationUseYn != ''">
     AND    LOCATION_USE_YN = #{locationUseYn, jdbcType=VARCHAR} 
     </if>
+    <if test="shippingUseYn != null and shippingUseYn != ''">
+    AND    SHIPPING_USE_YN = #{shippingUseYn, jdbcType=VARCHAR} 
+    </if>
     AND    USE_YN      = 'Y'
     ORDER BY LABEL 
     </select>
@@ -478,13 +481,22 @@
 	ORDER BY SORT_NO,LABEL
 	</select>
 	<select id="get_DD00043" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
-    SELECT PROCESS_CD       AS CODE 
-         , PROCESS_CD    ||'('|| PROCESS_NM      ||')' AS LABEL
-    FROM   MOM_PROCESS  
-    WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    SELECT MP.PROCESS_CD       AS CODE 
+         , MP.PROCESS_CD    ||'('|| MP.PROCESS_NM      ||')' AS LABEL
+    FROM   MOM_PROCESS MP 
+    WHERE  MP.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+    AND    MP.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
     <if test="processType != null and processType != ''">
-    AND    PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
+    AND    MP.PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
+    </if>
+    <if test="actionTypeCd   != null and actionTypeCd != ''">
+    AND    EXISTS ( SELECT *
+                    FROM   MOM_PROCESS_TYPE MPT
+                    WHERE  MPT.COMPANY_CD     = MP.COMPANY_CD
+                    AND    MPT.DIVISION_CD    = MP.DIVISION_CD
+                    AND    MPT.PROCESS_TYPE   = MP.PROCESS_TYPE
+                    AND    MPT.ACTION_TYPE_CD = #{actionTypeCd, jdbcType=VARCHAR} 
+                    AND    MPT.USE_YN 	      = 'Y' )
     </if>
     AND    USE_YN      = 'Y'
     ORDER BY PROCESS_CD

@@ -10,9 +10,6 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPT.COMPANY_CD, MPT.DIVISION_CD, 'MD0026', MPT.BOUNDARY_TYPE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS BOUNDARY_TYPE_NM  
 		     , MPT.ACTION_TYPE_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPT.COMPANY_CD, MPT.DIVISION_CD, 'MD0027', MPT.ACTION_TYPE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS ACTION_TYPE_NM
-		     , MPT.PICKING_ITEM_YN
-		     , MPT.PICKING_RECEIPT_YN
-             , MPT.UNLOADING_YN
 		     , MPT.USE_YN
 		     , MPT.UPDATE_BY   AS UPDATE_USER_NO
 		     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPT.COMPANY_CD, MPT.DIVISION_CD, MPT.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
@@ -54,9 +51,6 @@
 								  , PROCESS_TYPE_NM
 								  , BOUNDARY_TYPE_CD
 								  , ACTION_TYPE_CD
-								  , PICKING_ITEM_YN
-								  , PICKING_RECEIPT_YN
-                                  , UNLOADING_YN
 								  , USE_YN
 								  , DESCRIPTION
 								  , DEL_YN
@@ -70,9 +64,6 @@
 	                              , #{item.processTypeNm, jdbcType=VARCHAR}
 	                              , #{item.boundaryTypeCd, jdbcType=VARCHAR}
 	                              , #{item.actionTypeCd, jdbcType=VARCHAR}
-	                              , #{item.pickingItemYn, jdbcType=VARCHAR}
-	                              , #{item.pickingReceiptYn, jdbcType=VARCHAR}
-	                              , #{item.unloadingYn, jdbcType=VARCHAR}
 	                              , #{item.useYn, jdbcType=VARCHAR}
 	                              , #{item.description, jdbcType=VARCHAR}
 	                              , #{item.delYn, jdbcType=VARCHAR}

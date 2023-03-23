@@ -16,9 +16,9 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'IC0004', MDO.MAIN_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAIN_STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'IC0005', MDO.DTL_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DTL_STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDO.COMPANY_CD, MDO.DIVISION_CD, 'SM0017', MDO.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-					     , MDO.TRANSIT_ORDER_ID                         AS KEY_ID
+					     , MDO.TRANSIT_ORDER_ID                          AS KEY_ID
 					     , COUNT(*) OVER()                               AS TOTAL_COUNT
-					     , ROW_NUMBER() OVER(PARTITION BY MDO.COMPANY_CD,MDO.DIVISION_CD ORDER BY MDO.TRANSIT_ORDER_ID) AS ROW_CNT
+					     , ROW_NUMBER() OVER(PARTITION BY MDO.COMPANY_CD,MDO.DIVISION_CD ORDER BY MDO.TRANSIT_ORDER_ID ) AS ROW_CNT
 					FROM   MOM_TRANSIT_ORDER_V MDO
 					     , MOM_LOCATION MLR
 					     , MOM_LOCATION MLI
@@ -35,8 +35,6 @@
 					AND    MDO.COMPANY_CD           = #{companyCd, jdbcType=VARCHAR}
 					AND    MDO.DIVISION_CD          = #{divisionCd, jdbcType=VARCHAR}
 					AND    MDO.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					AND    MDO.DTL_STATE            = 'DOF'
-					AND    MDO.REMAIN_QTY           > 0
 					<if test="transitNo != null and transitNo != ''">
 					AND    (UPPER(MDO.TRANSIT_NO) LIKE '%' || UPPER(#{transitNo, jdbcType=VARCHAR}) || '%')   
 					</if>
@@ -51,48 +49,4 @@
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
 		</if>               
     </select>   
-    <delete id="remove_customBtn1-1" parameterType="java.util.List">
-        DELETE FROM MOM_PROC_DO_CLOSE
-          <where>
-              <foreach collection="list" item="item" open="" close="" separator="OR">
-            (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-               AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-               AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
-            )
-              </foreach>
-          </where>
-    </delete>  
-    <insert id="create_customBtn1-1" parameterType="java.util.List">
-        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_DO_CLOSE( COMPANY_CD
-                              , DIVISION_CD
-                              , PROCESS_TYPE
-                              , DO_NO
-                              , DELIVERY_ORDER_ID 
-                              , DESCRIPTION
-                              , VAL_MSG
-                              , MULTI_MSG
-                              , CREATE_BY
-                              , CREATE_DATE
-                              )
-        VALUES                ( #{item.companyCd, jdbcType=VARCHAR}
-                              , #{item.divisionCd, jdbcType=VARCHAR}
-                              , #{item.processType, jdbcType=VARCHAR}
-                              , #{item.transitNo, jdbcType=VARCHAR}
-                              , #{item.transitOrderId, jdbcType=VARCHAR}
-                              , #{item.description, jdbcType=VARCHAR}
-                              , #{item.valMsg, jdbcType=VARCHAR}
-                              , #{item.multiMsg, jdbcType=VARCHAR}
-                              , #{item.userId, jdbcType=VARCHAR}
-                              , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-                              )     
-        </foreach>
-    </insert>
-    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_STOCK_PKG.SP_DO_CLOSE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
-    </select>     
 </mapper>     

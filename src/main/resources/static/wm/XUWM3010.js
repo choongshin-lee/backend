@@ -1,4 +1,4 @@
-var menuId = 'XUWM1070_1';
+var menuId = 'XUWM3010';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -40,9 +40,9 @@ var VIEW= {
                     return;
                 }
                 $('#issueLocationCdSP21').val(checkItem[0]['issueLocationCd']);
-                $('#requestLocationCdSP21').val(checkItem[0]['requestLocationCd']);
+                $('#customerCdSP21').val(checkItem[0]['customerCd']);
                 $('#issueLocationCdSP21').jqxComboBox({disabled: true});
-                $('#requestLocationCdSP21').jqxComboBox({disabled: true});
+                $('#customerCdSP21').jqxComboBox({disabled: true});
             }
         }
         else if(index == 20){         
@@ -59,6 +59,6 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0200', VIEW);	
+	momWidget.gridPopup.init(2,21,1,'XUDG0190', VIEW);	
 	VIEW.init();
 });

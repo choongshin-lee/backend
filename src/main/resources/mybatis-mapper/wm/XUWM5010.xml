@@ -8,8 +8,12 @@
 	    </if>
 	                SELECT MPD.COMPANY_CD
 	                     , MPD.DIVISION_CD
-	                     , MPD.WORK_ORDER_ID
-	                     , MPD.WO_RESULT_ID
+	                     , MPD.PROCESS_CD         
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
+		                 , MPD.IO_TYPE
+	                     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
+	                     , MPD.REFERENCE_NO 
+						 , MPD.REFERENCE_DTL_NO 
 	                     , MPD.ITEM_ID
 	                     , MI.ITEM_NM
 	                     , MI.ITEM_SPEC
@@ -20,13 +24,14 @@
 	                     , MPD.TO_LOCATION_CD     AS ISSUE_LOCATION_CD 
 	                     , MLT.LOCATION_NM        AS ISSUE_LOCATION_NM
 	                     , MPD.QTY                AS ISSUE_QTY
+	                     , MPD.APPLY_FLAG
 	                     , TO_CHAR(MPD.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE
 	                     , MPD.CREATE_BY                                     AS REQUEST_USER_NO 
 	                     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.CREATE_BY) FROM DUAL ) AS REQUEST_USER_NM
 	                     , ROWIDTOCHAR(MPD.ROWID)            AS KEY_ID
 	                     , COUNT(*) OVER()   AS TOTAL_COUNT
-	                     , ROW_NUMBER() OVER(PARTITION BY MPD.COMPANY_CD,MPD.DIVISION_CD ORDER BY MPD.WO_RESULT_ID) AS ROW_CNT
-	                FROM   MOM_PRODUCT_DELIVEERY_SHEET MPD
+	                     , ROW_NUMBER() OVER(PARTITION BY MPD.COMPANY_CD,MPD.DIVISION_CD ORDER BY MPD.REFERENCE_DTL_NO) AS ROW_CNT
+	                FROM   MOM_PRODUCT_DELIVERY_SHEET MPD
 	                     , MOM_ITEM MI
 	                     , MOM_LOCATION MLF
 	                     , MOM_LOCATION MLT
@@ -42,7 +47,13 @@
 	                AND    MPD.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
 	                AND    MPD.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR} 
 	                AND    MPD.CREATE_DATE      BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-	                <if test="requestLocationCdNm != null and requestLocationCdNm != ''">
+	                <if test="applyFlag != null and applyFlag != ''">
+					AND    MPD.APPLY_FLAG  = #{applyFlag, jdbcType=VARCHAR}
+					</if>   
+					<if test="processCd != null and processCd != ''">
+					AND    MPD.PROCESS_CD  = #{processCd, jdbcType=VARCHAR}
+					</if>  
+					<if test="requestLocationCdNm != null and requestLocationCdNm != ''">
 	                AND    (UPPER(MPD.FROM_LOCATION_CD) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLF.LOCATION_NM) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%')    
 	                </if> 
 	                <if test="issueLocationCdNm != null and issueLocationCdNm != ''">
@@ -51,11 +62,11 @@
 	                <if test="itemIdNm != null and itemIdNm != ''">
 	                AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
 	                </if>
-	                <if test="workOrderId != null and workOrderId != ''">
-	                AND    (UPPER(MPD.WORK_ORDER_ID) LIKE '%' || UPPER(#{workOrderId, jdbcType=VARCHAR}) || '%' )    
+	                <if test="referenceNo != null and referenceNo != ''">
+	                AND    (UPPER(MPD.REFERENCE_NO) LIKE '%' || UPPER(#{referenceNo, jdbcType=VARCHAR}) || '%' )    
 	                </if> 
-	                <if test="woResultId != null and woResultId != ''">
-	                AND    (UPPER(MPD.WO_RESULT_ID) LIKE '%' || UPPER(#{woResultId, jdbcType=VARCHAR}) || '%' )    
+	                <if test="referenceDtlNo != null and referenceDtlNo != ''">
+	                AND    (UPPER(MPD.REFERENCE_DTL_NO) LIKE '%' || UPPER(#{referenceDtlNo, jdbcType=VARCHAR}) || '%' )    
 	                </if> 	                
 	    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 	               ) A

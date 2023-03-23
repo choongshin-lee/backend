@@ -1,4 +1,4 @@
-var menuId = 'XUWM5050';
+var menuId = 'XUWM3070';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -17,7 +17,7 @@ var VIEW= {
     },
     cellClickCallBack: function(index,rowIndex,target,e) {        
     if(index==0){
-      widget.findBtnClicked(1, {transitNo:e.item['transitNo']}, true, 'CELLCLICK',menuId,VIEW);
+      widget.findBtnClicked(1, {doNo:e.item['doNo']}, true, 'CELLCLICK',menuId,VIEW);
     }
   },
 };
