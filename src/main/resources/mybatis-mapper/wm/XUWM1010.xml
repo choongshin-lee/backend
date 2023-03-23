@@ -230,7 +230,7 @@
 		                    , #{item.itemId, jdbcType=VARCHAR}
 		                    , #{item.issueRequestQty, jdbcType=NUMERIC}
 		                    , #{item.unit, jdbcType=VARCHAR}
-		                    , #{item.locationCd, jdbcType=VARCHAR}
+		                    , #{item.storageLocationCd, jdbcType=VARCHAR}
 		                    , #{item.lcNo, jdbcType=VARCHAR}
 		                    , #{item.trackingNo, jdbcType=VARCHAR}
 		                    , #{item.cartonNo, jdbcType=VARCHAR}

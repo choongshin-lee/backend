@@ -75,6 +75,7 @@
              , MDD.TRACKING_NO
              , MDD.CARTON_NO
              , MDD.REFERENCE_NO
+             , MDD.REFERENCE_DTL_NO
              , MDD.STATE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'WM0002', MDD.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
              , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
@@ -178,6 +179,7 @@
                             , SO_NO
                             , SO_SEQ
                             , REFERENCE_NO
+                            , REFERENCE_DTL_NO
                             , DELIVERY_REQUEST_ID
                             , DESCRIPTION
                             , DEL_YN
@@ -196,13 +198,14 @@
 		                    , #{item.itemId, jdbcType=VARCHAR}
 		                    , #{item.issueRequestQty, jdbcType=NUMERIC}
 		                    , #{item.unit, jdbcType=VARCHAR}
-		                    , #{item.locationCd, jdbcType=VARCHAR}
+		                    , #{item.storageLocationCd, jdbcType=VARCHAR}
 		                    , #{item.lcNo, jdbcType=VARCHAR}
 		                    , #{item.trackingNo, jdbcType=VARCHAR}
 		                    , #{item.cartonNo, jdbcType=VARCHAR}
 		                    , #{item.soNo, jdbcType=VARCHAR}
 		                    , #{item.soSeq, jdbcType=NUMERIC}
 		                    , #{item.referenceNo, jdbcType=VARCHAR}
+		                    , #{item.referenceDtlNo, jdbcType=VARCHAR}
 		                    , #{item.deliveryRequestId, jdbcType=VARCHAR}
 		                    , #{item.description, jdbcType=VARCHAR}
 		                    , #{item.delYn, jdbcType=VARCHAR}

@@ -12,8 +12,10 @@
 		                 , MDM.DR_NM
 		                 , MDM.PROCESS_CD
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
+		                 , MDM.ISSUE_LOCATION_CD
+		                 , MLI.LOCATION_NM            AS ISSUE_LOCATION_NM
 		                 , MDM.REQUEST_LOCATION_CD
-		                 , ML.LOCATION_NM           AS REQUEST_LOCATION_NM
+		                 , MLR.LOCATION_NM            AS REQUEST_LOCATION_NM
 		                 , MDM.CUSTOMER_CD
 		                 , MP.PARTNER_NM            AS CUSTOMER_NM
 		                 , MDM.FORWARDER_CD
@@ -41,18 +43,22 @@
 		                 , COUNT(*) OVER()   AS TOTAL_COUNT
 		                 , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDM.DR_NO) AS ROW_CNT
 		            FROM   MOM_DR_MST   MDM
-		                 , MOM_LOCATION ML
+		                 , MOM_LOCATION MLI
+                         , MOM_LOCATION MLR
 		                 , MOM_PARTNER  MP
 		                 , MOM_PROCESS  MS
-		            WHERE  MDM.COMPANY_CD          = ML.COMPANY_CD
-		            AND    MDM.DIVISION_CD         = ML.DIVISION_CD
-		            AND    MDM.REQUEST_LOCATION_CD = ML.LOCATION_CD
-		            AND    MDM.COMPANY_CD          = MP.COMPANY_CD
-		            AND    MDM.DIVISION_CD         = MP.DIVISION_CD
-		            AND    MDM.CUSTOMER_CD         = MP.PARTNER_CD
-		            AND    MDM.COMPANY_CD          = MS.COMPANY_CD
-		            AND    MDM.DIVISION_CD         = MS.DIVISION_CD
-		            AND    MDM.PROCESS_CD          = MS.PROCESS_CD
+		            WHERE  MDM.COMPANY_CD          = MLI.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD         = MLI.DIVISION_CD(+)
+	                AND    MDM.ISSUE_LOCATION_CD   = MLI.LOCATION_CD(+)
+	                AND    MDM.COMPANY_CD          = MLR.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD         = MLR.DIVISION_CD(+)
+	                AND    MDM.REQUEST_LOCATION_CD = MLR.LOCATION_CD(+)
+	                AND    MDM.COMPANY_CD          = MP.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD         = MP.DIVISION_CD(+)
+	                AND    MDM.CUSTOMER_CD         = MP.PARTNER_CD(+)
+	                AND    MDM.COMPANY_CD          = MS.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD         = MS.DIVISION_CD(+)
+	                AND    MDM.PROCESS_CD          = MS.PROCESS_CD(+)
 		            AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 		            AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}
 		            AND    MDM.STATE               = 'DRF'
@@ -60,12 +66,15 @@
 		            <if test="drNo != null and drNo != ''">
 		            AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')	  
 		            </if>
-		            <if test="customerNm != null and customerNm != ''">
-		            AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerNm, jdbcType=VARCHAR}) || '%')	  
+		            <if test="customerCdNm != null and customerCdNm != ''">
+		            AND    (UPPER(MDM.CUSTOMER_CD) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%')
 		            </if>	
-		            <if test="requestLocationCdNm != null and requestLocationCdNm != ''">
-		            AND    (UPPER(MDM.REQUEST_LOCATION_CD) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%')
-		            </if>	
+		            <if test="issueLocationCdNm != null and issueLocationCdNm != ''">
+	                AND    (UPPER(MDM.ISSUE_LOCATION_CD) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLI.LOCATION_NM) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%')   
+	                </if> 
+	                <if test="requestLocationCdNm != null and requestLocationCdNm != ''">
+	                AND    (UPPER(MDM.REQUEST_LOCATION_CD) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLR.LOCATION_NM) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%')   
+	                </if>  
 		            <if test="processCd != null and processCd != ''">
 					AND    MDM.PROCESS_CD  = #{processCd, jdbcType=VARCHAR}
 					</if>   
@@ -97,11 +106,11 @@
              , MI.ITEM_SPEC
              , MI.ITEM_TYPE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-             , MDD.REQUEST_QTY
+             , MDD.REQUEST_QTY                                                                                AS ISSUE_REQUEST_QTY
              , MDD.UNIT 
              , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
-             , MDD.LOCATION_CD
-             , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.LOCATION_CD) FROM DUAL) AS LOCATION_NM
+             , MDD.LOCATION_CD                                                                                          AS STORAGE_LOCATION_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.LOCATION_CD) FROM DUAL) AS STORAGE_LOCATION_NM
              , MDD.LC_NO
              , MDD.TRACKING_NO
              , MDD.CARTON_NO
