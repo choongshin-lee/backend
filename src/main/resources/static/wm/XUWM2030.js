@@ -36,10 +36,8 @@ var VIEW= {
                     return;
                 }
                 $('#issueLocationCdSP21').val(checkItem[0]['receiptLocationCd']);
-                $('#customerCdSP21').val(checkItem[0]['customerCd']);
                 $('#drNoSP21').val('');
                 $('#issueLocationCdSP21').jqxComboBox({disabled: true});
-                $('#customerCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 20){         
@@ -47,8 +45,6 @@ var VIEW= {
             if(action='C'&& btnId == 'customBtn21-1'){ 
                 for(var i=0,max=param.length; i<max;i++){
                     param[i]['receiptId'] = checkItem[0]['receiptId'];
-                    param[i]['receiptTypeCd'] = checkItem[0]['receiptTypeCd'];
-                    param[i]['multiCheckYn'] = checkItem[0]['multiCheckYn'];
                 }
             }
         }

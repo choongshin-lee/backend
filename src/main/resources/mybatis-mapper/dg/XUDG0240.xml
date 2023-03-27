@@ -58,7 +58,7 @@
 	                    AND    MP.PROCESS_TYPE = 'ITS'
 	                    AND    MP.USE_YN       = 'Y')
 	    <if test="issueLocationCd != null and issueLocationCd != ''">
-	    AND    MDD.LOCATION_CD   = #{issueLocationCd, jdbcType=VARCHAR}
+	    AND    MDM.ISSUE_LOCATION_CD   = #{issueLocationCd, jdbcType=VARCHAR}
 	    </if>
 	    <if test="drNo != null and drNo != ''">
 	    AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%')   
@@ -83,7 +83,6 @@
 	    INTO MOM_PROC_LOCATION_RECEIPT_DTL( COMPANY_CD
 	                                      , DIVISION_CD
 	                                      , PROCESS_TYPE
-	                                      , RECEIPT_TYPE_CD
 	                                      , RECEIPT_ID
 	                                      , SEQ
 	                                      , IO_TYPE
@@ -94,7 +93,6 @@
 	                                      , REFERENCE_DTL_NO
 	                                      , RECEIPT_DETAIL_ID
 	                                      , RCV_LOGISTIC_UNIT_ID
-	                                      , MULTI_CHECK_YN
 	                                      , DESCRIPTION
 	                                      , DEL_YN
 	                                      , VAL_MSG
@@ -105,7 +103,6 @@
 	    VALUES                            ( #{item.companyCd, jdbcType=VARCHAR}  
 	                                      , #{item.divisionCd, jdbcType=VARCHAR}      
 	                                      , 'ITS'    
-	                                      , #{item.receiptTypeCd, jdbcType=VARCHAR}  
 	                                      , #{item.receiptId, jdbcType=VARCHAR}
 	                                      , #{item.seq, jdbcType=NUMERIC}
 	                                      , #{item.ioType, jdbcType=VARCHAR}
@@ -116,7 +113,6 @@
 	                                      , #{item.deliveryRequestId, jdbcType=VARCHAR}
 	                                      , #{item.receiptDetailId, jdbcType=VARCHAR}
 	                                      , #{item.rcvLogisticUnitId, jdbcType=VARCHAR}
-	                                      , #{item.multiCheckYn, jdbcType=VARCHAR}
 	                                      , #{item.description, jdbcType=VARCHAR}
 	                                      , #{item.delYn, jdbcType=VARCHAR}
 	                                      , #{item.valMsg, jdbcType=VARCHAR}

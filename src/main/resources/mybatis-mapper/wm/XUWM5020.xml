@@ -12,8 +12,10 @@
 		                 , MDM.DR_NM	     AS TRANSIT_NM
 		                 , MDM.PROCESS_CD         
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
+		                 , MDM.ISSUE_LOCATION_CD
+		                 , MLI.LOCATION_NM            AS ISSUE_LOCATION_NM
 		                 , MDM.REQUEST_LOCATION_CD
-		                 , ML.LOCATION_NM           AS REQUEST_LOCATION_NM
+		                 , MLR.LOCATION_NM            AS REQUEST_LOCATION_NM
 		                 , MDM.STATE
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'IC0002', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 		                 , MDM.DESCRIPTION
@@ -26,10 +28,14 @@
 		                 , COUNT(*) OVER()   AS TOTAL_COUNT
 		                 , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDM.DR_NO) AS ROW_CNT
 		            FROM   MOM_DR_MST MDM
-		                 , MOM_LOCATION ML
-		            WHERE  MDM.COMPANY_CD          = ML.COMPANY_CD
-		            AND    MDM.DIVISION_CD         = ML.DIVISION_CD
-		            AND    MDM.REQUEST_LOCATION_CD = ML.LOCATION_CD
+		                 , MOM_LOCATION MLI
+                         , MOM_LOCATION MLR
+		            WHERE  MDM.COMPANY_CD          = MLI.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD         = MLI.DIVISION_CD(+)
+	                AND    MDM.ISSUE_LOCATION_CD   = MLI.LOCATION_CD(+)
+	                AND    MDM.COMPANY_CD          = MLR.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD         = MLR.DIVISION_CD(+)
+	                AND    MDM.REQUEST_LOCATION_CD = MLR.LOCATION_CD(+)
 		            AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 		            AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}	
 		            AND    MDM.STATE               = 'DRG'
@@ -38,9 +44,12 @@
 		            <if test="transitNo != null and transitNo != ''">
 		            AND    (UPPER(MDM.DR_NO) LIKE '%' || UPPER(#{transitNo, jdbcType=VARCHAR}) || '%')	  
 		            </if>
-		            <if test="requestLocationCdNm != null and requestLocationCdNm != ''">
-		            AND    (UPPER(MDM.REQUEST_LOCATION_CD) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%')	  
-		            </if>	
+		            <if test="issueLocationCdNm != null and issueLocationCdNm != ''">
+	                AND    (UPPER(MDM.ISSUE_LOCATION_CD) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLI.LOCATION_NM) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%')   
+	                </if> 
+	                <if test="requestLocationCdNm != null and requestLocationCdNm != ''">
+	                AND    (UPPER(MDM.REQUEST_LOCATION_CD) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLR.LOCATION_NM) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%')   
+	                </if>  
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
@@ -110,6 +119,7 @@
                             , PROCESS_CD
                             , DR_NO
                             , DR_NM
+                            , ISSUE_LOCATION_CD
                             , REQUEST_LOCATION_CD
                             , CUSTOMER_CD
                             , FORWARDER_CD
@@ -133,6 +143,7 @@
                             , 'PR'
                             , #{item.transitNo, jdbcType=VARCHAR}
                             , #{item.transitNm, jdbcType=VARCHAR}
+                            , #{item.issueLocationCd, jdbcType=VARCHAR}
                             , #{item.requestLocationCd, jdbcType=VARCHAR}
                             , #{item.customerCd, jdbcType=VARCHAR}
                             , #{item.forwarderCd, jdbcType=VARCHAR}

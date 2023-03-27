@@ -51,8 +51,6 @@ var VIEW= {
             if(action='C'&& btnId == 'customBtn21-1'){ 
                 for(var i=0,max=param.length; i<max;i++){
                     param[i]['receiptId'] = checkItem[0]['receiptId'];
-                    param[i]['receiptTypeCd'] = checkItem[0]['receiptTypeCd'];
-                    param[i]['multiCheckYn'] = checkItem[0]['multiCheckYn'];
                 }
             }
         }

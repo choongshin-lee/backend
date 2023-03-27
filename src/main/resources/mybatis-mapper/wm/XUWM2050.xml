@@ -12,18 +12,10 @@
 					     , MLM.RECEIPT_NM
 					     , MLM.LOCATION_CD  AS RECEIPT_LOCATION_CD
 					     , ML.LOCATION_NM   AS RECEIPT_LOCATION_NM
-					     , MLM.LOCATION_USER_NO
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.LOCATION_USER_NO) FROM DUAL ) AS LOCATION_USER_NM
+					     , MLM.LOCATION_USER_NO  AS RECEIPT_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.LOCATION_USER_NO) FROM DUAL ) AS RECEIPT_USER_NM
 					     , MLM.PROCESS_TYPE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
-					     , MLM.RECEIPT_TYPE_CD
-					     , MLR.RECEIPT_TYPE_NM
-					     , MLR.LOGISTICS_USE_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'MD0020', MLR.LOGISTICS_USE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOGISTICS_USE_NM
-					     , MLR.RECEIPT_STEP_ID
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'MD0038', MLR.RECEIPT_STEP_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS RECEIPT_STEP_NM
-					     , MLR.ACTION_TYPE_ID
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'MD0027', MLR.ACTION_TYPE_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ACTION_TYPE_NM
 					     , MLM.STATE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'WM0002', MLM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 					     , MLM.DESCRIPTION
@@ -36,13 +28,9 @@
 					     , ROW_NUMBER() OVER(PARTITION BY MLM.COMPANY_CD,MLM.DIVISION_CD ORDER BY MLM.RECEIPT_ID) AS ROW_CNT
 					FROM   MOM_LOCATION_RECEIPT_MST MLM
 					     , MOM_LOCATION ML
-					     , MOM_LOCATION_RECEIPT_TYPE MLR
 					WHERE  MLM.COMPANY_CD      = ML.COMPANY_CD(+)
 					AND    MLM.DIVISION_CD     = ML.DIVISION_CD(+)
 					AND    MLM.LOCATION_CD     = ML.LOCATION_CD(+)
-					AND    MLM.COMPANY_CD      = MLR.COMPANY_CD(+)
-					AND    MLM.DIVISION_CD     = MLR.DIVISION_CD(+)
-					AND    MLM.RECEIPT_TYPE_CD = MLR.RECEIPT_TYPE_CD(+)
 					AND    MLM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 					AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					AND    MLM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
@@ -50,9 +38,6 @@
 					<if test="processType != null and processType != ''">
 					AND    MLM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
 					</if>     
-					<if test="receiptTypeCdNm != null and receiptTypeCdNm != ''">
-					AND    (UPPER(MLM.RECEIPT_TYPE_CD) LIKE '%' || UPPER(#{receiptTypeCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLR.RECEIPT_TYPE_NM) LIKE '%' || UPPER(#{receiptTypeCdNm, jdbcType=VARCHAR}) || '%')    
-					</if> 
 					<if test="receiptLocationCdNm != null and receiptLocationCdNm != ''">
 					AND    (UPPER(MLM.LOCATION_CD) LIKE '%' || UPPER(#{receiptLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{receiptLocationCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
@@ -70,10 +55,6 @@
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, 'WM0003', MLD.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 	         , MLD.IO_TYPE
 	         , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
-	         , MLD.PARTNER_CD
-	         , MP.PARTNER_NM
-	         , MLD.LOCATION_CD
-	         , ML.LOCATION_NM
 	         , MLD.ITEM_ID
 	         , MI.ITEM_NM
 	         , MI.ITEM_SPEC
@@ -82,14 +63,8 @@
 	         , MLD.UNIT
 	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UNIT) FROM DUAL) AS UNIT_NM 
 	         , MLD.RECEIPT_QTY
-	         , MLD.RECEIPT_QTY     AS CONFIRM_QTY
-	         , MLD.CURRENCY_CD
-	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, 'SM0017', MLD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-	         , MLD.EXCHANGE_RATE
-	         , MLD.UNIT_PRICE
-	         , MLD.AMOUNT
-	         , MLD.LOCAL_AMOUNT
 	         , MLD.REFERENCE_NO
+	         , MLD.REFERENCE_DTL_NO
 	         , MLD.RECEIPT_DETAIL_ID
 	         , MLD.RCV_LOGISTIC_UNIT_ID
 	         , MLD.DESCRIPTION
@@ -99,19 +74,11 @@
 	         , ROWIDTOCHAR(MLD.ROWID)            AS KEY_ID
 	    FROM   MOM_LOCATION_RECEIPT_DTL  MLD
 	        ,  MOM_ITEM MI
-	        ,  MOM_LOCATION ML
-	        ,  MOM_PARTNER MP
 	    WHERE  MLD.COMPANY_CD  = MI.COMPANY_CD
 	    AND    MLD.DIVISION_CD = MI.DIVISION_CD
 	    AND    MLD.ITEM_ID     = MI.ITEM_ID    
-	    AND    MLD.COMPANY_CD  = ML.COMPANY_CD(+)
-	    AND    MLD.DIVISION_CD = ML.DIVISION_CD(+)
-	    AND    MLD.LOCATION_CD = ML.LOCATION_CD(+)
-	    AND    MLD.COMPANY_CD  = MP.COMPANY_CD(+)
-	    AND    MLD.DIVISION_CD = MP.DIVISION_CD(+)
-	    AND    MLD.PARTNER_CD  = MP.PARTNER_CD(+)
-	    AND    MLD.COMPANY_CD  =  #{companyCd, jdbcType=VARCHAR}
-	    AND    MLD.DIVISION_CD =  #{divisionCd, jdbcType=VARCHAR}
+	    AND    MLD.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	    AND    MLD.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
 	    AND    MLD.RECEIPT_ID  = #{receiptId, jdbcType=VARCHAR} 
 	</select>  
     <delete id="remove_createBtn1" parameterType="java.util.List">
@@ -130,7 +97,6 @@
         INTO MOM_PROC_LR_CONFIRM( COMPANY_CD
                                 , DIVISION_CD
                                 , RECEIPT_ID
-                                , LOCATION_USER_NO
                                 , DESCRIPTION
                                 , VAL_MSG
                                 , MULTI_MSG
@@ -140,7 +106,6 @@
         VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
                                 , #{item.divisionCd, jdbcType=VARCHAR}
                                 , #{item.receiptId, jdbcType=VARCHAR}
-                                , #{item.locationUserNo, jdbcType=VARCHAR}
                                 , #{item.description, jdbcType=VARCHAR}
                                 , #{item.valMsg, jdbcType=VARCHAR}
                                 , #{item.multiMsg, jdbcType=VARCHAR}
