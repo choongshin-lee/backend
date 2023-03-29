@@ -15,16 +15,17 @@
 		                 , ML.LOCATION_NM   AS PICKING_LOCATION_NM
 		                 , MEM.AREA_CD
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MEM.COMPANY_CD, MEM.DIVISION_CD, MEM.AREA_CD) FROM DUAL) AS AREA_NM
+		                 , MEM.LOGISTICS_UNIT_CD
 		                 , MEM.RECEIPT_TYPE_CD
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_RECEIPT_TYPE_NAME(MEM.COMPANY_CD, MEM.DIVISION_CD, MEM .RECEIPT_TYPE_CD) FROM DUAL)  AS RECEIPT_TYPE_NM
-		                 , MEM.SEARCH_NM             AS ITEM_RECEIPT_ID  
+		                 , MEM.PICKING_GROUP_NO      AS ITEM_RECEIPT_ID  
 		                 , MEM.DESCRIPTION
 		                 , MEM.UPDATE_BY             AS UPDATE_USER_NO
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MEM.COMPANY_CD, MEM .DIVISION_CD, MEM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		                 , TO_CHAR(MEM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 		                 , ROWIDTOCHAR(MEM.ROWID)            AS KEY_ID
-		                 , MEM.EXEC_GROUP_UNIT 
-		                 , MEM.SEARCH_NM  AS ITEM_ID
+		                 , MEM.PICKING_GROUP_UNIT 
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MEM.COMPANY_CD, MEM.DIVISION_CD, 'WM0009', MEM.PICKING_GROUP_UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PICKING_GROUP_UNIT_NM
 		                 , COUNT(*) OVER()   AS TOTAL_COUNT
 		                 , ROW_NUMBER() OVER(PARTITION BY MEM.COMPANY_CD,MEM.DIVISION_CD ORDER BY MEM.EXEC_TASK_ID) AS ROW_CNT
 		            FROM   MOM_LOCATION_EXEC_TASK_MST MEM    
@@ -47,7 +48,7 @@
 		            AND    (UPPER(MEM.LOCATION_CD) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%')    
 		            </if> 
 		            <if test="itemReceiptId != null and itemReceiptId != ''">
-		            AND    UPPER(MEM.SEARCH_NM) LIKE '%' || UPPER(#{itemReceiptId, jdbcType=VARCHAR})     
+		            AND    UPPER(MEM.PICKING_GROUP_NO) LIKE '%' || UPPER(#{itemReceiptId, jdbcType=VARCHAR})     
 		            </if> 
 		        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				   ) A
@@ -103,7 +104,6 @@
 			                           , DIVISION_CD
 			                           , EXEC_TASK_TYPE   
                                        , EXEC_TASK_ID
-			                           , AREA_CD
 			                           , DESCRIPTION
 			                           , VAL_MSG
 			                           , MULTI_MSG
@@ -114,7 +114,6 @@
                                      , #{item.divisionCd, jdbcType=VARCHAR}
 	                                 , 'P'
                                      , #{item.pickingId, jdbcType=VARCHAR}
-	                                 , #{item.areaCd, jdbcType=VARCHAR}
 	                                 , #{item.description, jdbcType=VARCHAR}
 	                                 , #{item.valMsg, jdbcType=VARCHAR}
 	                                 , #{item.multiMsg, jdbcType=VARCHAR}

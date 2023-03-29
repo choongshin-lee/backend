@@ -34,10 +34,8 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#receiptTypeCdSP21').val(checkItem[0]['receiptTypeCd']);
                 $('#receiptLocationCdSP21').val(checkItem[0]['unloadingLocationCd']);
                 $('#itemIdSP21').val('');
-                $('#receiptTypeCdSP21').jqxComboBox({disabled: true});
                 $('#receiptLocationCdSP21').jqxComboBox({disabled: true});
             }
         }
