@@ -8,8 +8,8 @@
 		</if>
 		            SELECT MLM.COMPANY_CD
 					     , MLM.DIVISION_CD
-					     , MLM.EXEC_GROUP_UNIT       AS PICKING_TYPE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'WM0009', MLM.EXEC_GROUP_UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PICKING_TYPE_NM   
+					     , MLM.PICKING_GROUP_UNIT       AS PICKING_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'WM0009', MLM.PICKING_GROUP_UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PICKING_TYPE_NM   
 					     , MLM.EXEC_TASK_ID          AS PICKING_ID
 					     , MLD.SEQ
 					     , MLD.EXEC_TASK_DTL_ID      AS PICKING_DETAIL_ID
@@ -58,7 +58,7 @@
 					AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MLM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MLM.EXEC_TASK_TYPE  = 'P'   
-					AND    MLM.EXEC_GROUP_UNIT = 'R'
+					--AND    MLM.PICKING_GROUP_UNIT = 'R'
 					AND    MLD.STATE IN ( 'LEF', 'LER')
 					<if test="pickingId != null and pickingId != ''">
 					AND    UPPER(MLM.EXEC_TASK_ID) LIKE '%' || UPPER(#{pickingId, jdbcType=VARCHAR}) || '%'    
