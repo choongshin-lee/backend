@@ -47,10 +47,14 @@ var VIEW= {
             }
       }
       else if(index == 30){         
-            let checkItem = widget.getCheckedRowItems(widget.grid[0]);
+            let checkItem = widget.getCheckedRowItems(widget.grid[1]);
             if(action='C'&& btnId == 'customBtn31-1'){ 
                 for(var i=0,max=param.length; i<max;i++){
                     param[i]['pickingId'] = checkItem[0]['pickingId'];
+                    param[i]['pickingDetailId'] = checkItem[0]['pickingDetailId'];
+                    param[i]['toAreaCd'] = checkItem[0]['toAreaCd'];
+                    param[i]['toLogisticsUnitCd'] = checkItem[0]['toLogisticsUnitCd'];
+                    param[i]['unit'] = checkItem[0]['unit'];
                 }
             }
         }
@@ -60,7 +64,7 @@ var VIEW= {
 			widget.findBtnClicked(1, {pickingId:e.item['pickingId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {toPickingLocationCd:e.item['toPickingLocationCd'],toAreaCd:e.item['toAreaCd'],toLogisticsUnitCd:e.item['toLogisticsUnitCd']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(2, {pickingDetailId:e.item['pickingDetailId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 };
