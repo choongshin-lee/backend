@@ -35,8 +35,8 @@ var VIEW= {
                     return;
                 }
                 $('#receiptLocationCdSP21').val(checkItem[0]['pickingLocationCd']);
-                $('#itemIdSP21').val(checkItem[0]['itemId']);
-                $('#itemIdSP21').attr("disabled", true);
+                $('#receiptIdSP21').val('');
+                //$('#receiptIdSP21').attr("disabled", true);
                 $('#receiptLocationCdSP21').jqxComboBox({disabled: true});
             }
         }
