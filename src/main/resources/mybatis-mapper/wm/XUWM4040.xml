@@ -128,7 +128,7 @@
 					                                      , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
     <delete id="remove_customBtn1-1" parameterType="java.util.List">
-        DELETE FROM SP_LOCATION_EXEC_STATE_CHANGE
+        DELETE FROM MOM_PROC_LOCATION_EXEC_STATE
             <where>
             <foreach collection="list" item="item" open="" close="" separator="OR">
             (     COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}

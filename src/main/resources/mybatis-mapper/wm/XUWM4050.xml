@@ -59,38 +59,41 @@
     </select>   
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MLD.EXEC_TASK_ID   AS PICKING_ID
-		     , MLD.SEQ
 		     , MLD.ITEM_ID
+		     , MIN(MI.ITEM_NM)    AS ITEM_NM
+             , MIN(MI.ITEM_SPEC)  AS ITEM_SPEC
+             , MIN(MI.ITEM_TYPE)  AS ITEM_TYPE
+             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_TYPE_NM
 		     , MLD.UNIT
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UNIT) FROM DUAL) AS UNIT_NM
-		     , MLD.QTY      AS PICKING_QTY
-		     , NVL(MLD.RESULT_QTY,0)           AS PICKING_RESULT_QTY
-		     , NVL(MLD.CLOSE_QTY,0)           
-		     , MLD.QTY - NVL(MLD.RESULT_QTY,0) - NVL(MLD.CLOSE_QTY,0)   AS REMAIN_QTY 
-		     , MLD.REFERENCE_NO      AS RECEIPT_ID
-			 , MLD.REFERENCE_DTL_NO  AS RECEIPT_DETAIL_ID 
-		     , MLM.LOCATION_CD		 AS PICKING_LOCATION_CD
-		     , MLM.AREA_CD	         AS TO_AREA_CD
-		     , MLM.LOGISTICS_UNIT_CD AS TO_LOGISTICS_UNIT_CD
-		     , MLD.EXEC_TASK_DTL_ID  AS PICKING_DETAIL_ID
-		     , MLD.DESCRIPTION
-			 , MLD.UPDATE_BY          AS UPDATE_USER_NO
-			 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-			 , TO_CHAR(MLD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-			 , ROWIDTOCHAR(MLD.ROWID)                            AS KEY_ID
-			 , MLM.COMPANY_CD
-			 , MLM.DIVISION_CD
+		     , SUM(MLD.QTY)                         AS PICKING_QTY
+		     , SUM(NVL(MLD.RESULT_QTY,0))           AS PICKING_RESULT_QTY
+		     , SUM(NVL(MLD.CLOSE_QTY,0))             
+		     , SUM(MLD.QTY - NVL(MLD.RESULT_QTY,0) - NVL(MLD.CLOSE_QTY,0))   AS REMAIN_QTY 
+		     , MIN(MLM.LOCATION_CD)       AS PICKING_LOCATION_CD
+		     , MIN(MLM.AREA_CD)           AS TO_AREA_CD
+		     , MIN(MLM.LOGISTICS_UNIT_CD) AS TO_LOGISTICS_UNIT_CD
+		     , MLD.EXEC_TASK_ID||'-'|| MLD.ITEM_ID ||'-'|| MLD.UNIT                          AS KEY_ID
+		     , MLD.COMPANY_CD
+		     , MLD.DIVISION_CD
 		FROM   MOM_LOCATION_EXEC_TASK_MST MLM 
 		     , MOM_LOCATION_EXEC_TASK_DTL MLD
-		WHERE  MLM.COMPANY_CD   = MLD.COMPANY_CD
-		AND    MLM.DIVISION_CD  = MLD.DIVISION_CD
-		AND    MLM.EXEC_TASK_ID = MLD.EXEC_TASK_ID   
+		     , MOM_ITEM MI
+		WHERE  MLM.COMPANY_CD    = MLD.COMPANY_CD
+		AND    MLM.DIVISION_CD   = MLD.DIVISION_CD
+		AND    MLM.EXEC_TASK_ID  = MLD.EXEC_TASK_ID   
+		AND    MLD.COMPANY_CD    = MI.COMPANY_CD
+        AND    MLD.DIVISION_CD   = MI.DIVISION_CD
+        AND    MLD.ITEM_ID       = MI.ITEM_ID
 		AND    MLD.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
 		AND    MLD.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
-		AND    MLD.EXEC_TASK_ID  = #{pickingId, jdbcType=VARCHAR}     
-		AND    MLD.STATE        = 'LEF'
-		ORDER BY MLD.EXEC_TASK_ID 
-		       , MLD.SEQ 
+		AND    MLD.EXEC_TASK_ID  = #{pickingId, jdbcType=VARCHAR}        
+		AND    MLD.STATE         = 'LEF'
+		GROUP BY MLD.COMPANY_CD
+		       , MLD.DIVISION_CD
+		       , MLD.EXEC_TASK_ID
+		       , MLD.ITEM_ID
+		       , MLD.UNIT
 	</select> 
 	<select id="get_findBtn3" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MLR.EXEC_RESULT_ID 
@@ -110,9 +113,10 @@
 		     , MLR.COMPANY_CD
 			 , MLR.DIVISION_CD   
 		FROM   MOM_LOCATION_EXEC_RESULT MLR
-		WHERE  MLR.COMPANY_CD         =  #{companyCd, jdbcType=VARCHAR}
-		AND    MLR.DIVISION_CD        =  #{divisionCd, jdbcType=VARCHAR}
-		AND    MLR.EXEC_TASK_DTL_ID    = #{pickingDetailId, jdbcType=VARCHAR}    
+		WHERE  MLR.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+		AND    MLR.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+		AND    MLR.EXEC_TASK_ID    = #{pickingId, jdbcType=VARCHAR}    
+		AND    MLR.EXEC_TASK_ID    = #{itemId, jdbcType=VARCHAR}
 		ORDER BY MLR.EXEC_RESULT_ID
 	</select> 
 	<delete id="remove_customBtn1-1" parameterType="java.util.List">
@@ -185,6 +189,7 @@
                                          , EXEC_TASK_TYPE
                                          , EXEC_TASK_ID
                                          , LOGISTICS_UNIT_CD
+                                         , RECEIPT_TYPE_CD
                                          , ACTION_TYPE
                                          , DESCRIPTION
                                          , VAL_MSG
@@ -197,6 +202,7 @@
                                          , 'P'
                                          , #{item.pickingId, jdbcType=VARCHAR}
                                          , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                         , #{item.receiptTypeCd, jdbcType=VARCHAR}
                                          , 'E'
                                          , #{item.description, jdbcType=VARCHAR}
                                          , #{item.valMsg, jdbcType=VARCHAR}

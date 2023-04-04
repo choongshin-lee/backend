@@ -132,5 +132,55 @@
 					                                      , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
 					                                      , 'U' 
 					                                      , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
-    </select>  
+    </select> 
+    <delete id="remove_customBtn1-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_LOCATION_EXEC_STATE
+            <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (     COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}
+             AND  DIVISION_CD        = #{item.divisionCd, jdbcType=VARCHAR}
+             AND  EXEC_TASK_TYPE     = 'U'
+             AND  ACTION_TYPE        = 'S'
+             AND  CREATE_BY          = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+            </where>
+    </delete>  
+  <insert id="create_customBtn1-1" parameterType="java.util.List">
+      <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+      INTO MOM_PROC_LOCATION_EXEC_STATE( COMPANY_CD
+                                       , DIVISION_CD
+                                       , EXEC_TASK_TYPE
+                                       , EXEC_TASK_ID
+                                       , LOGISTICS_UNIT_CD
+                                       , ACTION_TYPE
+                                       , DESCRIPTION
+                                       , VAL_MSG
+                                       , MULTI_MSG
+                                       , CREATE_BY
+                                       , CREATE_DATE
+                                       )
+        VALUES                         ( #{item.companyCd, jdbcType=VARCHAR}  
+                                       , #{item.divisionCd, jdbcType=VARCHAR}   
+                                       , 'U'
+                                       , #{item.unloadingId, jdbcType=VARCHAR}
+                                       , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                       , 'S'
+                                       , #{item.description, jdbcType=VARCHAR}
+                                       , #{item.valMsg, jdbcType=VARCHAR}
+                                       , #{item.multiMsg, jdbcType=VARCHAR}
+                                       , #{item.userId, jdbcType=VARCHAR}
+                                       , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                       )
+      </foreach>
+  </insert>
+  <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+      { CALL MOM_WMS_PKG.SP_LOCATION_EXEC_STATE_CHANGE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                      , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                      , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                      , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
+                                                      , 'U'
+                                                      , 'S'
+                                                      , #{userId,      jdbcType=VARCHAR, mode=IN} )}                            
+  </select>     
 </mapper>    

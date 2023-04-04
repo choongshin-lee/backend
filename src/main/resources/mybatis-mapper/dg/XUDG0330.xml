@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0330">
+    <select id="get_findBtn31" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    SELECT MIS.COMPANY_CD
+		     , MIS.DIVISION_CD
+		     , MIS.LOCATION_CD  
+		     , (SELECT MOM_COMMON_PKG.fn_get_location_name(MIS.COMPANY_CD, MIS.DIVISION_CD, MIS.LOCATION_CD) FROM DUAL) AS LOCATION_NM
+		     , MIS.AREA_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MIS.COMPANY_CD, MIS.DIVISION_CD, MIS.AREA_CD) FROM DUAL) AS AREA_NM
+		     , MIS.LOGISTICS_UNIT_CD
+		     , MIS.ITEM_ID
+		     , MI.ITEM_NM
+		     , MI.ITEM_SPEC
+		     , MI.ITEM_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+		     , MIS.STOCK_QTY
+		     , ROWIDTOCHAR(MIS.ROWID)    AS KEY_ID
+		FROM   MOM_AREA_ITEM_STOCK MIS
+		     , MOM_ITEM MI
+		WHERE  MIS.COMPANY_CD        = MI.COMPANY_CD
+		AND    MIS.DIVISION_CD       = MI.DIVISION_CD
+		AND    MIS.ITEM_ID           = MI.ITEM_ID
+		AND    MIS.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
+		AND    MIS.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
+		AND    MIS.LOCATION_CD       = #{unloadingLocationCd, jdbcType=VARCHAR}
+		AND    MIS.ITEM_ID           = #{itemId, jdbcType=VARCHAR}     
+		<if test="toLogisticsUnitCd != null and toLogisticsUnitCd != ''">
+		AND    MIS.LOGISTICS_UNIT_CD != #{toLogisticsUnitCd, jdbcType=VARCHAR}     
+		</if>
+		AND    MIS.STOCK_QTY > 0
+		ORDER BY MIS.STOCK_QTY
+    </select>
+    <delete id="remove_customBtn31-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_EXEC_TASK_RESULT 
+          <where>
+              <foreach collection="list" item="item" open="" close="" separator="OR">
+            (       COMPANY_CD     = #{item.companyCd, jdbcType=VARCHAR}
+               AND  DIVISION_CD    = #{item.divisionCd, jdbcType=VARCHAR}
+               AND  EXEC_TASK_TYPE = 'U'
+               AND  CREATE_BY      = #{item.userId, jdbcType=VARCHAR}
+            )
+              </foreach>
+          </where>
+    </delete>  
+    <insert id="create_customBtn31-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_EXEC_TASK_RESULT( COMPANY_CD
+	                                  , DIVISION_CD
+	                                  , EXEC_TASK_TYPE 
+                                      , EXEC_TASK_ID 
+                                      , EXEC_TASK_DTL_ID  
+	                                  , LOCATION_CD  
+	                                  , FROM_AREA_CD 
+	                                  , FROM_LOGISTICS_UNIT_CD
+	                                  , TO_AREA_CD 
+	                                  , TO_LOGISTICS_UNIT_CD
+	                                  , ITEM_ID 
+	                                  , UNIT
+	                                  , QTY 
+	                                  , DESCRIPTION
+	                                  , VAL_MSG
+	                                  , MULTI_MSG
+	                                  , CREATE_BY
+	                                  , CREATE_DATE
+	                                  )
+        VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
+	                                  , #{item.divisionCd, jdbcType=VARCHAR}
+	                                  , 'P'
+	                                  , #{item.unloadingId, jdbcType=VARCHAR}
+	                                  , #{item.unloadingDetailId, jdbcType=VARCHAR}
+	                                  , #{item.locationCd, jdbcType=VARCHAR}
+	                                  , #{item.areaCd, jdbcType=VARCHAR}
+	                                  , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+	                                  , #{item.toAreaCd, jdbcType=VARCHAR}
+	                                  , #{item.toLogisticsUnitCd, jdbcType=VARCHAR}
+	                                  , #{item.itemId, jdbcType=VARCHAR}
+	                                  , #{item.unit, jdbcType=VARCHAR}
+	                                  , #{item.unloadingQty, jdbcType=NUMERIC}
+	                                  , #{item.description, jdbcType=VARCHAR}
+	                                  , #{item.valMsg, jdbcType=VARCHAR}
+	                                  , #{item.multiMsg, jdbcType=VARCHAR}
+	                                  , #{item.userId, jdbcType=VARCHAR}
+	                                  , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+	                                  )     
+        </foreach>
+    </insert>
+    <select id="proc_customBtn31-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WMS_PKG.SP_LOCATION_EXEC_TASK_RESULT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                       , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                       , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                               		   , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                               		   , 'P'
+                                                       , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>    
+</mapper>

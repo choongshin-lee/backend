@@ -35,7 +35,8 @@ var VIEW= {
                     return;
                 }
                 $('#receiptLocationCdSP21').val(checkItem[0]['unloadingLocationCd']);
-                $('#itemIdSP21').val('');
+                $('#receiptIdSP21').val('');
+                //$('#receiptIdSP21').attr("disabled", true);
                 $('#receiptLocationCdSP21').jqxComboBox({disabled: true});
             }
         }

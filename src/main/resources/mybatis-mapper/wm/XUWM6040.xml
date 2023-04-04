@@ -3,182 +3,222 @@
 <mapper namespace="com.mom.backend.XUWM6040">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
-		    SELECT A.*
-		    FROM   (
-		</if>
-		            SELECT MLM.COMPANY_CD
-					     , MLM.DIVISION_CD
-					     , MLM.EXEC_TASK_ID          AS UNLOADING_ID
-					     , MLD.SEQ
-					     , MLD.EXEC_TASK_DTL_ID      AS UNLOADING_DETAIL_ID
-					     , MLM.LOCATION_CD           AS UNLOADING_LOCATION_CD
-					     , ML.LOCATION_NM            AS UNLOADING_LOCATION_NM
-					     , MLM.AREA_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.AREA_CD) FROM DUAL) AS AREA_NM
-					     , MLM.RECEIPT_TYPE_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_RECEIPT_TYPE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.RECEIPT_TYPE_CD) FROM DUAL)  AS RECEIPT_TYPE_NM
-					     , MLD.STATE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, 'WM0008', MLD.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM  
-					     , MLD.ITEM_ID
-					     , MI.ITEM_NM
-					     , MI.ITEM_SPEC
-					     , MI.ITEM_TYPE
-					    , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-					     , MLD.UNIT
-					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UNIT) FROM DUAL) AS UNIT_NM
-					     , MLD.QTY               AS UNLOADING_QTY
-					     , MLD.REFERENCE_NO      AS RECEIPT_ID
-					     , MLD.REFERENCE_DTL_NO  AS RECEIPT_DETAIL_ID
-					     , MLD.DESCRIPTION
-					     , MLM.CONFIRM_DATE
-					     , MLM.CONFIRM_USER_NO 
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
-					     , MLD.UPDATE_BY                                                                                             AS UPDATE_USER_NO
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UPDATE_BY) FROM DUAL )       AS UPDATE_USER_NM
-					     , TO_CHAR(MLD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')                                                         AS UPDATE_DATE
-					     , ROWIDTOCHAR(MLD.ROWID)            AS KEY_ID
-					     , COUNT(*) OVER()   AS TOTAL_COUNT
-					     , ROW_NUMBER() OVER(PARTITION BY MLM.COMPANY_CD,MLM.DIVISION_CD ORDER BY MLD.EXEC_TASK_DTL_ID, MLD.SEQ) AS ROW_CNT
-					FROM   MOM_LOCATION_EXEC_TASK_MST MLM
-					     , MOM_LOCATION_EXEC_TASK_DTL MLD
-					     , MOM_LOCATION ML
-					     , MOM_ITEM MI
-					WHERE  MLM.COMPANY_CD   = MLD.COMPANY_CD
-					AND    MLM.DIVISION_CD  = MLD.DIVISION_CD
-					AND    MLM.EXEC_TASK_ID = MLD.EXEC_TASK_ID     
-					AND    MLM.COMPANY_CD   = ML.COMPANY_CD
-					AND    MLM.DIVISION_CD  = ML.DIVISION_CD
-					AND    MLM.LOCATION_CD  = ML.LOCATION_CD
-					AND    MLD.COMPANY_CD   = MI.COMPANY_CD
-					AND    MLD.DIVISION_CD  = MI.DIVISION_CD
-					AND    MLD.ITEM_ID      = MI.ITEM_ID   
-					AND    MLM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
-					AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
-					AND    MLM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					AND    MLM.EXEC_TASK_TYPE  = 'U'   
-					AND    MLD.STATE IN ( 'LEF', 'LER')
-					<if test="unloadingId != null and unloadingId != ''">
-					AND    UPPER(MLM.EXEC_TASK_ID) LIKE '%' || UPPER(#{unloadingId, jdbcType=VARCHAR}) || '%'    
-					</if>
-					<if test="unloadingLocationCdNm != null and unloadingLocationCdNm != ''">
-					AND    (UPPER(MLM.LOCATION_CD) LIKE '%' || UPPER(#{unloadingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{unloadingLocationCdNm, jdbcType=VARCHAR}) || '%')    
-					</if>   
-					<if test="receiptTypeCd != null and receiptTypeCd != ''">
-					AND    MLM.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}
-					</if>   
-					<if test="itemIdNm != null and itemIdNm != ''">
-					AND     (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
-					</if>
-		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
-				       ) A
-				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
-		</if>               
+        SELECT A.*
+        FROM   (
+        </if>
+                SELECT MLM.COMPANY_CD
+	                 , MLM.DIVISION_CD
+	                 , MLM.EXEC_TASK_ID         AS UNLOADING_ID
+	                 , MLM.LOCATION_CD          AS UNLOADING_LOCATION_CD
+	                 , ML.LOCATION_NM           AS UNLOADING_LOCATION_NM
+	                 , MLM.AREA_CD
+	                 , MA.AREA_NM
+	                 , MLM.LOGISTICS_UNIT_CD
+	                 , MLM.RECEIPT_TYPE_CD
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_RECEIPT_TYPE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.RECEIPT_TYPE_CD) FROM DUAL)  AS RECEIPT_TYPE_NM
+	                 , MLM.DESCRIPTION
+	                 , MLM.UPDATE_BY             AS UPDATE_USER_NO
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+	                 , TO_CHAR(MLM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+	                 , MLM.CONFIRM_USER_NO              
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
+	                 , TO_CHAR(MLM.CONFIRM_DATE  ,'YYYY-MM-DD') AS CONFIRM_DATE
+	                 , ROWIDTOCHAR(MLM.ROWID)            AS KEY_ID
+	                 , COUNT(*) OVER()   AS TOTAL_COUNT
+	                 , ROW_NUMBER() OVER(PARTITION BY MLM.COMPANY_CD,MLM.DIVISION_CD ORDER BY MLM.EXEC_TASK_ID) AS ROW_CNT
+	            FROM   MOM_LOCATION_EXEC_TASK_MST MLM
+	                 , MOM_LOCATION ML
+	                 , MOM_AREA     MA
+	            WHERE  MLM.COMPANY_CD         = ML.COMPANY_CD
+	            AND    MLM.DIVISION_CD        = ML.DIVISION_CD
+	            AND    MLM.LOCATION_CD        = ML.LOCATION_CD
+	            AND    MLM.COMPANY_CD         = MA.COMPANY_CD
+	            AND    MLM.DIVISION_CD        = MA.DIVISION_CD
+	            AND    MLM.AREA_CD            = MA.AREA_CD
+	            AND    MLM.COMPANY_CD         = #{companyCd, jdbcType=VARCHAR}
+	            AND    MLM.DIVISION_CD        = #{divisionCd, jdbcType=VARCHAR}
+	            AND    MLM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999 
+	            AND    MLM.EXEC_TASK_TYPE     = 'U'
+	            AND    MLM.STATE              = 'LES'
+	            <if test="unloadingId != null and unloadingId != ''">
+	            AND    (UPPER(MLM.EXEC_TASK_ID) LIKE '%' || UPPER(#{unloadingId, jdbcType=VARCHAR}) || '%')    
+	            </if>
+	            <if test="unloadingLocationCdNm != null and unloadingLocationCdNm != ''">
+	            AND    (UPPER(MLM.LOCATION_CD) LIKE '%' || UPPER(#{unloadingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{unloadingLocationCdNm, jdbcType=VARCHAR}) || '%')    
+	            </if>  
+	            <if test="areaCdNm != null and areaCdNm != ''">
+	            AND    (UPPER(MLM.AREA_CD) LIKE '%' || UPPER(#{areaCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MA.AREA_NM) LIKE '%' || UPPER(#{areaCdNm, jdbcType=VARCHAR}) || '%')    
+	            </if>  
+	            <if test="receiptTypeCd != null and receiptTypeCd != ''">
+	            AND    MLM.RECEIPT_TYPE_CD  = #{receiptTypeCd, jdbcType=VARCHAR}
+	            </if> 
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+               ) A
+        WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+        </if>               
     </select>   
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-	    SELECT MLR.COMPANY_CD
-	         , MLR.DIVISION_CD
-	         , MLR.EXEC_RESULT_ID    AS UNLOADING_RESULT_ID
-	         , MLR.SEQ
-	         , MLR.EXEC_TASK_ID      AS UNLOADING_ID
-	         , MLR.EXEC_TASK_DTL_ID  AS UNLOADING_DETAIL_ID
-	         , MLR.STATE
-	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'WM0010', MLR.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
-	         , MLR.TRANSFER_UNIT   AS UNLOADING_TRANSFER_UNIT
-	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'WM0011', MLR.TRANSFER_UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS UNLOADING_TRANSFER_UNIT_NM
-	         , MLR.TO_LOGISTICS_UNIT_CD
-	         , (SELECT MOM_COMMON_PKG.FN_GET_LOGISTICS_UNIT_NAME( MLR.COMPANY_CD, MLR.DIVISION_CD, MLR.TO_LOGISTICS_UNIT_CD) FROM DUAL) AS TO_LOGISTICS_UNIT_NM
-	         , MLR.FROM_AREA_CD
-	         , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, MLR.FROM_AREA_CD) FROM DUAL) AS FROM_AREA_NM
-	         , MLR.FROM_LOGISTICS_UNIT_CD
-	         , (SELECT MOM_COMMON_PKG.FN_GET_LOGISTICS_UNIT_NAME( MLR.COMPANY_CD, MLR.DIVISION_CD, MLR.FROM_LOGISTICS_UNIT_CD) FROM DUAL) AS FROM_LOGISTICS_UNIT_NM
-	         , MLR.ITEM_ID
-	         , MI.ITEM_NM
-	         , MI.ITEM_SPEC
-	         , MI.ITEM_TYPE
-	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-	         , MlR.UNIT
-	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MlR.COMPANY_CD, MlR.DIVISION_CD, MlR.UNIT) FROM DUAL) AS UNIT_NM
-	         , TO_CHAR(MlR.RESULT_DATE ,'YYYY-MM-DD HH24:MI:SS') AS RESULT_DATE
-	         , MLR.QTY
-	         , MlR.DESCRIPTION
-	         , MlR.UPDATE_BY      AS UPDATE_USER_NO
-	         , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MlR.COMPANY_CD, MlR.DIVISION_CD, MlR.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-	         , TO_CHAR(MlR.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-	         , ROWIDTOCHAR(MlR.ROWID)                            AS KEY_ID
-	    FROM   MOM_LOCATION_EXEC_RESULT MlR 
-	         , MOM_ITEM MI  
-	    WHERE  MlR.COMPANY_CD        = MI.COMPANY_CD
-	    AND    MlR.DIVISION_CD       = MI.DIVISION_CD
-	    AND    MlR.ITEM_ID           = MI.ITEM_ID    
-	    AND    MlR.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
-	    AND    MlR.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
-	    AND    MlR.EXEC_TASK_DTL_ID  = #{unloadingDetailId, jdbcType=VARCHAR}        
-	    ORDER BY MLR.EXEC_RESULT_ID 
-	           , MLR.SEQ 
-	</select> 
-	<delete id="remove_createBtn2" parameterType="java.util.List">
-        DELETE FROM MOM_PROC_EXEC_TASK_RESULT 
-          <where>
-              <foreach collection="list" item="item" open="" close="" separator="OR">
-            (       COMPANY_CD     = #{item.companyCd, jdbcType=VARCHAR}
-               AND  DIVISION_CD    = #{item.divisionCd, jdbcType=VARCHAR}
-               AND  EXEC_TASK_TYPE = 'U'
-               AND  CREATE_BY      = #{item.userId, jdbcType=VARCHAR}
-            )
-              </foreach>
-          </where>
+        SELECT MLD.EXEC_TASK_ID   AS UNLOADING_ID
+             , MLD.ITEM_ID
+             , MIN(MI.ITEM_NM)    AS ITEM_NM
+             , MIN(MI.ITEM_SPEC)  AS ITEM_SPEC
+             , MIN(MI.ITEM_TYPE)  AS ITEM_TYPE
+             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_TYPE_NM
+	         , MLD.UNIT
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UNIT) FROM DUAL) AS UNIT_NM
+	         , SUM(MLD.QTY)                         AS UNLOADING_QTY
+	         , SUM(NVL(MLD.RESULT_QTY,0))           AS UNLOADING_RESULT_QTY
+	         , SUM(NVL(MLD.CLOSE_QTY,0))             
+	         , SUM(MLD.QTY - NVL(MLD.RESULT_QTY,0) - NVL(MLD.CLOSE_QTY,0))   AS REMAIN_QTY 
+	         , MIN(MLM.LOCATION_CD)       AS UNLOADING_LOCATION_CD
+	         , MIN(MLM.AREA_CD)           AS TO_AREA_CD
+	         , MIN(MLM.LOGISTICS_UNIT_CD) AS TO_LOGISTICS_UNIT_CD
+	         , MLD.EXEC_TASK_ID||'-'|| MLD.ITEM_ID ||'-'|| MLD.UNIT                          AS KEY_ID
+	         , MLD.COMPANY_CD
+	         , MLD.DIVISION_CD
+	    FROM   MOM_LOCATION_EXEC_TASK_MST MLM 
+	         , MOM_LOCATION_EXEC_TASK_DTL MLD
+	         , MOM_ITEM MI
+	    WHERE  MLM.COMPANY_CD    = MLD.COMPANY_CD
+	    AND    MLM.DIVISION_CD   = MLD.DIVISION_CD
+	    AND    MLM.EXEC_TASK_ID  = MLD.EXEC_TASK_ID   
+	    AND    MLD.COMPANY_CD    = MI.COMPANY_CD
+	    AND    MLD.DIVISION_CD   = MI.DIVISION_CD
+	    AND    MLD.ITEM_ID       = MI.ITEM_ID
+	    AND    MLD.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+	    AND    MLD.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+	    AND    MLD.EXEC_TASK_ID  = #{unloadingId, jdbcType=VARCHAR}        
+	    AND    MLD.STATE         = 'LEF'
+	    GROUP BY MLD.COMPANY_CD
+	           , MLD.DIVISION_CD
+	           , MLD.EXEC_TASK_ID
+	           , MLD.ITEM_ID
+	           , MLD.UNIT
+    </select> 
+    <select id="get_findBtn3" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    SELECT MLR.EXEC_RESULT_ID 
+		     , MLR.EXEC_TASK_ID      AS UNLOADING_ID
+		     , MLR.EXEC_TASK_DTL_ID  AS UNLOADING_DETAIL_ID   
+		     , MLR.STATE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, 'WM0010', MLR.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+		     , MLR.FROM_AREA_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, MLR.FROM_AREA_CD) FROM DUAL) AS FROM_AREA_NM
+		     , MLR.FROM_LOGISTICS_UNIT_CD
+		     , MLR.QTY                               AS UNLOADING_QTY
+		     , TO_CHAR(MLR.RESULT_DATE,'YYYY-MM-DD') AS RESULT_DATE
+		     , TO_CHAR(MLR.CANCEL_DATE,'YYYY-MM-DD') AS CANCEL_DATE
+		     , MLR.CANCEL_USER_NO
+		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, MLR.CANCEL_USER_NO) FROM DUAL ) AS CANCEL_USER_NM
+		     , ROWIDTOCHAR(MLR.ROWID)
+		     , MLR.COMPANY_CD
+		     , MLR.DIVISION_CD   
+		FROM   MOM_LOCATION_EXEC_RESULT MLR
+		WHERE  MLR.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+		AND    MLR.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+		AND    MLR.EXEC_TASK_ID    = #{unloadingId, jdbcType=VARCHAR}    
+		AND    MLR.EXEC_TASK_ID    = #{itemId, jdbcType=VARCHAR}
+	    ORDER BY MLR.EXEC_RESULT_ID
+    </select> 
+    <delete id="remove_customBtn1-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_LOCATION_EXEC_STATE
+            <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+                (     COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}
+                 AND  DIVISION_CD        = #{item.divisionCd, jdbcType=VARCHAR}
+                 AND  EXEC_TASK_TYPE     = 'U'
+                 AND  ACTION_TYPE        = 'C'
+                 AND  CREATE_BY          = #{item.userId, jdbcType=VARCHAR}
+                )
+            </foreach>
+            </where>
     </delete>  
-    <insert id="create_createBtn2" parameterType="java.util.List">
+    <insert id="create_customBtn1-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_EXEC_TASK_RESULT( COMPANY_CD
-	                                  , DIVISION_CD
-	                                  , EXEC_TASK_TYPE 
-                                      , EXEC_TASK_ID 
-                                      , EXEC_TASK_DTL_ID  
-	                                  , TRANSFER_UNIT 
-	                                  , LOCATION_CD  
-	                                  , TO_AREA_CD 
-	                                  , TO_LOGISTICS_UNIT_CD 
-	                                  , FROM_AREA_CD 
-	                                  , FROM_LOGISTICS_UNIT_CD 
-	                                  , ITEM_ID 
-	                                  , UNIT
-	                                  , QTY 
-	                                  , DESCRIPTION
-	                                  , VAL_MSG
-	                                  , MULTI_MSG
-	                                  , CREATE_BY
-	                                  , CREATE_DATE
-	                                  )
-        VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
-	                                  , #{item.divisionCd, jdbcType=VARCHAR}
-	                                  , 'U'
-	                                  , #{item.unloadingId, jdbcType=VARCHAR}
-	                                  , #{item.unloadingDetailId, jdbcType=VARCHAR}
-	                                  , #{item.unloadingTransferUnit, jdbcType=VARCHAR}     
-	                                  , #{item.locationCd, jdbcType=VARCHAR}
-	                                  , #{item.toAreaCd, jdbcType=VARCHAR}
-	                                  , #{item.toLogisticsUnitCd, jdbcType=VARCHAR}
-	                                  , #{item.fromAreaCd, jdbcType=VARCHAR}
-	                                  , #{item.fromLogisticsUnitCd, jdbcType=VARCHAR}
-	                                  , #{item.itemId, jdbcType=VARCHAR}
-	                                  , #{item.unit, jdbcType=VARCHAR}
-	                                  , #{item.unloadingQty, jdbcType=NUMERIC}
-	                                  , #{item.description, jdbcType=VARCHAR}
-	                                  , #{item.valMsg, jdbcType=VARCHAR}
-	                                  , #{item.multiMsg, jdbcType=VARCHAR}
-	                                  , #{item.userId, jdbcType=VARCHAR}
-	                                  , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-	                                  )     
+        INTO MOM_PROC_LOCATION_EXEC_STATE( COMPANY_CD
+                                         , DIVISION_CD
+                                         , EXEC_TASK_TYPE
+                                         , EXEC_TASK_ID
+                                         , LOGISTICS_UNIT_CD
+                                         , ACTION_TYPE
+                                         , DESCRIPTION
+                                         , VAL_MSG
+                                         , MULTI_MSG
+                                         , CREATE_BY
+                                         , CREATE_DATE
+                                         )
+        VALUES                           ( #{item.companyCd, jdbcType=VARCHAR}  
+                                         , #{item.divisionCd, jdbcType=VARCHAR}   
+                                         , 'U'
+                                         , #{item.unloadingId, jdbcType=VARCHAR}
+                                         , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                         , 'C'
+                                         , #{item.description, jdbcType=VARCHAR}
+                                         , #{item.valMsg, jdbcType=VARCHAR}
+                                         , #{item.multiMsg, jdbcType=VARCHAR}
+                                         , #{item.userId, jdbcType=VARCHAR}
+                                         , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                         )
         </foreach>
     </insert>
-    <select id="proc_createBtn2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_LOCATION_EXEC_TASK_RESULT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                                       , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                                       , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                               		   , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                               		   , 'U'
-                                                       , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
-    </select>     
-         
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WMS_PKG.SP_LOCATION_EXEC_STATE_CHANGE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
+                                                        , 'U'
+                                                        , 'C'
+                                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}                            
+    </select>  
+    <delete id="remove_customBtn1-2" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_LOCATION_EXEC_STATE
+            <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (     COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}
+             AND  DIVISION_CD        = #{item.divisionCd, jdbcType=VARCHAR}
+             AND  EXEC_TASK_TYPE     = 'U'
+             AND  ACTION_TYPE        = 'E'
+             AND  CREATE_BY          = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+            </where>
+    </delete>  
+    <insert id="create_customBtn1-2" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_LOCATION_EXEC_STATE( COMPANY_CD
+                                         , DIVISION_CD
+                                         , EXEC_TASK_TYPE
+                                         , EXEC_TASK_ID
+                                         , LOGISTICS_UNIT_CD
+                                         , RECEIPT_TYPE_CD
+                                         , ACTION_TYPE
+                                         , DESCRIPTION
+                                         , VAL_MSG
+                                         , MULTI_MSG
+                                         , CREATE_BY
+                                         , CREATE_DATE
+                                         )
+        VALUES                           ( #{item.companyCd, jdbcType=VARCHAR}  
+                                         , #{item.divisionCd, jdbcType=VARCHAR}   
+                                         , 'U'
+                                         , #{item.unloadingId, jdbcType=VARCHAR}
+                                         , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                         , #{item.receiptTypeCd, jdbcType=VARCHAR}
+                                         , 'E'
+                                         , #{item.description, jdbcType=VARCHAR}
+                                         , #{item.valMsg, jdbcType=VARCHAR}
+                                         , #{item.multiMsg, jdbcType=VARCHAR}
+                                         , #{item.userId, jdbcType=VARCHAR}
+                                         , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                         )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn1-2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WMS_PKG.SP_LOCATION_EXEC_STATE_CHANGE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
+                                                        , 'U'
+                                                        , 'E'
+                                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}                            
+    </select>    
 </mapper>     

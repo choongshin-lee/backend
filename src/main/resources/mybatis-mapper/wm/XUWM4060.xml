@@ -39,20 +39,12 @@
 		          AND    MLM.DIVISION_CD        = #{divisionCd, jdbcType=VARCHAR}
 		          AND    MLM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999 
 		          AND    MLM.EXEC_TASK_TYPE     = 'P'
-		          AND    EXISTS ( SELECT '*'
-		                          FROM   MOM_LOCATION_EXEC_TASK_DTL MLD
-		                          WHERE  MLD.COMPANY_CD   = MLM.COMPANY_CD
-		                          AND    MLD.DIVISION_CD  = MLM.DIVISION_CD
-		                          AND    MLD.EXEC_TASK_ID = MLM.EXEC_TASK_ID   
-		                          AND    MLD.STATE        = 'LEF' )   
+		          AND    MLM.STATE              = 'LES'
 		          <if test="pickingId != null and pickingId != ''">
 		          AND    (UPPER(MLM.EXEC_TASK_ID) LIKE '%' || UPPER(#{pickingId, jdbcType=VARCHAR}) || '%')    
 		          </if>
 		          <if test="pickingLocationCdNm != null and pickingLocationCdNm != ''">
 		          AND    (UPPER(MLM.LOCATION_CD) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{pickingLocationCdNm, jdbcType=VARCHAR}) || '%')    
-		          </if>  
-		          <if test="pickingAreaCdNm != null and pickingAreaCdNm != ''">
-		          AND    (UPPER(MLM.AREA_CD) LIKE '%' || UPPER(#{pickingAreaCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MA.AREA_NM) LIKE '%' || UPPER(#{pickingAreaCdNm, jdbcType=VARCHAR}) || '%')    
 		          </if>  
 		          <if test="areaCdNm != null and areaCdNm != ''">
 			      AND    (UPPER(MLM.AREA_CD) LIKE '%' || UPPER(#{areaCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MA.AREA_NM) LIKE '%' || UPPER(#{areaCdNm, jdbcType=VARCHAR}) || '%')    
@@ -123,4 +115,106 @@
 	  AND    MLR.EXEC_TASK_DTL_ID   = #{pickingDetailId, jdbcType=VARCHAR}    
 	  ORDER BY MLR.EXEC_RESULT_ID
   </select> 
+	<delete id="remove_customBtn1-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_LOCATION_EXEC_STATE
+            <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (     COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}
+             AND  DIVISION_CD        = #{item.divisionCd, jdbcType=VARCHAR}
+             AND  EXEC_TASK_TYPE     = 'P'
+             AND  ACTION_TYPE        = 'C'
+             AND  CREATE_BY          = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+            </where>
+    </delete>  
+	<insert id="create_customBtn1-1" parameterType="java.util.List">
+	    <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+	    INTO MOM_PROC_LOCATION_EXEC_STATE( COMPANY_CD
+                                         , DIVISION_CD
+                                         , EXEC_TASK_TYPE
+                                         , EXEC_TASK_ID
+                                         , LOGISTICS_UNIT_CD
+                                         , ACTION_TYPE
+                                         , DESCRIPTION
+                                         , VAL_MSG
+	                                     , MULTI_MSG
+	                                     , CREATE_BY
+	                                     , CREATE_DATE
+	                                     )
+        VALUES                           ( #{item.companyCd, jdbcType=VARCHAR}  
+                                         , #{item.divisionCd, jdbcType=VARCHAR}   
+                                         , 'P'
+                                         , #{item.pickingId, jdbcType=VARCHAR}
+                                         , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                         , 'C'
+                                         , #{item.description, jdbcType=VARCHAR}
+                                         , #{item.valMsg, jdbcType=VARCHAR}
+                                         , #{item.multiMsg, jdbcType=VARCHAR}
+                                         , #{item.userId, jdbcType=VARCHAR}
+                                         , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                         )
+	    </foreach>
+	</insert>
+	<select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+	    { CALL MOM_WMS_PKG.SP_LOCATION_EXEC_STATE_CHANGE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
+                                                        , 'P'
+                                                        , 'C'
+                                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}                            
+	</select>  
+	<delete id="remove_customBtn1-2" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_LOCATION_EXEC_STATE
+            <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (     COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}
+             AND  DIVISION_CD        = #{item.divisionCd, jdbcType=VARCHAR}
+             AND  EXEC_TASK_TYPE     = 'P'
+             AND  ACTION_TYPE        = 'E'
+             AND  CREATE_BY          = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+            </where>
+    </delete>  
+	<insert id="create_customBtn1-2" parameterType="java.util.List">
+	    <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+	    INTO MOM_PROC_LOCATION_EXEC_STATE( COMPANY_CD
+                                         , DIVISION_CD
+                                         , EXEC_TASK_TYPE
+                                         , EXEC_TASK_ID
+                                         , LOGISTICS_UNIT_CD
+                                         , RECEIPT_TYPE_CD
+                                         , ACTION_TYPE
+                                         , DESCRIPTION
+                                         , VAL_MSG
+	                                     , MULTI_MSG
+	                                     , CREATE_BY
+	                                     , CREATE_DATE
+	                                     )
+        VALUES                           ( #{item.companyCd, jdbcType=VARCHAR}  
+                                         , #{item.divisionCd, jdbcType=VARCHAR}   
+                                         , 'P'
+                                         , #{item.pickingId, jdbcType=VARCHAR}
+                                         , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                         , #{item.receiptTypeCd, jdbcType=VARCHAR}
+                                         , 'E'
+                                         , #{item.description, jdbcType=VARCHAR}
+                                         , #{item.valMsg, jdbcType=VARCHAR}
+                                         , #{item.multiMsg, jdbcType=VARCHAR}
+                                         , #{item.userId, jdbcType=VARCHAR}
+                                         , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                         )
+	    </foreach>
+	</insert>
+	<select id="proc_customBtn1-2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+	    { CALL MOM_WMS_PKG.SP_LOCATION_EXEC_STATE_CHANGE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
+                                                        , 'P'
+                                                        , 'E'
+                                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}                            
+	</select>      
 </mapper>     

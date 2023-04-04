@@ -64,7 +64,7 @@ var VIEW= {
 			widget.findBtnClicked(1, {pickingId:e.item['pickingId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {pickingDetailId:e.item['pickingDetailId']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(2, {pickingId:e.item['pickingId'],itemId:e.item['itemId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 };
