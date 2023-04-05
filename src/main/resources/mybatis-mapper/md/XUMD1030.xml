@@ -23,6 +23,8 @@
 		             , MP.REPRESENTATIVE_NM
 		             , MP.PARTNER_USER_NM
 		             , MP.DO_INVOICE_YN
+		             , MP.TAX_TYPE
+		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MP.COMPANY_CD,MP.DIVISION_CD,'SM0029', MP.TAX_TYPE, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS TAX_TYPE_NM
 		             , MP.USE_YN
 		             , MP.DESCRIPTION
 		             , MP.UPDATE_BY                                      AS UPDATE_USER_NO
@@ -69,6 +71,7 @@
 							   , REPRESENTATIVE_NM
 							   , PARTNER_USER_NM
 							   , DO_INVOICE_YN
+							   , TAX_TYPE
 							   , USE_YN
 							   , DESCRIPTION
 							   , CREATE_BY
@@ -94,6 +97,7 @@
 				               , #{item.representativeNm,    jdbcType=VARCHAR}
 				               , #{item.partnerUserNm,       jdbcType=VARCHAR}
 				               , #{item.doInvoiceYn,         jdbcType=VARCHAR}
+				               , #{item.taxType,             jdbcType=VARCHAR}
 				               , #{item.useYn,   			 jdbcType=VARCHAR}  
 				               , #{item.description,         jdbcType=VARCHAR}    
 				               , TRIM(#{item.userId,         jdbcType=VARCHAR})
@@ -118,6 +122,7 @@
              , REPRESENTATIVE_NM = #{item.representativeNm, jdbcType=VARCHAR}
              , PARTNER_USER_NM   = #{item.partnerUserNm,    jdbcType=VARCHAR}
              , DO_INVOICE_YN     = #{item.doInvoiceYn,      jdbcType=VARCHAR}
+             , TAX_TYPE	         = #{item.taxType,          jdbcType=VARCHAR}
              , ADDRESS           = #{item.address,          jdbcType=VARCHAR}
 		     , USE_YN 		     = #{item.useYn,            jdbcType=VARCHAR}
  		     , DESCRIPTION       = #{item.description,      jdbcType=VARCHAR}
@@ -161,6 +166,7 @@
                             #{representativeNm, jdbcType=VARCHAR} as representativeNm,
                             #{partnerUserNm, jdbcType=VARCHAR}    as partnerUserNm,
                             #{doInvoiceYn,   jdbcType=VARCHAR}    as doInvoiceYn,
+                            #{taxType,       jdbcType=VARCHAR}    as taxType,
                             #{useYn, jdbcType=VARCHAR} as useYn,
                             #{description, jdbcType=VARCHAR} as description,
                             #{userId, jdbcType=VARCHAR} as createBy,
@@ -187,6 +193,7 @@
                , REPRESENTATIVE_NM = PARAM.representativeNm
                , PARTNER_USER_NM   = PARAM.partnerUserNm
                , DO_INVOICE_YN     = PARAM.doInvoiceYn
+               , TAX_TYPE          = PARAM.taxType
                , USE_YN = PARAM.useYn
                , DESCRIPTION = PARAM.description
                , UPDATE_BY = PARAM.updateBy
@@ -208,6 +215,7 @@
                  , REPRESENTATIVE_NM
                  , PARTNER_USER_NM
                  , DO_INVOICE_YN
+                 , TAX_TYPE
                  , USE_YN
                  , DESCRIPTION
                  , CREATE_BY
@@ -230,6 +238,7 @@
                  , PARAM.representativeNm
                  , PARAM.partnerUserNm
                  , PARAM.doInvoiceYn
+                 , PARAM.taxType
                  , PARAM.useYn
                  , PARAM.description
                  , PARAM.createBy
