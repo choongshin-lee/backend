@@ -144,7 +144,9 @@
                                          , DIVISION_CD
                                          , EXEC_TASK_TYPE
                                          , EXEC_TASK_ID
-                                         , LOGISTICS_UNIT_CD
+                                         , LOCATION_CD 
+										 , LOGISTICS_UNIT_CD
+										 , RECEIPT_TYPE_CD
                                          , RECEIPT_STEP_ID
                                          , ACTION_TYPE
                                          , DESCRIPTION
@@ -157,7 +159,9 @@
                                          , #{item.divisionCd, jdbcType=VARCHAR}   
                                          , 'U'
                                          , #{item.unloadingId, jdbcType=VARCHAR}
-                                         , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                         , #{item.locationCd, jdbcType=VARCHAR}
+										 , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+										 , #{item.receiptTypeCd, jdbcType=VARCHAR}
                                          , #{item.receiptStepId, jdbcType=VARCHAR}
                                          , 'C'
                                          , #{item.description, jdbcType=VARCHAR}
@@ -196,7 +200,9 @@
                                          , DIVISION_CD
                                          , EXEC_TASK_TYPE
                                          , EXEC_TASK_ID
-                                         , LOGISTICS_UNIT_CD
+                                         , LOCATION_CD 
+										 , LOGISTICS_UNIT_CD
+										 , RECEIPT_TYPE_CD
                                          , RECEIPT_STEP_ID
                                          , ACTION_TYPE
                                          , DESCRIPTION
@@ -209,7 +215,9 @@
                                          , #{item.divisionCd, jdbcType=VARCHAR}   
                                          , 'U'
                                          , #{item.unloadingId, jdbcType=VARCHAR}
-                                         , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+                                         , #{item.locationCd, jdbcType=VARCHAR}
+										 , #{item.logisticsUnitCd, jdbcType=VARCHAR}
+										 , #{item.receiptTypeCd, jdbcType=VARCHAR}
                                          , #{item.receiptStepId, jdbcType=VARCHAR}
                                          , 'E'
                                          , #{item.description, jdbcType=VARCHAR}

@@ -34,6 +34,8 @@
 		     , MPM.CREATE_DEPT_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_DEPARTMENT_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.CREATE_DEPT_CD) FROM DUAL) AS CREATE_DEPT_NM
 		     , MPM.DO_INVOICE_YN
+		     , MPM.TAX_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'SM0029', MPM.TAX_TYPE, 'KR') FROM DUAL)  AS TAX_TYPE_NM
 		     , MPM.DESCRIPTION
 		FROM   MOM_PO_MST MPM
 		     , MOM_PARTNER MP
@@ -139,10 +141,12 @@
 			                , PO_DUE_DATE
 			                , DO_INVOICE_YN
 			                , CURRENCY_CD
+			                , EXCHANGE_RATE
 			                , PAYMENT_METHOD
 			                , PRICE_TERMS
 			                , PAYMENT_TERMS
 			                , SHIPPING_METHOD
+			                , TAX_TYPE
 			                , DESCRIPTION
 			                , DEL_YN
 			                , VAL_MSG
@@ -159,10 +163,12 @@
 			                , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
 			                , #{item.doInvoiceYn, jdbcType=VARCHAR}
 			                , #{item.currencyCd, jdbcType=VARCHAR}
+			                , #{item.exchangeRate, jdbcType=NUMERIC}
 			                , #{item.paymentMethod, jdbcType=VARCHAR}
 			                , #{item.priceTerms, jdbcType=VARCHAR}
 			                , #{item.paymentTerms, jdbcType=VARCHAR}
 			                , #{item.shippingMethod, jdbcType=VARCHAR}
+			                , #{item.taxType, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.delYn, jdbcType=VARCHAR}
 			                , #{item.valMsg, jdbcType=VARCHAR}

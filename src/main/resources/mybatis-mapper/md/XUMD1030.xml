@@ -25,6 +25,10 @@
 		             , MP.DO_INVOICE_YN
 		             , MP.TAX_TYPE
 		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MP.COMPANY_CD,MP.DIVISION_CD,'SM0029', MP.TAX_TYPE, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS TAX_TYPE_NM
+		             , MP.COUNTRY_CD
+		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MP.COMPANY_CD,MP.DIVISION_CD,'SM0030', MP.COUNTRY_CD, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS COUNTRY_NM
+		             , MP.CURRENCY_CD
+		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MP.COMPANY_CD,MP.DIVISION_CD,'SM0017', MP.CURRENCY_CD, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS CURRENCY_NM
 		             , MP.USE_YN
 		             , MP.DESCRIPTION
 		             , MP.UPDATE_BY                                      AS UPDATE_USER_NO
@@ -72,6 +76,8 @@
 							   , PARTNER_USER_NM
 							   , DO_INVOICE_YN
 							   , TAX_TYPE
+							   , COUNTRY_CD
+                               , CURRENCY_CD 
 							   , USE_YN
 							   , DESCRIPTION
 							   , CREATE_BY
@@ -91,16 +97,18 @@
 				               , #{item.businessItem,  jdbcType=VARCHAR}
 				               , #{item.businessType,  jdbcType=VARCHAR}
 				               , #{item.telNo,         jdbcType=VARCHAR}
-				               , #{item.faxNo,         jdbcType=VARCHAR}
-				               , #{item.email,         jdbcType=VARCHAR}
-				               , #{item.address,       jdbcType=INTEGER}
-				               , #{item.representativeNm,    jdbcType=VARCHAR}
-				               , #{item.partnerUserNm,       jdbcType=VARCHAR}
-				               , #{item.doInvoiceYn,         jdbcType=VARCHAR}
-				               , #{item.taxType,             jdbcType=VARCHAR}
-				               , #{item.useYn,   			 jdbcType=VARCHAR}  
-				               , #{item.description,         jdbcType=VARCHAR}    
-				               , TRIM(#{item.userId,         jdbcType=VARCHAR})
+				               , #{item.faxNo,            jdbcType=VARCHAR}
+				               , #{item.email,            jdbcType=VARCHAR}
+				               , #{item.address,          jdbcType=INTEGER}
+				               , #{item.representativeNm, jdbcType=VARCHAR}
+				               , #{item.partnerUserNm,    jdbcType=VARCHAR}
+				               , #{item.doInvoiceYn,      jdbcType=VARCHAR}
+				               , #{item.taxType,          jdbcType=VARCHAR}
+				               , #{item.countryCd,        jdbcType=VARCHAR}
+				               , #{item.currencyCd,       jdbcType=VARCHAR}
+				               , #{item.useYn,   		  jdbcType=VARCHAR}  
+				               , #{item.description,      jdbcType=VARCHAR}    
+				               , TRIM(#{item.userId,      jdbcType=VARCHAR})
 				               , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
 				               , TRIM(#{item.userId,   jdbcType=VARCHAR})
 				               , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})  
@@ -123,6 +131,8 @@
              , PARTNER_USER_NM   = #{item.partnerUserNm,    jdbcType=VARCHAR}
              , DO_INVOICE_YN     = #{item.doInvoiceYn,      jdbcType=VARCHAR}
              , TAX_TYPE	         = #{item.taxType,          jdbcType=VARCHAR}
+             , COUNTRY_CD	     = #{item.countryCd,        jdbcType=VARCHAR}
+             , CURRENCY_CD	     = #{item.currencyCd,       jdbcType=VARCHAR}
              , ADDRESS           = #{item.address,          jdbcType=VARCHAR}
 		     , USE_YN 		     = #{item.useYn,            jdbcType=VARCHAR}
  		     , DESCRIPTION       = #{item.description,      jdbcType=VARCHAR}
@@ -167,6 +177,8 @@
                             #{partnerUserNm, jdbcType=VARCHAR}    as partnerUserNm,
                             #{doInvoiceYn,   jdbcType=VARCHAR}    as doInvoiceYn,
                             #{taxType,       jdbcType=VARCHAR}    as taxType,
+                            #{countryCd,     jdbcType=VARCHAR}    as countryCd,
+                            #{currencyCd,    jdbcType=VARCHAR}    as currencyCd,
                             #{useYn, jdbcType=VARCHAR} as useYn,
                             #{description, jdbcType=VARCHAR} as description,
                             #{userId, jdbcType=VARCHAR} as createBy,
@@ -194,10 +206,12 @@
                , PARTNER_USER_NM   = PARAM.partnerUserNm
                , DO_INVOICE_YN     = PARAM.doInvoiceYn
                , TAX_TYPE          = PARAM.taxType
-               , USE_YN = PARAM.useYn
-               , DESCRIPTION = PARAM.description
-               , UPDATE_BY = PARAM.updateBy
-               , UPDATE_DATE = PARAM.updateDate
+               , COUNTRY_CD        = PARAM.countryCd
+               , CURRENCY_CD       = PARAM.currencyCd
+               , USE_YN            = PARAM.useYn
+               , DESCRIPTION       = PARAM.description
+               , UPDATE_BY         = PARAM.updateBy
+               , UPDATE_DATE       = PARAM.updateDate
       WHEN NOT MATCHED THEN
           INSERT ( COMPANY_CD
                  , DIVISION_CD
@@ -216,6 +230,8 @@
                  , PARTNER_USER_NM
                  , DO_INVOICE_YN
                  , TAX_TYPE
+                 , COUNTRY_CD
+                 , CURRENCY_CD
                  , USE_YN
                  , DESCRIPTION
                  , CREATE_BY
@@ -239,6 +255,8 @@
                  , PARAM.partnerUserNm
                  , PARAM.doInvoiceYn
                  , PARAM.taxType
+                 , PARAM.countryCd
+                 , PARAM.currencyCd
                  , PARAM.useYn
                  , PARAM.description
                  , PARAM.createBy

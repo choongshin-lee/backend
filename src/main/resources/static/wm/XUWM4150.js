@@ -1,4 +1,4 @@
-var menuId = 'XUMM1070_1';
+var menuId = 'XUWM4150';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -9,13 +9,11 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
-	
 	},
 };
 
 $(document).ready(function(event){	
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
-	momWidget.init(2, menuId, VIEW);	
 	VIEW.init();
 });

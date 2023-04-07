@@ -17,6 +17,7 @@
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS UNIT_NM
                  , MI.PURCHASE_UNIT
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.PURCHASE_UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS PURCHASE_NM
+                 , MI.PURCHASE_EXCHANGE_RATE
                  , MI.PROCUREMENT_TYPE
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0004', MI.PROCUREMENT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS PROCUREMENT_TYPE_NM
                  , MI.MATERIAL_TYPE
@@ -37,6 +38,7 @@
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0006', MI.ISSUE_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ISSUE_TYPE_NM
                  , MI.ISSUE_UNIT
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.ISSUE_UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ISSUE_UNIT_NM
+                 , MI.ISSUE_EXCHANGE_RATE
                  , MI.VENDOR_CD
                  , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.VENDOR_CD) FROM DUAL ) AS VENDOR_NM
                  , MI.DEPARTURE_VENDOR_CD
@@ -118,6 +120,7 @@
 					      , ITEM_SPEC
 						  , UNIT
 					  	  , PURCHASE_UNIT
+					  	  , PURCHASE_EXCHANGE_RATE
 						  , PROCUREMENT_TYPE
 						  , MATERIAL_TYPE
 						  , NET_WEIGHT
@@ -129,6 +132,7 @@
 						  , STORAGE_LOCATION_CD
 						  , ISSUE_TYPE
 						  , ISSUE_UNIT
+						  , ISSUE_EXCHANGE_RATE
 						  , VENDOR_CD
 						  , DEPARTURE_VENDOR_CD
 						  , TEST_REPORT_FLAG
@@ -166,17 +170,19 @@
                           , #{item.itemSpec, jdbcType=VARCHAR}
                           , #{item.unit, jdbcType=VARCHAR}
                           , #{item.purchaseUnit, jdbcType=VARCHAR}
+                          , #{item.purchaseExchangeRate, jdbcType=NUMERIC}
                           , #{item.procurementType, jdbcType=VARCHAR}
                           , #{item.materialType, jdbcType=VARCHAR}
-                          , #{item.netWeight, jdbcType=VARCHAR}
+                          , #{item.netWeight, jdbcType=NUMERIC}
                           , #{item.netWeightUnit, jdbcType=VARCHAR}
-                          , #{item.grossWeight, jdbcType=VARCHAR}
+                          , #{item.grossWeight, jdbcType=NUMERIC}
                           , #{item.grossWeight_unit, jdbcType=VARCHAR}
                           , #{item.inLocationCd, jdbcType=VARCHAR}
                           , #{item.outLocationCd, jdbcType=VARCHAR}
                           , #{item.storageLocationCd, jdbcType=VARCHAR}
                           , #{item.issueType, jdbcType=VARCHAR}                          
-                          , #{item.issueUnit, jdbcType=VARCHAR}                                                                                                
+                          , #{item.issueUnit, jdbcType=VARCHAR}
+                          , #{item.issueExchangeRate, jdbcType=NUMERIC}                                                                                                
                           , #{item.vendorCd, jdbcType=VARCHAR}
                           , #{item.departureVendorCd, jdbcType=VARCHAR}
                           , #{item.testReportFlag, jdbcType=VARCHAR}
@@ -256,6 +262,7 @@
 					      , ITEM_SPEC
 						  , UNIT
 					  	  , PURCHASE_UNIT
+					  	  , PURCHASE_EXCHANGE_RATE
 						  , PROCUREMENT_TYPE
 						  , MATERIAL_TYPE
 						  , NET_WEIGHT
@@ -267,6 +274,7 @@
 						  , STORAGE_LOCATION_CD
 						  , ISSUE_TYPE
 						  , ISSUE_UNIT
+						  , ISSUE_EXCHANGE_RATE
 						  , VENDOR_CD
 						  , DEPARTURE_VENDOR_CD
 						  , TEST_REPORT_FLAG
@@ -304,17 +312,19 @@
                           , #{item.itemSpec, jdbcType=VARCHAR}
                           , #{item.unit, jdbcType=VARCHAR}
                           , #{item.purchaseUnit, jdbcType=VARCHAR}
+                          , #{item.purchaseExchangeRate, jdbcType=NUMERIC}
                           , #{item.procurementType, jdbcType=VARCHAR}
                           , #{item.materialType, jdbcType=VARCHAR}
-                          , #{item.netWeight, jdbcType=VARCHAR}
+                          , #{item.netWeight, jdbcType=NUMERIC}
                           , #{item.netWeightUnit, jdbcType=VARCHAR}
-                          , #{item.grossWeight, jdbcType=VARCHAR}
+                          , #{item.grossWeight, jdbcType=NUMERIC}
                           , #{item.grossWeight_unit, jdbcType=VARCHAR}
                           , #{item.inLocationCd, jdbcType=VARCHAR}
                           , #{item.outLocationCd, jdbcType=VARCHAR}
                           , #{item.storageLocationCd, jdbcType=VARCHAR}
                           , #{item.issueType, jdbcType=VARCHAR}                          
-                          , #{item.issueUnit, jdbcType=VARCHAR}                                                                                                
+                          , #{item.issueUnit, jdbcType=VARCHAR}   
+                          , #{item.issueExchangeRate, jdbcType=NUMERIC}                                                                                               
                           , #{item.vendorCd, jdbcType=VARCHAR}
                           , #{item.departureVendorCd, jdbcType=VARCHAR}
                           , #{item.testReportFlag, jdbcType=VARCHAR}

@@ -14,6 +14,9 @@ var VIEW= {
 	copyCallInit: function(index,your,action,btnId,param,result) {
 	    if(index ==0 && btnId =='copyBtn'){	
 		    $('#poNoDP1').val('');
+		    $('#doInvoiceYnDP1').val('');
+		    $('#currencyCdDP1').val('');
+		    $('#exchangeRateDP1').val('');
 		}
 	},
     createCallInit: function(index,your,action,btnId,param,result) { //등록버튼 팝업띄우기 전에 호출되는 함수 
@@ -76,7 +79,7 @@ $(document).ready(function(event){
 	//momWidget.init(2, menuId, VIEW,'GRID');	
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(1,11,1,'XUDG0220', VIEW); 
+	//momWidget.gridPopup.init(1,11,1,'XUDG0220', VIEW); 
 	momWidget.gridPopup.init(2,21,1,'XUSM8060', VIEW);
 		
 	VIEW.init();
