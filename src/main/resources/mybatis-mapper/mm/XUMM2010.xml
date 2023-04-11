@@ -35,7 +35,7 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_DEPARTMENT_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.CREATE_DEPT_CD) FROM DUAL) AS CREATE_DEPT_NM
 		     , MPM.DO_INVOICE_YN
 		     , MPM.TAX_TYPE
-             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'SM0029', MPM.TAX_TYPE, 'KR') FROM DUAL)  AS TAX_TYPE_NM
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'SM0029', MPM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
 		     , MPM.DESCRIPTION
 		FROM   MOM_PO_MST MPM
 		     , MOM_PARTNER MP
@@ -77,13 +77,17 @@
 		     , MI.ITEM_SPEC 
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MI.PURCHASE_UNIT
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.PURCHASE_UNIT) FROM DUAL) AS PURCHASE_UNIT_NM
+		     , MPD.UNIT      AS PURCHASE_UNIT
+			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.UNIT) FROM DUAL) AS PURCHASE_UNIT_NM
+			 , MI.UNIT       
+			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UNIT) FROM DUAL) AS UNIT_NM
 		     , MRD.REQUEST_QTY   AS PURCHASE_REQUEST_QTY 
              , MRD.PO_QTY        AS PURCHASE_ORDERED_QTY 
              , (MRD.REQUEST_QTY - NVL(MRD.PO_QTY,0) - NVL(MRD.CLOSE_QTY,0)) + MPD.PO_QTY AS PO_PASSIBLE_QTY    
 		     , MPD.PO_QTY       AS PO_QTY     	   
-		     , MPD.UNIT_PRICE
+		     , MRD.UNIT_PRICE   AS REF_UNIT_PRICE 
+		     , MPD.UNIT_PRICE   AS RECENT_UNIT_PRICE
+		     , MPD.UNIT_PRICE   AS PO_UNIT_PRICE
 		     , MPD.AMOUNT
 		     , MPD.LOCAL_AMOUNT
 		     , MPD.DEPARTURE_LOCATION_CD
@@ -122,8 +126,9 @@
         DELETE FROM MOM_PROC_PO_MST
         <where>
         <foreach collection="list" item="item" open="" close="" separator="OR">
-        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+        (       COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}
+           AND  DIVISION_CD        = #{item.divisionCd, jdbcType=VARCHAR}
+           AND  PO_REFERENCE_TYPE  = '10'
            AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
         )
         </foreach>
@@ -133,8 +138,8 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_PO_MST( COMPANY_CD
 			                , DIVISION_CD
-			                , PO_NO
 			                , PO_REFERENCE_TYPE
+			                , PO_NO
 			                , PO_TITLE
 			                , PO_TYPE
 			                , VENDOR_CD
@@ -155,8 +160,8 @@
 			                , CREATE_DATE )
         VALUES              ( #{item.companyCd, jdbcType=VARCHAR}
 			                , #{item.divisionCd, jdbcType=VARCHAR}
+			                , '10'
 			                , #{item.poNo, jdbcType=VARCHAR}
-			                , #{item.poReferenceType, jdbcType=VARCHAR}
 			                , #{item.poTitle, jdbcType=VARCHAR}
 			                , #{item.poCategory, jdbcType=VARCHAR}
 			                , #{item.partnerCd, jdbcType=VARCHAR}
@@ -179,19 +184,21 @@
         </foreach>
     </insert>
     <select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MATERIAL_PKG.SP_UPSERT_PO_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-					                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-					                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-					                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  
-					                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	                     
+        { CALL MOM_MATERIAL_PKG.SP_UPSERT_PO_MST( #{p_err_code,       jdbcType=VARCHAR, mode=OUT}
+					                            , #{p_err_msg,        jdbcType=VARCHAR, mode=OUT}
+					                            , #{companyCd,        jdbcType=VARCHAR, mode=IN}
+					                            , #{divisionCd,       jdbcType=VARCHAR, mode=IN}		
+					                            , '10'										  
+					                            , #{userId,           jdbcType=VARCHAR, mode=IN} )}    	                     
     </select>  
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_PO_DTL
         <where>
         <foreach collection="list" item="item" open="" close="" separator="OR">
-        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+        (       COMPANY_CD         = #{item.companyCd, jdbcType=VARCHAR}
+           AND  DIVISION_CD        = #{item.divisionCd, jdbcType=VARCHAR}
+           AND  PO_REFERENCE_TYPE  = '10'
+           AND  CREATE_BY          = #{item.userId, jdbcType=VARCHAR}
         )
         </foreach>
         </where>
@@ -200,17 +207,15 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_PO_DTL( COMPANY_CD
 			                , DIVISION_CD
-			                , PO_NO
-			                , PO_SEQ
 			                , PO_REFERENCE_TYPE
+			                , PO_NO
 			                , PURCHASE_ORDER_ID
 			                , REFERENCE_NO
 			                , REFERENCE_DTL_NO
 			                , ITEM_ID
-			                , PO_PASSIBLE_QTY
-			                , PO_QTY
-			                , REF_UNIT_PRICE
-			                , CONFIRM_UNIT_PRICE
+			                , UNIT
+			                , QTY
+			                , UNIT_PRICE
 			                , DEPARTURE_LOCATION_CD
 			                , TEST_REPORT_FLAG
 			                , IQC_FLAG
@@ -225,17 +230,15 @@
 			                , CREATE_DATE )
         VALUES              ( #{item.companyCd, jdbcType=VARCHAR}
 			                , #{item.divisionCd, jdbcType=VARCHAR}
+			                , '10'
 			                , #{item.poNo, jdbcType=VARCHAR}
-			                , #{item.poSeq, jdbcType=NUMERIC}
-			                , #{item.poReferenceType, jdbcType=VARCHAR}
 			                , #{item.purchaseOrderId, jdbcType=VARCHAR}
 			                , #{item.prNo, jdbcType=VARCHAR}
 			                , #{item.purchaseRequestId, jdbcType=VARCHAR}
 			                , #{item.itemId, jdbcType=VARCHAR}
-			                , #{item.poPassibleQty, jdbcType=NUMERIC}
+			                , #{item.purchaseUnit, jdbcType=VARCHAR}
 			                , #{item.poQty, jdbcType=NUMERIC}
-			                , #{item.refUnitPrice, jdbcType=NUMERIC}
-			                , #{item.unitPrice, jdbcType=NUMERIC}
+			                , #{item.poUnitPrice, jdbcType=NUMERIC}
 			                , #{item.departureLocationCd, jdbcType=VARCHAR}
 			                , #{item.testReportFlag, jdbcType=VARCHAR}
 			                , #{item.iqcFlag, jdbcType=VARCHAR}
@@ -252,10 +255,11 @@
         </foreach>
     </insert>
     <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MATERIAL_PKG.SP_UPSERT_PO_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-					                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-					                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-					                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  
-					                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
+        { CALL MOM_MATERIAL_PKG.SP_UPSERT_PO_DTL( #{p_err_code,       jdbcType=VARCHAR, mode=OUT}
+					                            , #{p_err_msg,        jdbcType=VARCHAR, mode=OUT}
+					                            , #{companyCd,        jdbcType=VARCHAR, mode=IN}
+					                            , #{divisionCd,       jdbcType=VARCHAR, mode=IN}			
+					                            , '10'							  
+					                            , #{userId,           jdbcType=VARCHAR, mode=IN} )}    	              
     </select>      
 </mapper>
