@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUMM2160">
+<mapper namespace="com.mom.backend.XUMM7020">
     <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -38,10 +38,11 @@
 			      ,MII.UNIT_PRICE 
 			     , MII.AMOUNT
 			     , MII.LOCAL_AMOUNT
-			     , MPI.INOUT_TYPE
-			     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MM0012', MPI.INOUT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS INOUT_TYPE_NM
+			     , MPI.PROCESS_CD
+	             , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.PROCESS_CD) FROM DUAL)  AS PROCESS_NM  
 			     , MPI.PURCHASE_INOUT_ID    
-			     , MPI.PURCHASE_ORDER_ID
+			     , MPI.REFERENCE_NO
+                 , MPI.REFERENCE_DTL_NO
 			     , MII.CREATE_BY   AS CREATE_USER_NO      
 			     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM      
 			     , TO_CHAR(MII.CREATE_DATE ,'YYYY-MM-DD')     AS CREATE_DATE
@@ -79,8 +80,8 @@
 			<if test="ioType != null and ioType != ''">
 			AND    MII.IO_TYPE IN (${ioType})
 			</if>
-			<if test="inoutType != null and inoutType != ''">
-			AND    MPI.INOUT_TYPE IN (${inoutType})
+			<if test="processCd != null and processCd != ''">
+			AND    MPI.PROCESS_CD IN (${processCd})
 			</if>
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A

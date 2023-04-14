@@ -569,4 +569,11 @@
     AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
     ORDER BY LOGISTICS_UNIT_CD
     </select>
+    <select id="get_DD00048" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
+	SELECT TO_CHAR(TRUNC(MC.DATE_ID, 'MONTH'), 'YYYYMM') CODE
+	     , TO_CHAR(TRUNC(MC.DATE_ID, 'MONTH'), 'YYYY-MM') LABEL
+	FROM   MOM_CALENDAR MC
+	GROUP BY TRUNC(MC.DATE_ID, 'MONTH')      
+	ORDER BY 1
+	</select>
 </mapper>

@@ -1,4 +1,4 @@
-var menuId = 'XUMM2160';
+var menuId = 'XUMM7020';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {

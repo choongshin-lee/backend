@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0350">
+    <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    SELECT MDOM.COMPANY_CD
+		     , MDOM.DIVISION_CD
+		     , MDOM.DO_NO
+		     , MDOD.DELIVERY_ORDER_ID
+		     , MDOD.REFERENCE_NO
+		     , MDOD.REFERENCE_DTL_NO
+		     , TO_CHAR(MDOD.SHIP_DATE ,'YYYY-MM-DD')  AS SHIP_DATE
+		     , MDOD.ITEM_ID
+		     , MI.ITEM_NM
+		     , MI.ITEM_SPEC
+		     , MI.ITEM_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+		     , MDOD.QTY
+		     , MDOD.UNIT
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, MDOD.UNIT) FROM DUAL) AS UNIT_NM
+		     , ''            AS CONVERSION_QTY
+				 , ''            AS CONVERSION_UNIT 
+		     , MDOD.CURRENCY_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, 'SM0017', MDOD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+		     , MDOD.EXCHANGE_RATE
+		     , MDOD.UNIT_PRICE
+		     , MDOD.AMOUNT
+		     , MDOD.LOCAL_AMOUNT
+		     , MDOM.TAX_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDOM.COMPANY_CD, MDOM.DIVISION_CD, 'SM0029', MDOM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+				 , TRUNC(ROUND(MDOD.LOCAL_AMOUNT * (MOM_COMMON_PKG.FN_GET_TAX_RATE(MDOM.COMPANY_CD , MDOM.DIVISION_CD , MDOM.TAX_TYPE)) ,0),-1) AS TAX_AMOUNT
+		FROM   MOM_DELIVERY_ORDER_DTL  MDOD
+		     , MOM_DELIVERY_ORDER_MST  MDOM 
+		     , MOM_ITEM                MI 
+		     , MOM_TAX_INVOICE_DTL     MTID          
+		WHERE  MDOD.COMPANY_CD        = MDOM.COMPANY_CD 
+		AND    MDOD.DIVISION_CD       = MDOM.DIVISION_CD 
+		AND    MDOD.DO_NO             = MDOM.DO_NO
+		AND    MDOD.COMPANY_CD        = MI.COMPANY_CD
+		AND    MDOD.DIVISION_CD       = MI.DIVISION_CD
+		AND    MDOD.ITEM_ID           = MI.ITEM_ID  
+		AND    MDOD.COMPANY_CD        = MTID.COMPANY_CD(+) 
+		AND    MDOD.DIVISION_CD       = MTID.DIVISION_CD(+) 
+		AND    MDOD.DELIVERY_ORDER_ID = MTID.REFERENCE_DTL_NO 
+		AND    MDOD.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
+		AND    MDOD.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
+		AND    MDOM.PARTNER_CD        = #{partnerCd, jdbcType=VARCHAR}
+		AND    MDOD.SHIP_DATE         &lt; #{invoiceDate, jdbcType=VARCHAR}  OR  MDOD.SHIP_DATE = #{invoiceDate, jdbcType=VARCHAR}) 
+		AND    MDOM.TAX_TYPE          = #{taxType, jdbcType=VARCHAR}
+		AND    MDOD.CLOSING_YN        = 'N'
+		AND    MTID.REFERENCE_DTL_NO IS NULL;
+    </select>
+    <delete id="remove_customBtn21-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_TAX_INVOICE_DTL 
+          <where>
+              <foreach collection="list" item="item" open="" close="" separator="OR">
+            (       COMPANY_CD     = #{item.companyCd, jdbcType=VARCHAR}
+               AND  DIVISION_CD    = #{item.divisionCd, jdbcType=VARCHAR}
+               AND  PUR_SAL_TYPE = 'S'
+               AND  CREATE_BY      = #{item.userId, jdbcType=VARCHAR}
+            )
+              </foreach>
+          </where>
+    </delete>  
+    <insert id="create_customBtn21-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_TAX_INVOICE_DTL( COMPANY_CD
+									 , DIVISION_CD
+									 , PUR_SAL_TYPE
+									 , VENDOR_CD
+									 , INVOICE_DATE
+									 , TAX_TYPE
+									 , REFERENCE_NO
+									 , REFERENCE_DTL_NO
+									 , ITEM_ID
+									 , IO_DATE
+									 , QTY
+									 , LOCAL_AMOUNT
+									 , TAX_RATE
+									 , TAX_AMOUNT
+									 , DESCRIPTION
+									 , ETC_YN
+									 , ACTION_TYPE
+									 , VAL_MSG
+									 , MULTI_MSG
+									 , CREATE_BY
+									 , CREATE_DATE
+	                                 )
+        VALUES                       ( #{item.companyCd, jdbcType=VARCHAR}
+					                 , #{item.divisionCd, jdbcType=VARCHAR}
+					                 , 'S'
+					                 , #{item.partnerCd, jdbcType=VARCHAR}
+					                 , TO_DATE(#{item.invoiceDate, jdbcType=VARCHAR},'YYYY-MM-DD')
+					                 , #{item.taxType, jdbcType=VARCHAR}
+					                 , #{item.referenceNo, jdbcType=VARCHAR}
+					                 , #{item.referenceDtlNo, jdbcType=VARCHAR}
+					                 , #{item.itemId, jdbcType=VARCHAR}
+					                 , TO_DATE(#{item.receiptDate, jdbcType=VARCHAR},'YYYY-MM-DD') 
+					                 , #{item.qty, jdbcType=NUMERIC}
+					                 , #{item.localAmount, jdbcType=NUMERIC}
+					                 , #{item.taxRate, jdbcType=NUMERIC}
+					                 , #{item.taxAmount, jdbcType=NUMERIC}
+					                 , #{item.description, jdbcType=VARCHAR}
+					                 , 'N'
+					                 , #{item.actionType, jdbcType=VARCHAR}
+					                 , #{item.valMsg, jdbcType=VARCHAR}
+					                 , #{item.multiMsg, jdbcType=VARCHAR}
+					                 , #{item.userId, jdbcType=VARCHAR}
+					                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+					                 )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn21-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_CLOSED_PKG.SP_UPSERT_TAX_INVOICE_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+			                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
+			                                           , 'S'											  
+			                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                   
+    </select>    
+</mapper>

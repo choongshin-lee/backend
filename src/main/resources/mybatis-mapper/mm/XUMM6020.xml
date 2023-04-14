@@ -64,13 +64,7 @@
 	    </if>							
 	    AND      MPIM.STATE       = 'PIR'  -- 접수		
 	    AND      MPIM.IQC_FLAG    = 'Y'				
-	    AND      EXISTS (SELECT '*'					
-	                     FROM   MOM_PURCHASE_INOUT_DTL MPD					
-	                     WHERE  MPD.COMPANY_CD   = MPIM.COMPANY_CD					
-	                     AND    MPD.DIVISION_CD  = MPIM.DIVISION_CD					
-	                     AND    MPD.INOUT_NO     = MPIM.INOUT_NO					
-	                     AND    MPD.STATE        = MPIM.STATE)					
-		ORDER BY MPIM.INOUT_NO				
+	    ORDER BY MPIM.INOUT_NO				
     </select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MPID.COMPANY_CD
@@ -87,6 +81,7 @@
 	         , MI.UNIT       
 	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UNIT) FROM DUAL) AS UNIT_NM
 	         , MPID.INOUT_QTY        AS RECEIVE_REQUEST_QTY
+	         , MPID.IQC_RESULT       AS INSPECTION_RESULT
 	         , MPID.CURRENCY_CD
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'SM0017', MPID.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 	         , MPID.EXCHANGE_RATE
@@ -107,12 +102,62 @@
         ORDER BY MPID.INOUT_NO  
                , MPID.SEQ 
     </select>
+    <delete id="remove_customBtn1-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_PI_IQC_RESULT
+        <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+	        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+	           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+	           AND  BUTTON_TYPE = 'E'
+	           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+	        )
+            </foreach>
+        </where>
+    </delete>  
+    <insert id="create_customBtn1-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_PI_IQC_RESULT( COMPANY_CD
+					               , DIVISION_CD
+					               , BUTTON_TYPE
+					               , PROCESS_CD
+					               , INOUT_NO
+					               , PURCHASE_INOUT_ID
+					               , IQC_RESULT
+					               , VAL_MSG
+					               , MULTI_MSG
+					               , DESCRIPTION
+					               , CREATE_BY
+					               , CREATE_DATE )
+        VALUES                     ( #{item.companyCd, jdbcType=VARCHAR}
+					               , #{item.divisionCd, jdbcType=VARCHAR}
+					               , 'E'
+					               , #{item.processCd, jdbcType=VARCHAR}
+					               , #{item.inoutNo, jdbcType=VARCHAR}
+					               , #{item.purchaseInoutId, jdbcType=VARCHAR}
+					               , #{item.inspectionResult, jdbcType=VARCHAR}
+					               , #{item.valMsg, jdbcType=VARCHAR}
+					               , #{item.multiMsg, jdbcType=VARCHAR}
+					               , #{item.description, jdbcType=VARCHAR}
+					               , #{item.userId, jdbcType=VARCHAR}
+					               , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+					               )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_MATERIAL_PKG.SP_PI_IQC_RESULT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+					                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+					                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+					                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}		
+					                            , 'E'									  
+					                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	   	              
+    </select>  
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
     DELETE FROM MOM_PROC_PI_IQC_RESULT
         <where>
             <foreach collection="list" item="item" open="" close="" separator="OR">
 	        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
 	           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+	           AND  BUTTON_TYPE = 'S'
 	           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
 	        )
             </foreach>
@@ -122,11 +167,11 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_PI_IQC_RESULT( COMPANY_CD
 					               , DIVISION_CD
+					               , BUTTON_TYPE
 					               , PROCESS_CD
 					               , INOUT_NO
 					               , PURCHASE_INOUT_ID
 					               , IQC_RESULT
-					               , IQC_REFERENCE_NO
 					               , VAL_MSG
 					               , MULTI_MSG
 					               , DESCRIPTION
@@ -134,11 +179,11 @@
 					               , CREATE_DATE )
         VALUES                     ( #{item.companyCd, jdbcType=VARCHAR}
 					               , #{item.divisionCd, jdbcType=VARCHAR}
+					               , 'S'
 					               , #{item.processCd, jdbcType=VARCHAR}
 					               , #{item.inoutNo, jdbcType=VARCHAR}
 					               , #{item.purchaseInoutId, jdbcType=VARCHAR}
-					               , #{item.iqcResult, jdbcType=VARCHAR}
-					               , #{item.iqcReferenceNo, jdbcType=VARCHAR}
+					               , #{item.inspectionResult, jdbcType=VARCHAR}
 					               , #{item.valMsg, jdbcType=VARCHAR}
 					               , #{item.multiMsg, jdbcType=VARCHAR}
 					               , #{item.description, jdbcType=VARCHAR}
@@ -151,7 +196,8 @@
     { CALL MOM_MATERIAL_PKG.SP_PI_IQC_RESULT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 				                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 				                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-				                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  
+				                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}		
+				                            , 'S'									  
 				                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>  
 </mapper>
