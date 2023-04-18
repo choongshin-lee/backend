@@ -190,7 +190,8 @@ var mCommon = {
 			'</div>' +
 			'</div>' +
 			'<div id = "jump1" class="jumps-prevent" style="padding-top: 74px;"></div>';
-		$('#jump1').after(leftMenuTop + leftMenuTopLv1 + leftMenuTopLv2);
+		//$('#jump1').after(leftMenuTop + leftMenuTopLv1 + leftMenuTopLv2);
+		   $('#jump1').after(leftMenuTop  +  createMenu(dataset,0)+ leftMenuTopLv2);
 
 	},
 	/* '<li class="sub-category"><h3>화면</h3></li>'+*/
@@ -2621,4 +2622,64 @@ function base64toBlob(base64Data, contentType) {
 	}
 	return new Blob(byteArrays, { type: contentType });
 }
+
+
+function createMenu(menuData,menuLavel) {
+   var menu = '';
+              
+      for (var i = 0; i < menuData.length; i++) {
+         if (menuData[i]['child']) {
+            if(menuLavel ==0){
+               menu += '<li">' +
+                     '<a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)">' +
+                     '<i class="side-menu__icon ' + menuData[i]['icon'] + '"></i>' +
+                     '<span class="side-menu__label">' + menuData[i]['menuNm'] + '</span>' +
+                     '<i class="angle fe fe-chevron-right"></i>' +
+                     '</a>' +
+                     '<ul class="slide-menu">' +
+                     '<li class="side-menu-label1">' +
+                     '<a href="javascript:void(0)">' + menuData[i]['menuNm'] + '</a>' +
+                     '</li>';
+                     
+            }else{
+               menu += '<li>' +
+                     '<a class="slide-item" data-bs-toggle="slide">' +
+                     '<span class="side-menu__label">' + menuData[i]['menuNm'] + '</span>' +
+                     '<i class="angle fe fe-chevron-right"></i>' +
+                     '</a>' +
+                     '<ul class="slide-menu">' +
+                     '<li class="side-menu-label1">' +
+                     '<a href="javascript:void(0)">' + menuData[i]['menuNm'] + '</a>' +
+                     '</li>';               
+            }
+                          
+            for (var j = 0; j < menuData[i]['child'].length; j++) {
+               var item = menuData[i]['child'][j];
+
+                  if (menuData[i]['child'][j]['child']) {
+                     
+                     var subMenu = '';
+                     
+                         subMenu += createMenu(menuData[i]['child'],menuLavel +1);
+                         menu += subMenu;
+                         menu += '</ul>';
+                         
+                  }else{
+                     
+                      menu += '<li>' +
+                           '<a id=' + item['menuId'] + ' href=#' + item['menuId'] + ' name="' + item['menuNm'] + '" data-path=' + item['url'] + ' class="slide-item">' + item['menuNm'] + '</a>' +
+                           '</li>';
+                                          
+                  }
+                  
+               }
+               menu += '</ul>';
+            }
+
+            
+         }
+            //menu += '</ul>';
+            return menu;
+}  
+          
 

@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUDG0350">
+<mapper namespace="com.mom.backend.XUDG0360">
     <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
 	    SELECT MDOM.COMPANY_CD
 		     , MDOM.DIVISION_CD
 		     , MDOM.DO_NO
 		     , MDOD.DELIVERY_ORDER_ID
-		     , MDOD.REFERENCE_NO
-		     , MDOD.REFERENCE_DTL_NO
+		     , MDOD.REFERENCE_NO          	AS SO_NO
+		     , MDOD.REFERENCE_DTL_NO		AS SO_DETAIL_NO
 		     , TO_CHAR(MDOD.SHIP_DATE ,'YYYY-MM-DD')  AS SHIP_DATE
 		     , MDOD.ITEM_ID
 		     , MI.ITEM_NM
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MDOD.QTY
-		     , MDOD.UNIT
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, MDOD.UNIT) FROM DUAL) AS UNIT_NM
-		     , ''            AS CONVERSION_QTY
-				 , ''            AS CONVERSION_UNIT 
+		     , MDOD.SHIP_QTY
+		     , MDOD.DO_UNIT   AS SHIP_UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, MDOD.DO_UNIT) FROM DUAL) AS SHIP_UOM_NM
+		     , MDOD.CONVERSION_QTY
+			 , MDOD.CONVERSION_UNIT  AS CONVERSION_UOM
+			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, MDOD.CONVERSION_UNIT) FROM DUAL) AS CONVERSION_UOM_NM
 		     , MDOD.CURRENCY_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, 'SM0017', MDOD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 		     , MDOD.EXCHANGE_RATE
@@ -27,7 +28,7 @@
 		     , MDOD.LOCAL_AMOUNT
 		     , MDOM.TAX_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDOM.COMPANY_CD, MDOM.DIVISION_CD, 'SM0029', MDOM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
-				 , TRUNC(ROUND(MDOD.LOCAL_AMOUNT * (MOM_COMMON_PKG.FN_GET_TAX_RATE(MDOM.COMPANY_CD , MDOM.DIVISION_CD , MDOM.TAX_TYPE)) ,0),-1) AS TAX_AMOUNT
+			 , TRUNC(ROUND(MDOD.LOCAL_AMOUNT * (MOM_COMMON_PKG.FN_GET_TAX_RATE(MDOM.COMPANY_CD , MDOM.DIVISION_CD , MDOM.TAX_TYPE)) ,0),-1) AS TAX_AMOUNT
 		FROM   MOM_DELIVERY_ORDER_DTL  MDOD
 		     , MOM_DELIVERY_ORDER_MST  MDOM 
 		     , MOM_ITEM                MI 
@@ -40,14 +41,14 @@
 		AND    MDOD.ITEM_ID           = MI.ITEM_ID  
 		AND    MDOD.COMPANY_CD        = MTID.COMPANY_CD(+) 
 		AND    MDOD.DIVISION_CD       = MTID.DIVISION_CD(+) 
-		AND    MDOD.DELIVERY_ORDER_ID = MTID.REFERENCE_DTL_NO 
+		AND    MDOD.DELIVERY_ORDER_ID = MTID.REFERENCE_DTL_NO(+) 
 		AND    MDOD.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
 		AND    MDOD.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
 		AND    MDOM.PARTNER_CD        = #{partnerCd, jdbcType=VARCHAR}
-		AND    MDOD.SHIP_DATE         &lt; #{invoiceDate, jdbcType=VARCHAR}  OR  MDOD.SHIP_DATE = #{invoiceDate, jdbcType=VARCHAR}) 
+		AND    (MDOD.SHIP_DATE         &lt; #{invoiceDate, jdbcType=VARCHAR} OR  MDOD.SHIP_DATE = #{invoiceDate, jdbcType=VARCHAR}) 
 		AND    MDOM.TAX_TYPE          = #{taxType, jdbcType=VARCHAR}
 		AND    MDOD.CLOSING_YN        = 'N'
-		AND    MTID.REFERENCE_DTL_NO IS NULL;
+		AND    MTID.REFERENCE_DTL_NO IS NULL
     </select>
     <delete id="remove_customBtn21-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_TAX_INVOICE_DTL 
@@ -95,7 +96,7 @@
 					                 , #{item.referenceDtlNo, jdbcType=VARCHAR}
 					                 , #{item.itemId, jdbcType=VARCHAR}
 					                 , TO_DATE(#{item.receiptDate, jdbcType=VARCHAR},'YYYY-MM-DD') 
-					                 , #{item.qty, jdbcType=NUMERIC}
+					                 , #{item.doQty, jdbcType=NUMERIC}
 					                 , #{item.localAmount, jdbcType=NUMERIC}
 					                 , #{item.taxRate, jdbcType=NUMERIC}
 					                 , #{item.taxAmount, jdbcType=NUMERIC}

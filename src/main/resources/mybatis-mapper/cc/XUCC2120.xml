@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUCC2120">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        SELECT MIMS.COMPANY_CD
+		     , MIMS.DIVISION_CD
+		     , MIMS.ITEM_ID
+		     , MIMS.UNIT
+		     , MIN(MI.ITEM_NM)     AS ITEM_NM
+		     , MIN(MI.ITEM_SPEC)   AS ITEM_SPEC
+		     , MIN(MI.ITEM_TYPE)   AS ITEM_TYPE
+		     , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MIMS.COMPANY_CD, MIMS.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_TYPE_NM
+		     , MIMS.UNIT   AS UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MIMS.COMPANY_CD, MIMS.DIVISION_CD, MIMS.UNIT) FROM DUAL) AS UOM_NM
+		     , MIMS.CLOSE_YEAR_MONTH                
+		     , TO_CHAR(MAX(MIMS.IO_DATE) ,'YYYY-MM-DD')  AS CLOSED_DATE
+		     , SUM(MIMS.BEGIN_QTY) AS BEGIN_QTY
+		     , SUM(MIMS.IN_QTY)    AS IN_QTY
+		     , SUM(MIMS.OUT_QTY)   AS OUT_QTY
+		     , SUM(MIMS.END_QTY)   AS END_QTY
+		FROM   MOM_ITEM_INOUT_MONTHLY_SUMMARY MIMS
+		     , MOM_ITEM MI 
+		     , MOM_LOCATION ML 
+		WHERE MIMS.COMPANY_CD       = MI.COMPANY_CD 
+		AND   MIMS.DIVISION_CD      = MI.DIVISION_CD 
+		AND   MIMS.ITEM_ID          = MI.ITEM_ID 
+		AND   MIMS.COMPANY_CD       = ML.COMPANY_CD 
+		AND   MIMS.DIVISION_CD      = ML.DIVISION_CD 
+		AND   MIMS.LOCATION_CD      = ML.LOCATION_CD      
+		AND   MIMS.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+		AND   MIMS.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}
+		AND   MIMS.CLOSE_YEAR_MONTH = #{closeYearMonth, jdbcType=VARCHAR}
+		<if test="itemIdNm != null and itemIdNm != ''">
+		AND (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
+		</if>
+		<if test="itemType != null and itemType != ''">
+		AND   MI.ITEM_TYPE     = #{itemType, jdbcType=VARCHAR}
+		</if>
+		GROUP BY MIMS.COMPANY_CD
+		       , MIMS.DIVISION_CD
+		       , MIMS.ITEM_ID
+		       , MIMS.UNIT
+		       , MIMS.CLOSE_YEAR_MONTH  
+    </select>
+</mapper>
