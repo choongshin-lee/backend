@@ -36,7 +36,7 @@
 		AND   MIMS.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}
 		AND   MIMS.CLOSE_YEAR_MONTH = #{closeYearMonth, jdbcType=VARCHAR}
 		<if test="itemType != null and itemType != ''">
-		AND   MI.ITEM_TYPE     = #{itemType, jdbcType=VARCHAR}
+		AND     MI.ITEM_TYPE    IN (${itemType}) 
 		</if>
 		<if test="plantCd != null and plantCd != ''">
 		AND   ML.PLANT_CD      = #{plantCd, jdbcType=VARCHAR}

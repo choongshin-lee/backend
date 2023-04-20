@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUCC1110">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        SELECT MCC.COMPANY_CD
+		     , MCC.DIVISION_CD
+		     , MCC.CLOSE_YEAR_MONTH
+		     , NVL(MCC.CLOSING_YN, 'N') AS CLOSING_YN
+		     , TO_CHAR(MCC.CLOSING_DATE ,'YYYY-MM-DD')     AS CLOSING_DATE
+		     , MCC.CLOSING_USER_NO
+		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MCC.COMPANY_CD, MCC.DIVISION_CD, MCC.CLOSING_USER_NO) FROM DUAL ) AS CLOSING_USER_NM
+		     , MCC.DESCRIPTION
+		     , ROWIDTOCHAR(MCC.ROWID)  AS KEY_ID
+		from   MOM_MONTHLY_CLOSING_CTL MCC
+		WHERE  MCC.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+		AND    MCC.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}
+		<if test="closeYearMonth != null and closeYearMonth != ''">
+		AND    MCC.CLOSE_YEAR_MONTH = #{closeYearMonth, jdbcType=VARCHAR}
+		</if>
+		AND    MCC.CLOSING_TYPE = 'P'
+    </select>
+	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    SELECT MTM.COMPANY_CD
+		     , MTM.DIVISION_CD
+		     , MTM.VENDOR_CD  AS PARTNER_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MTM.COMPANY_CD, MTM.DIVISION_CD, MTM.VENDOR_CD) FROM DUAL) AS PARTNER_NM
+             , MTM.TAX_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MTM.COMPANY_CD, MTM.DIVISION_CD, 'SM0029', MTM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+		     , TO_CHAR(MTM.INVOICE_DATE ,'YYYY-MM-DD')   AS INVOICE_DATE
+		     , MTD.ITEM_ID
+		     , MIN(MI.ITEM_NM)        AS ITEM_NM
+		     , MIN(MI.ITEM_SPEC)      AS ITEM_SPEC
+		     , MIN(MI.ITEM_TYPE)      AS ITEM_TYPE
+		     , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MTM.COMPANY_CD, MTM.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_TYPE_NM
+		     , SUM(MTD.QTY)           AS QTY
+		     , SUM(MTD.LOCAL_AMOUNT)  AS LOCAL_AMOUNT
+		     , SUM(MTD.TAX_AMOUNT)    AS TAX_AMOUNT
+		     , MTM.VENDOR_CD || '_' || MTD.ITEM_ID || '_' || MTM.TAX_TYPE || '_' || MTM.INVOICE_DATE   AS KEY_ID
+		     , MTM.CLOSE_YEAR_MONTH
+		FROM   MOM_TAX_INVOICE_MST MTM
+		     , MOM_TAX_INVOICE_DTL MTD
+		     , MOM_ITEM MI
+		WHERE  MTM.COMPANY_CD      = MTD.COMPANY_CD
+		AND    MTM.DIVISION_CD      = MTD.DIVISION_CD
+		AND    MTM.CLOSE_YEAR_MONTH = MTD.CLOSE_YEAR_MONTH
+		AND    MTM.VENDOR_CD        = MTD.VENDOR_CD
+		AND    MTM.INVOICE_DATE     = MTD.INVOICE_DATE
+		AND    MTM.TAX_TYPE         = MTD.TAX_TYPE
+		AND    MTD.COMPANY_CD       = MI.COMPANY_CD
+        AND    MTD.DIVISION_CD      = MI.DIVISION_CD
+        AND    MTD.ITEM_ID          = MI.ITEM_ID
+		AND    MTM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+		AND    MTM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}
+		AND    MTM.CLOSE_YEAR_MONTH = #{closeYearMonth, jdbcType=VARCHAR}
+		AND    MTM.PUR_SAL_TYPE     = 'P'
+		GROUP BY MTM.COMPANY_CD
+               , MTM.DIVISION_CD
+               , MTM.VENDOR_CD
+		       , MTD.ITEM_ID
+		       , MTM.TAX_TYPE
+		       , MTM.INVOICE_DATE
+		       , MTM.CLOSE_YEAR_MONTH
+    </select>
+    <delete id="remove_customBtn1-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_MONTHLY_CLOSING
+        <where>
+        <foreach collection="list" item="item" open="" close="" separator="OR">
+        (       COMPANY_CD   = #{item.companyCd, jdbcType=VARCHAR}
+           AND  DIVISION_CD  = #{item.divisionCd, jdbcType=VARCHAR}
+           AND  CLOSING_TYPE = 'P'
+           AND  CREATE_BY    = #{item.userId, jdbcType=VARCHAR}
+        )
+        </foreach>
+        </where>
+    </delete>
+	<insert id="create_customBtn1-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+	    INTO MOM_PROC_MONTHLY_CLOSING( COMPANY_CD
+									 , DIVISION_CD
+									 , CLOSING_TYPE
+									 , CLOSE_YEAR_MONTH
+									 , CLOSING_YN
+									 , DESCRIPTION
+									 , DEL_YN
+									 , VAL_MSG
+									 , MULTI_MSG
+									 , CREATE_BY
+									 , CREATE_DATE)
+        VALUES                       ( #{item.companyCd, jdbcType=VARCHAR}
+					                 , #{item.divisionCd, jdbcType=VARCHAR}
+					                 , 'P'
+					                 , #{item.closeYearMonth, jdbcType=VARCHAR}
+					                 , #{item.closingYn, jdbcType=VARCHAR}
+					                 , #{item.description, jdbcType=VARCHAR}
+					                 , #{item.delYn, jdbcType=VARCHAR}
+					                 , #{item.valMsg, jdbcType=VARCHAR}
+					                 , #{item.multiMsg, jdbcType=VARCHAR}
+					                 , #{item.userId, jdbcType=VARCHAR}
+					                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+					                 )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_CLOSED_PKG.SP_UPSERT_MONTHLY_CLOSING( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+			                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
+			                                           , 'P'											  
+			                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
+    </select>    
+</mapper>

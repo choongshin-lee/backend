@@ -35,7 +35,7 @@
 		AND   MIDS.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
 		AND   MIDS.IO_DATE     = #{closedDate, jdbcType=VARCHAR}
 		<if test="itemType != null and itemType != ''">
-		AND   MI.ITEM_TYPE     = #{itemType, jdbcType=VARCHAR}
+		AND     MI.ITEM_TYPE    IN (${itemType}) 
 		</if>
 		<if test="plantCd != null and plantCd != ''">
 		AND   ML.PLANT_CD      = #{plantCd, jdbcType=VARCHAR}
