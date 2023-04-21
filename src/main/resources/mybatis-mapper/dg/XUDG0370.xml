@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0370">
+    <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    SELECT TO_CHAR(MTID.IO_DATE ,'YYYY-MM-DD')   AS IO_DATE      
+		     , MTID.REFERENCE_DTL_NO  
+		     , MTID.ITEM_ID         
+		     , MI.ITEM_NM
+		     , MI.ITEM_SPEC
+		     , MI.ITEM_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+		     , MTID.QTY             
+		     , MTID.LOCAL_AMOUNT    
+		     , MTID.TAX_RATE        
+		     , MTID.TAX_AMOUNT   
+		     , MTID.COMPANY_CD      
+		     , MTID.DIVISION_CD     
+		     , MTID.PUR_SAL_TYPE    
+		     , MTID.CLOSE_YEAR_MONTH
+		     , MTID.VENDOR_CD         AS PARTNER_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MTID.COMPANY_CD, MTID.DIVISION_CD, MTID.VENDOR_CD) FROM DUAL) AS  PARTNER_NM   
+		     , TO_CHAR(MTID.INVOICE_DATE ,'YYYY-MM-DD')   AS INVOICE_DATE
+		     , MTID.TAX_TYPE        
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MTID.COMPANY_CD, MTID.DIVISION_CD, 'SM0029', MTID.TAX_TYPE, 'KR') FROM DUAL)  AS TAX_TYPE_NM
+		     , MTID.DESCRIPTION     
+		     , MTID.CREATE_BY       
+		     , MTID.CREATE_DATE     
+		     , MTID.UPDATE_BY       
+		     , MTID.UPDATE_DATE    
+		     , ROWIDTOCHAR(MTID.ROWID)  AS KEY_ID
+		FROM   MOM_TAX_INVOICE_DTL MTID
+		     , MOM_ITEM MI
+		WHERE  MTID.COMPANY_CD       = MI.COMPANY_CD(+)
+		AND    MTID.DIVISION_CD      = MI.DIVISION_CD(+)
+		AND    MTID.ITEM_ID          = MI.ITEM_ID(+)     
+		AND    MTID.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+		AND    MTID.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}
+		AND    MTID.PUR_SAL_TYPE     = 'P'
+		AND    MTID.CLOSE_YEAR_MONTH = #{closeYearMonth, jdbcType=VARCHAR}
+		AND    MTID.VENDOR_CD        = #{partnerCd, jdbcType=VARCHAR} 
+		AND    MTID.TAX_TYPE 	     = #{taxType, jdbcType=VARCHAR}
+		AND    MTID.ITEM_ID	         = #{itemId, jdbcType=VARCHAR} 
+		ORDER BY MTID.IO_DATE
+    </select>
+</mapper>

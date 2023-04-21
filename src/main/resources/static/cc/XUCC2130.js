@@ -1,4 +1,4 @@
-var menuId = 'XUCC1120';
+var menuId = 'XUCC2130';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -32,18 +32,16 @@ var VIEW= {
             let checkItem = widget.getCheckedRowItems(widget.grid[1]);
             if(btnId == 'customGridPopBtn2-1'){ 
                 if(checkItem.length==0){
-                    result.msg = '하단에 매출거래월마감상세 선택필수!';
+                    result.msg = '하단에서 월수불마감현황 선택필수!';
                     result.result = 'WARN';
                     return;
                 }
-                $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
-	            $('#partnerCdSP21').jqxComboBox({disabled: true});
-		        $('#taxTypeSP21').val(checkItem[0]['taxType']);
-		        $('#taxTypeSP21').jqxComboBox({disabled: true});
+                $('#locationCdSP21').val(checkItem[0]['locationCd']);
+	            $('#locationCdSP21').jqxComboBox({disabled: true});
 		        $('#itemIdSP21').val(checkItem[0]['itemId']);
 		        $('#itemIdSP21').attr("disabled", true);
 		        $('#closeYearMonthSP21').val(checkItem[0]['closeYearMonth']);
-		        $('#closeYearMonthSP21').attr("disabled", true);
+		        $('#closeYearMonthSP21').attr("disabled", true);                
             }
         }
 
@@ -54,6 +52,6 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0380', VIEW);	
+	momWidget.gridPopup.init(2,21,1,'XUDG0390', VIEW);	
 	VIEW.init();
 });

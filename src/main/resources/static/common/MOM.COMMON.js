@@ -2625,61 +2625,70 @@ function base64toBlob(base64Data, contentType) {
 
 
 function createMenu(menuData,menuLavel) {
-   var menu = '';
+       
+    var menu = '';
               
-      for (var i = 0; i < menuData.length; i++) {
-         if (menuData[i]['child']) {
+    for (let i = 0; i < menuData.length; i++) {
+        if (menuData[i]['child']) {
             if(menuLavel ==0){
-               menu += '<li">' +
-                     '<a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)">' +
-                     '<i class="side-menu__icon ' + menuData[i]['icon'] + '"></i>' +
-                     '<span class="side-menu__label">' + menuData[i]['menuNm'] + '</span>' +
-                     '<i class="angle fe fe-chevron-right"></i>' +
-                     '</a>' +
-                     '<ul class="slide-menu">' +
-                     '<li class="side-menu-label1">' +
-                     '<a href="javascript:void(0)">' + menuData[i]['menuNm'] + '</a>' +
-                     '</li>';
-                     
-            }else{
-               menu += '<li>' +
-                     '<a class="slide-item" data-bs-toggle="slide">' +
-                     '<span class="side-menu__label">' + menuData[i]['menuNm'] + '</span>' +
-                     '<i class="angle fe fe-chevron-right"></i>' +
-                     '</a>' +
-                     '<ul class="slide-menu">' +
-                     '<li class="side-menu-label1">' +
-                     '<a href="javascript:void(0)">' + menuData[i]['menuNm'] + '</a>' +
-                     '</li>';               
+                menu += '<li">' +
+                    '<a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)">' +
+                    '<i class="side-menu__icon ' + menuData[i]['icon'] + '"></i>' +
+                    '<span class="side-menu__label">' + menuData[i]['menuNm'] + '</span>' +
+                    '<i class="angle fe fe-chevron-right"></i>' +
+                    '</a>' +
+                    '<ul class="slide-menu">' +
+                    '<li class="side-menu-label1">' +
+                    '<a href="javascript:void(0)">' + menuData[i]['menuNm'] + '</a>' +
+                    '</li>';
             }
-                          
+            else{
+                menu += '<li>' +
+                    '<a class="slide-item" data-bs-toggle="slide">' +
+                    '<span class="side-menu__label">' + menuData[i]['menuNm'] + '</span>' +
+                    '<i class="angle fe fe-chevron-right"></i>' +
+                    '</a>' +
+                    '<ul class="slide-menu">' +
+                    '<li class="side-menu-label1">' +
+                    '<a href="javascript:void(0)">' + menuData[i]['menuNm'] + '</a>' +
+                    '</li>';               
+            }
+                    
             for (var j = 0; j < menuData[i]['child'].length; j++) {
-               var item = menuData[i]['child'][j];
+               
+                if (menuData[i]['child'][j]['child']) {
+                    menu += '<li>' +
+                        '<a class="slide-item" data-bs-toggle="slide">' +
+                        '<span class="side-menu__label">' + menuData[i]['child'][j]['menuNm'] + '</span>' +
+                        '<i class="angle fe fe-chevron-right"></i>' +
+                        '</a>' +
+                        '<ul class="slide-menu">' +
+                        '<li class="side-menu-label1">' +
+                        '<a href="javascript:void(0)">' + menuData[i]['child'][j]['menuNm'] + '</a>' +
+                        '</li>';  
+                    
+                    for (var k = 0; k < menuData[i]['child'][j]['child'].length; k++) {
+                        const item = menuData[i]['child'][j]['child'][k];      
+                        menu += '<li>' +
+                            '<a id=' + item['menuId'] + ' href=#' + item['menuId'] + ' name="' + item['menuNm'] + '" data-path=' + item['url'] + ' class="slide-item">' + item['menuNm'] + '</a>' +
+                            '</li>';
+                    }
+                    menu += '</ul>';
 
-                  if (menuData[i]['child'][j]['child']) {
-                     
-                     var subMenu = '';
-                     
-                         subMenu += createMenu(menuData[i]['child'],menuLavel +1);
-                         menu += subMenu;
-                         menu += '</ul>';
-                         
-                  }else{
-                     
-                      menu += '<li>' +
-                           '<a id=' + item['menuId'] + ' href=#' + item['menuId'] + ' name="' + item['menuNm'] + '" data-path=' + item['url'] + ' class="slide-item">' + item['menuNm'] + '</a>' +
-                           '</li>';
-                                          
-                  }
-                  
-               }
-               menu += '</ul>';
+                }
+                else{
+                    const item = menuData[i]['child'][j];      
+                    menu += '<li>' +
+                        '<a id=' + item['menuId'] + ' href=#' + item['menuId'] + ' name="' + item['menuNm'] + '" data-path=' + item['url'] + ' class="slide-item">' + item['menuNm'] + '</a>' +
+                        '</li>';
+                }
             }
-
-            
-         }
-            //menu += '</ul>';
-            return menu;
+            menu += '</ul>';
+        }
+    }
+    
+    return menu;
+    
 }  
           
 

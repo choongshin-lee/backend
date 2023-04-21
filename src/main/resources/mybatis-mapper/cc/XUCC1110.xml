@@ -2,22 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mom.backend.XUCC1110">
     <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-        SELECT MCC.COMPANY_CD
+        WITH C_YYMM AS (SELECT TO_CHAR(TRUNC(MC.DATE_ID, 'MONTH'), 'YYYYMM') AS YYYYMM
+                FROM   MOM_CALENDAR MC
+                WHERE  1 =1 
+                AND   MC.DATE_ID  <![CDATA[<=]]>   MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR})
+                GROUP BY TRUNC(MC.DATE_ID, 'MONTH')      
+                ORDER BY 1 DESC ) 
+		SELECT MCC.COMPANY_CD
 		     , MCC.DIVISION_CD
-		     , MCC.CLOSE_YEAR_MONTH
+		     , C.YYYYMM                 AS CLOSE_YEAR_MONTH
 		     , NVL(MCC.CLOSING_YN, 'N') AS CLOSING_YN
 		     , TO_CHAR(MCC.CLOSING_DATE ,'YYYY-MM-DD')     AS CLOSING_DATE
 		     , MCC.CLOSING_USER_NO
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MCC.COMPANY_CD, MCC.DIVISION_CD, MCC.CLOSING_USER_NO) FROM DUAL ) AS CLOSING_USER_NM
 		     , MCC.DESCRIPTION
-		     , ROWIDTOCHAR(MCC.ROWID)  AS KEY_ID
-		from   MOM_MONTHLY_CLOSING_CTL MCC
-		WHERE  MCC.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
-		AND    MCC.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}
+		     , C.YYYYMM   AS KEY_ID 
+		FROM   C_YYMM C
+		     , MOM_MONTHLY_CLOSING_CTL MCC
+		WHERE  C.YYYYMM = MCC.CLOSE_YEAR_MONTH(+)     
+		AND    MCC.COMPANY_CD(+)       = #{companyCd, jdbcType=VARCHAR}
+		AND    MCC.DIVISION_CD(+)      = #{divisionCd, jdbcType=VARCHAR}
 		<if test="closeYearMonth != null and closeYearMonth != ''">
 		AND    MCC.CLOSE_YEAR_MONTH = #{closeYearMonth, jdbcType=VARCHAR}
 		</if>
-		AND    MCC.CLOSING_TYPE = 'P'
+		AND    MCC.CLOSING_TYPE(+) = 'P'
+		ORDER BY C.YYYYMM DESC   
     </select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MTM.COMPANY_CD
@@ -81,7 +90,7 @@
 									 , CLOSE_YEAR_MONTH
 									 , CLOSING_YN
 									 , DESCRIPTION
-									 , DEL_YN
+									 , ACTION_TYPE
 									 , VAL_MSG
 									 , MULTI_MSG
 									 , CREATE_BY
@@ -92,7 +101,7 @@
 					                 , #{item.closeYearMonth, jdbcType=VARCHAR}
 					                 , #{item.closingYn, jdbcType=VARCHAR}
 					                 , #{item.description, jdbcType=VARCHAR}
-					                 , #{item.delYn, jdbcType=VARCHAR}
+					                 , #{item.actionType, jdbcType=VARCHAR}
 					                 , #{item.valMsg, jdbcType=VARCHAR}
 					                 , #{item.multiMsg, jdbcType=VARCHAR}
 					                 , #{item.userId, jdbcType=VARCHAR}

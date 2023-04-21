@@ -52,14 +52,6 @@ var VIEW= {
 				$('#taxTypeSP21').jqxComboBox({disabled: true});
             }
         }
-	    //else if(index == 20){         
-        //    let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-        //    if(action='C'&& btnId == 'customBtn21-1'){ 
-        //        for(var i=0,max=param.length; i<max;i++){
-        //            param[i]['partnerCd'] = checkItem[0]['partnerCd'];
-        //        }
-        //    }
-       // }
     }        
 };
 

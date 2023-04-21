@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUDG0390">
+    <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    SELECT MIMS.COMPANY_CD
+		     , MIMS.DIVISION_CD
+		     , MIMS.LOCATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MIMS.COMPANY_CD, MIMS.DIVISION_CD,MIMS.LOCATION_CD) FROM DUAL) AS LOCATION_NM
+		     , MIMS.ITEM_ID
+		     , MIMS.UNIT
+		     , MI.ITEM_NM
+		     , MI.ITEM_SPEC
+		     , MI.ITEM_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MIMS.COMPANY_CD, MIMS.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+		     , MIMS.UNIT   AS UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MIMS.COMPANY_CD, MIMS.DIVISION_CD, MIMS.UNIT) FROM DUAL) AS UOM_NM
+		     , MIMS.CLOSE_YEAR_MONTH
+		     , MIMS.BEGIN_QTY
+		     , MIMS.IN_QTY
+		     , MIMS.OUT_QTY
+		     , MIMS.END_QTY
+		     , MIMS.LOCATION_CD || '_' || MIMS.ITEM_ID || '_' || MIMS.UNIT   AS KEY_ID
+		FROM   MOM_ITEM_INOUT_MONTHLY_SUMMARY MIMS
+		     , MOM_ITEM MI 
+		     , MOM_LOCATION ML 
+		WHERE MIMS.COMPANY_CD       = MI.COMPANY_CD 
+		AND   MIMS.DIVISION_CD      = MI.DIVISION_CD 
+		AND   MIMS.ITEM_ID          = MI.ITEM_ID 
+		AND   MIMS.COMPANY_CD       = ML.COMPANY_CD 
+		AND   MIMS.DIVISION_CD      = ML.DIVISION_CD 
+		AND   MIMS.LOCATION_CD      = ML.LOCATION_CD      
+		AND   MIMS.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+		AND   MIMS.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}
+		AND   MIMS.CLOSE_YEAR_MONTH = #{closeYearMonth, jdbcType=VARCHAR}
+		AND   MIMS.LOCATION_CD      = #{locationCd, jdbcType=VARCHAR} 
+		AND   MIMS.ITEM_ID	        = #{itemId, jdbcType=VARCHAR} 
+    </select>
+</mapper>
