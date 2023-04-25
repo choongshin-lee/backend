@@ -49,6 +49,7 @@
 				    <if test="prTitle != null and prTitle != ''">
 				    AND (UPPER(MPR.PR_TITLE) LIKE '%' || UPPER(#{prTitle, jdbcType=VARCHAR}) || '%')	  
 				    </if>	
+				    AND    MPR.STATE          = 'PRG'
 			        ORDER BY  MPR.REQUEST_DATE , MPR.PR_TYPE
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A

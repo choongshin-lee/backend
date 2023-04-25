@@ -127,7 +127,7 @@
 			                                           , 'P'											  
 			                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>    
-    <delete id="remove_createBtn2" parameterType="java.util.List">
+    <delete id="remove_createBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_TAX_INVOICE_DTL 
           <where>
               <foreach collection="list" item="item" open="" close="" separator="OR">
@@ -139,7 +139,7 @@
               </foreach>
           </where>
     </delete>  
-    <insert id="create_createBtn2" parameterType="java.util.List">
+    <insert id="create_createBtn2-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_TAX_INVOICE_DTL( COMPANY_CD
 									 , DIVISION_CD
@@ -187,7 +187,7 @@
 					                 )
         </foreach>
     </insert>
-    <select id="proc_createBtn2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    <select id="proc_createBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
         { CALL MOM_CLOSED_PKG.SP_UPSERT_TAX_INVOICE_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 			                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 			                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
