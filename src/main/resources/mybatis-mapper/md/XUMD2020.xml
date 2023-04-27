@@ -18,45 +18,38 @@
 		     , TO_CHAR(MB.START_DATE,'YYYY-MM-DD') AS START_DATE
 		     , TO_CHAR(MB.END_DATE,'YYYY-MM-DD') AS END_DATE          
 		     , MB.SORT_NO  
-		     , MB.UPDATE_BY  
-		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.UPDATE_BY) FROM DUAL ) AS UPDATEBYNM
+		     , MB.UPDATE_BY   AS UPDATE_USER_NO
+		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		     , TO_CHAR(MB.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 		     , MI.ITEM_NM AS CHILD_ITEM_NM    
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM     
-		     , MB.UNIT
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME( MB.COMPANY_CD,MB.DIVISION_CD, MB.UNIT) FROM DUAL) AS UNIT_NM 
-		     , MI.STORAGE_LOCATION_CD
-		     , MI.LOT_MANAGEMENT_YN
-		     , MI.PRICE_SYNC_YN
-			 , MI.PO_OVER_RECEIPT_RATE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MB.COMPANY_CD,MB.DIVISION_CD,MI.STORAGE_LOCATION_CD) FROM DUAL) AS STORAGE_LOCATION_NM
+		     , MI.MFG_UOM  AS UOM
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME( MB.COMPANY_CD,MB.DIVISION_CD, MI.MFG_UOM ) FROM DUAL) AS UOM_NM 
+	         , MB.CONVERSION_UOM
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME( MB.COMPANY_CD,MB.DIVISION_CD, MB.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM 
+	         , MB.CONVERSION_QTY
+		     , MI.STORAGE_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MB.COMPANY_CD,MB.DIVISION_CD,MI.STORAGE_WAREHOUSE_CD) FROM DUAL) AS STORAGE_WAREHOUSE_NM
 		     , (SELECT MOM_COMMON_PKG.FN_GET_PRIMARY_WORK_CENTER_CD(MB.COMPANY_CD, MB.DIVISION_CD, MB.CHILD_ITEM_ID) FROM DUAL) AS WORK_CENTER_CD
              , (SELECT MOM_COMMON_PKG.FN_GET_WORK_CENTER_NAME( MB.COMPANY_CD
                                                              , MB.DIVISION_CD
                                                              , (SELECT MOM_COMMON_PKG.FN_GET_PRIMARY_WORK_CENTER_CD(MB.COMPANY_CD, MB.DIVISION_CD, MB.CHILD_ITEM_ID) FROM DUAL)) 
                FROM   DUAL)  AS WORK_CENTER_NM
-		     , MCD.COMPANY_CD
-		     , MCD.COMPANY_NM
-		     , MCD.DIVISION_CD
-		     , MCD.DIVISION_NM
+		     , MB.COMPANY_CD
+		     , MB.DIVISION_CD
 		     , MB.DESCRIPTION
 		     , CONNECT_BY_ROOT(MB.CHILD_ITEM_ID)             AS BOM_ROOT
 		     , SYS_CONNECT_BY_PATH(MB.CHILD_ITEM_ID, ' -> ') AS BOM_PATH
 		     , CONNECT_BY_ISLEAF                             AS BOM_LEAF
-		     , MB.USE_YN 
-        FROM   MOM_COM_DIV_V MCD
-	         , MOM_BOM MB
+        FROM   MOM_BOM MB
 		     , MOM_ITEM MI
-		WHERE  MCD.COMPANY_CD   = MB.COMPANY_CD
-		AND    MCD.DIVISION_CD  = MB.DIVISION_CD
-		AND    MB.COMPANY_CD    = MI.COMPANY_CD
+		WHERE  MB.COMPANY_CD    = MI.COMPANY_CD
 		AND    MB.DIVISION_CD   = MI.DIVISION_CD
 		AND    MB.CHILD_ITEM_ID = MI.ITEM_ID 
 	    AND    MB.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 	    AND    MB.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}  	
-		AND    MB.USE_YN      = #{useYn, jdbcType=VARCHAR}    
 		<choose>
 	 	    <when test='deploymentType.equals("E")'>
 	  	  	START WITH MB.PARENT_ITEM_ID = #{childItemId, jdbcType=VARCHAR}   
@@ -95,8 +88,9 @@
 						   , DIVISION_CD
 						   , PARENT_ITEM_ID
 						   , CHILD_ITEM_ID
-						   , UNIT
 						   , REQ_QTY
+						   , CONVERSION_UOM
+						   , CONVERSION_QTY
 						   , START_DATE
 						   , END_DATE
 						   , PHANTOM_FLAG
@@ -104,7 +98,6 @@
 						   , DEDUCT_TYPE
 						   , CHARGE_YN
 						   , SORT_NO
-						   , USE_YN
 						   , DESCRIPTION
 						   , CREATE_BY
 						   , CREATE_DATE
@@ -118,6 +111,8 @@
             , #{item.childItemId,        jdbcType=VARCHAR}
             , #{item.unit,               jdbcType=VARCHAR}
             , #{item.reqQty,             jdbcType=NUMERIC}
+            , #{item.conversionUom,      jdbcType=VARCHAR}
+            , #{item.conversionQty,      jdbcType=NUMERIC}
             , TO_DATE(#{item.startDate,  jdbcType=VARCHAR},'YYYY-MM-DD')
             , TO_DATE(#{item.endDate,    jdbcType=VARCHAR},'YYYY-MM-DD')
             , #{item.phantomFlag,        jdbcType=VARCHAR}
@@ -125,7 +120,6 @@
             , #{item.deductType,         jdbcType=VARCHAR}
             , #{item.chargeYn,           jdbcType=VARCHAR}
             , #{item.sortNo,             jdbcType=NUMERIC}
-            , #{item.useYn,              jdbcType=VARCHAR}
             , #{item.description,        jdbcType=VARCHAR}    
             , #{item.userId,        jdbcType=VARCHAR}
             , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})

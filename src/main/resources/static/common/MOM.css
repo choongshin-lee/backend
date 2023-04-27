@@ -2418,7 +2418,8 @@ border-color: #d8dce3 !important;
     height: 55rem;
 }
 .searcharea-pop.R8-remark-out {
-    height: 44rem;
+    /*height: 44rem;*/
+    height: 50rem;
 }
 .searcharea-pop.R9-remark-in {
     height: 54.5rem;
@@ -4580,7 +4581,8 @@ border-color: #d8dce3 !important;
     margin-left: 58rem !important;
     margin-top: -100rem !important;
     background: white !important;
-    height: 63.5rem !important;
+    /*height: 63.5rem !important;*/
+    height: 58.5rem !important;
     border-radius: 0.5rem;
     border: 1px solid #bdbdbd !important;
     margin-left: 18vw !important;

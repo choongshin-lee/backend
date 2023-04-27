@@ -152,22 +152,25 @@
     ORDER BY LABEL
     </select>
     <select id="get_DD00018" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
-    SELECT LOCATION_CD   AS CODE 
-         , LOCATION_CD ||'('|| LOCATION_NM   ||')' AS LABEL
-    FROM   MOM_LOCATION   
+    SELECT WAREHOUSE_CD   AS CODE 
+         , WAREHOUSE_CD ||'('|| WAREHOUSE_NM   ||')' AS LABEL
+    FROM   MOM_WAREHOUSE   
     WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
     AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
-    <if test="locationType != null and locationType != ''">
-    AND    LOCATION_TYPE = #{locationType, jdbcType=VARCHAR} 
+    <if test="warehouseType != null and warehouseType != ''">
+    AND    WAREHOUSE_TYPE = #{warehouseType, jdbcType=VARCHAR} 
     </if>
     <if test="searchKey != null and searchKey != ''">
-    AND    (TRIM(UPPER(LOCATION_CD)) LIKE '%' || TRIM(UPPER(#{searchKey, jdbcType=VARCHAR})) || '%' OR TRIM(UPPER(LOCATION_NM)) LIKE '%' || TRIM(UPPER(#{searchKey, jdbcType=VARCHAR})) || '%')
+    AND    (TRIM(UPPER(WAREHOUSE_CD)) LIKE '%' || TRIM(UPPER(#{searchKey, jdbcType=VARCHAR})) || '%' OR TRIM(UPPER(WAREHOUSE_NM)) LIKE '%' || TRIM(UPPER(#{searchKey, jdbcType=VARCHAR})) || '%')
     </if>
-    <if test="locationUseYn != null and locationUseYn != ''">
-    AND    LOCATION_USE_YN = #{locationUseYn, jdbcType=VARCHAR} 
+    <if test="warehouseUseYn != null and warehouseUseYn != ''">
+    AND    WAREHOUSE_USE_YN = #{warehouseUseYn, jdbcType=VARCHAR} 
     </if>
-    <if test="shippingUseYn != null and shippingUseYn != ''">
-    AND    SHIPPING_USE_YN = #{shippingUseYn, jdbcType=VARCHAR} 
+    <if test="purchaseWarehouseYn != null and purchaseWarehouseYn != ''">
+    AND    PURCHASE_WAREHOUSE_YN = #{purchaseWarehouseYn, jdbcType=VARCHAR} 
+    </if>    
+    <if test="shippingWarehouseYn != null and shippingUseYn != ''">
+    AND    SHIPPING_WAREHOUSE_YN = #{shippingWarehouseYn, jdbcType=VARCHAR} 
     </if>
     AND    USE_YN      = 'Y'
     ORDER BY LABEL 
@@ -595,5 +598,19 @@
     <if test="attribute2 != null and attribute2 != ''">
     AND     ATTRIBUTE2 = #{attribute2, jdbcType=VARCHAR} 
     </if>
-	</select>    
+	</select>  
+	<select id="get_DD00050" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	SELECT CODE
+	     , NVL((SELECT MOM_COMMON_PKG.FN_GET_MULTI_LANGUAGE(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR},#{langCd, jdbcType=VARCHAR},'CODE',#{groupCd, jdbcType=VARCHAR}|| '_' ||CODE)
+	            FROM   DUAL ),CODE ||'('|| CODE_NM ||')') AS LABEL
+	FROM   MOM_CODE
+	WHERE  DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+	AND    COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND    GROUP_CD    = 'MD0001'
+	AND    USE_YN      = 'Y'
+	<if test="itemGroupCd != null and itemGroupCd != ''">
+	AND     UPPER(CODE)  LIKE '%' || UPPER(#{itemGroupCd , jdbcType=VARCHAR}) || '%'
+	</if>
+	ORDER BY SORT_NO,LABEL
+	</select>  
 </mapper>
