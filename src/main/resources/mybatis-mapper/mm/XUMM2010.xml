@@ -77,10 +77,10 @@
 		     , MI.ITEM_SPEC 
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MPD.UNIT      AS PURCHASE_UNIT
-			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.UNIT) FROM DUAL) AS PURCHASE_UNIT_NM
-			 , MI.UNIT       
-			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UNIT) FROM DUAL) AS UNIT_NM
+		     , MPD.PURCHASE_UOM
+			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.PURCHASE_UOM) FROM DUAL) AS PURCHASE_UOM_NM
+			 , MI.UOM        
+			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
 		     , MRD.REQUEST_QTY   AS PURCHASE_REQUEST_QTY 
              , MRD.PO_QTY        AS PURCHASE_ORDERED_QTY 
              , (MRD.REQUEST_QTY - NVL(MRD.PO_QTY,0) - NVL(MRD.CLOSE_QTY,0)) + MPD.PO_QTY AS PO_PASSIBLE_QTY    
@@ -90,12 +90,10 @@
 		     , MPD.UNIT_PRICE   AS PO_UNIT_PRICE
 		     , MPD.AMOUNT
 		     , MPD.LOCAL_AMOUNT
-		     , MPD.DEPARTURE_LOCATION_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MPD.COMPANY_CD,MPD.DIVISION_CD,MPD.DEPARTURE_LOCATION_CD) FROM DUAL) AS DEPARTURE_LOCATION_NM
-		     , MPD.TEST_REPORT_FLAG
+		     , MPD.DEPARTURE_WAREHOUSE_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPD.COMPANY_CD,MPD.DIVISION_CD,MPD.DEPARTURE_WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM
 		     , MPD.IQC_FLAG
 		     , MPD.LOT_MANAGEMENT_YN
-		     , MPD.PRICE_SYNC_YN
 		     , MPD.PO_OVER_RECEIPT_RATE
 		     , MPD.DESCRIPTION
 		     , MPD.REFERENCE_NO            AS PR_NO
@@ -213,7 +211,7 @@
 			                , REFERENCE_NO
 			                , REFERENCE_DTL_NO
 			                , ITEM_ID
-			                , UNIT
+			                , PURCHASE_UOM
 			                , QTY
 			                , UNIT_PRICE
 			                , DEPARTURE_LOCATION_CD
@@ -236,14 +234,12 @@
 			                , #{item.prNo, jdbcType=VARCHAR}
 			                , #{item.purchaseRequestId, jdbcType=VARCHAR}
 			                , #{item.itemId, jdbcType=VARCHAR}
-			                , #{item.purchaseUnit, jdbcType=VARCHAR}
+			                , #{item.purchaseUom, jdbcType=VARCHAR}
 			                , #{item.poQty, jdbcType=NUMERIC}
 			                , #{item.poUnitPrice, jdbcType=NUMERIC}
-			                , #{item.departureLocationCd, jdbcType=VARCHAR}
-			                , #{item.testReportFlag, jdbcType=VARCHAR}
+			                , #{item.departureWarehouseCd, jdbcType=VARCHAR}
 			                , #{item.iqcFlag, jdbcType=VARCHAR}
 			                , #{item.lotManagementYn, jdbcType=VARCHAR}
-			                , #{item.priceSyncYn, jdbcType=VARCHAR}
 			                , #{item.poOverReceiptRate, jdbcType=NUMERIC}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.delYn, jdbcType=VARCHAR}

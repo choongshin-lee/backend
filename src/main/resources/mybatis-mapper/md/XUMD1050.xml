@@ -6,40 +6,34 @@
         SELECT A.*
 	    FROM   ( 
 	    </if>
-				SELECT MCD.COMPANY_CD
-			         , MCD.COMPANY_NM
-				     , MCD.DIVISION_CD
-				     , MCD.DIVISION_NM
+				SELECT MWC.COMPANY_CD
+			         , MWC.DIVISION_CD
 				     , MWC.WORK_GROUP_CD
 				     , (SELECT MOM_COMMON_PKG.FN_GET_WORK_GROUP_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.WORK_GROUP_CD) FROM DUAL) AS WORK_GROUP_NM
 					 , MWC.WORK_CENTER_CD
 					 , MWC.WORK_CENTER_NM
 					 , MWC.WORK_CENTER_TYPE
 					 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWC.COMPANY_CD,MWC.DIVISION_CD, 'MD0010', MWC.WORK_CENTER_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS WORK_CENTER_TYPE_NM  
-					 , MWC.CONSUME_LOCATION_CD
-					 , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.CONSUME_LOCATION_CD) FROM DUAL) AS CONSUME_LOCATION_NM
-					 , MWC.GOOD_LOCATION_CD
-					 , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.GOOD_LOCATION_CD) FROM DUAL) AS GOOD_LOCATION_NM
-					 , MWC.DEFECT_LOCATION_CD
-					 , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.DEFECT_LOCATION_CD) FROM DUAL) AS DEFECT_LOCATION_NM
+					 , MWC.CONSUME_WAREHOUSE_CD
+					 , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.CONSUME_WAREHOUSE_CD) FROM DUAL) AS CONSUME_WAREHOUSE_NM
+					 , MWC.GOOD_WAREHOUSE_CD
+					 , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.GOOD_WAREHOUSE_CD) FROM DUAL) AS GOOD_WAREHOUSE_NM
+					 , MWC.DEFECT_WAREHOUSE_CD
+					 , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.DEFECT_WAREHOUSE_CD) FROM DUAL) AS DEFECT_WAREHOUSE_NM
 					 , MWC.USE_YN
 					 , MWC.DESCRIPTION
-					 , MWC.CREATE_BY
-					 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.CREATE_BY) FROM DUAL ) AS CREATE_BY_NM
+					 , MWC.CREATE_BY   AS CREATE_USER_NO
+					 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.CREATE_BY) FROM DUAL )  AS CREATE_USER_NM
 					 , TO_CHAR(MWC.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE
-					 , MWC.UPDATE_BY
-					 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.UPDATE_BY) FROM DUAL ) AS UPDATE_BY_NM
+					 , MWC.UPDATE_BY   AS UPDATE_USER_NO         
+					 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWC.COMPANY_CD, MWC.DIVISION_CD, MWC.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 					 , TO_CHAR(MWC.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-			         , ROWIDTOCHAR(MWC.ROWID) AS GRID_ID
-			         , MWC.WORK_CENTER_CD     AS KEY_ID
+			         , ROWIDTOCHAR(MWC.ROWID)   AS KEY_ID
 	                 , COUNT(*) OVER() AS TOTAL_COUNT
 	                 , ROW_NUMBER() OVER(PARTITION BY MWC.COMPANY_CD,MWC.DIVISION_CD ORDER BY MWC.WORK_CENTER_CD  ) AS ROW_COUNT	
-			    FROM   MOM_COM_DIV_V MCD
-			         , MOM_WORK_CENTER MWC
-			    WHERE  MCD.COMPANY_CD  = MWC.COMPANY_CD
-			    AND    MCD.DIVISION_CD = MWC.DIVISION_CD  
-				AND    MCD.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-				AND    MCD.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}  		
+			    FROM   MOM_WORK_CENTER MWC
+			    WHERE  MWC.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+				AND    MWC.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}  		
 				<if test="workGroupCd != null and workGroupCd != ''">
 			    AND    MWC.WORK_GROUP_CD = #{workGroupCd, jdbcType=VARCHAR}
 				</if>
@@ -68,9 +62,9 @@
 					               ,  WORK_CENTER_CD
 					               ,  WORK_CENTER_NM
 					               ,  WORK_CENTER_TYPE
-					               ,  CONSUME_LOCATION_CD
-					               ,  GOOD_LOCATION_CD
-					               ,  DEFECT_LOCATION_CD
+					               ,  CONSUME_WAREHOUSE_CD
+					               ,  GOOD_WAREHOUSE_CD
+					               ,  DEFECT_WAREHOUSE_CD
 					               ,  USE_YN
 					               ,  DESCRIPTION
 					               ,  CREATE_BY
@@ -85,9 +79,9 @@
             ,   #{item.workCenterCd,      jdbcType=VARCHAR}
             ,   #{item.workCenterNm,      jdbcType=VARCHAR}
             ,   #{item.workCenterType,    jdbcType=VARCHAR}
-            ,   #{item.consumeLocationCd, jdbcType=VARCHAR}
-            ,   #{item.goodLocationCd,    jdbcType=VARCHAR}
-            ,   #{item.defectLocationCd,     jdbcType=VARCHAR}
+            ,   #{item.consumeWarehouseCd, jdbcType=VARCHAR}
+            ,   #{item.goodWarehouseCd,    jdbcType=VARCHAR}
+            ,   #{item.defectWarehouseCd, jdbcType=VARCHAR}
             ,   #{item.useYn,             jdbcType=VARCHAR}
             ,   #{item.description,       jdbcType=VARCHAR}
             ,   #{item.userId,            jdbcType=VARCHAR}
@@ -103,9 +97,9 @@
         SET    WORK_GROUP_CD       = #{item.workGroupCd, 	  jdbcType=VARCHAR}
 		     , WORK_CENTER_NM      = #{item.workCenterNm, 	  jdbcType=VARCHAR}
 		     , WORK_CENTER_TYPE    = #{item.workCenterType,    jdbcType=VARCHAR}
-		     , CONSUME_LOCATION_CD = #{item.consumeLocationCd, jdbcType=VARCHAR}
-		     , GOOD_LOCATION_CD    = #{item.goodLocationCd, 	  jdbcType=VARCHAR}
-		     , DEFECT_LOCATION_CD  = #{item.defectLocationCd, 	  jdbcType=VARCHAR}
+		     , CONSUME_WAREHOUSE_CD = #{item.consumeWarehouseCd,jdbcType=VARCHAR}
+		     , GOOD_WAREHOUSE_CD    = #{item.goodWarehouseCd, 	jdbcType=VARCHAR}
+		     , DEFECT_WAREHOUSE_CD  = #{item.defectWarehouseCd, jdbcType=VARCHAR}
 		     , USE_YN              = #{item.useYn, 			  jdbcType=VARCHAR}
 		     , DESCRIPTION         = #{item.description, 	  jdbcType=VARCHAR}
 		     , UPDATE_BY           = #{item.userId, 		  jdbcType=VARCHAR}
@@ -140,9 +134,9 @@
                   #{workCenterNm, jdbcType=VARCHAR} as workCenterNm,
                   #{routingId, jdbcType=VARCHAR} as routingId,
                   #{workCenterType, jdbcType=VARCHAR} as workCenterType,
-                  #{consumeLocationCd, jdbcType=VARCHAR} as consumeLocationCd,
-                  #{goodLocationCd, jdbcType=VARCHAR} as goodLocationCd,
-                  #{defectLocationCd, jdbcType=VARCHAR} as defectLocationCd,
+                  #{consumeWarehouseCd, jdbcType=VARCHAR} as consumeWarehouseCd,
+                  #{goodWarehouseCd, jdbcType=VARCHAR} as goodWarehouseCd,
+                  #{defectWarehouseCd, jdbcType=VARCHAR} as defectWarehouseCd,
                   #{useYn, jdbcType=VARCHAR} as useYn,
                   #{description, jdbcType=VARCHAR} as description,
                   #{userId, jdbcType=VARCHAR} as createBy,
@@ -160,9 +154,9 @@
              , WORK_CENTER_NM = PARAM.workCenterNm
              , ROUTING_ID = PARAM.routingId
              , WORK_CENTER_TYPE = PARAM.workCenterType
-             , CONSUME_LOCATION_CD = PARAM.consumeLocationCd
-             , GOOD_LOCATION_CD = PARAM.goodLocationCd
-             , DEFECT_LOCATION_CD = PARAM.defectLocationCd
+             , CONSUME_WAREHOUSE_CD = PARAM.consumeWarehouseCd
+             , GOOD_WAREHOUSE_CD = PARAM.goodWarehouseCd
+             , DEFECT_WAREHOUSE_CD = PARAM.defectWarehouseCd
              , USE_YN = PARAM.useYn
              , DESCRIPTION = PARAM.description
              , UPDATE_BY = PARAM.updateBy
@@ -175,9 +169,9 @@
                , WORK_CENTER_NM
                , ROUTING_ID
                , WORK_CENTER_TYPE
-               , CONSUME_LOCATION_CD
-               , GOOD_LOCATION_CD
-               , DEFECT_LOCATION_CD
+               , CONSUME_WAREHOUSE_CD
+               , GOOD_WAREHOUSE_CD
+               , DEFECT_WAREHOUSE_CD
                , USE_YN
                , DESCRIPTION
                , CREATE_BY
@@ -191,9 +185,9 @@
                , PARAM.workCenterNm
                , PARAM.routingId
                , PARAM.workCenterType
-               , PARAM.consumeLocationCd
-               , PARAM.goodLocationCd
-               , PARAM.defectLocationCd
+               , PARAM.consumeWarehouseCd
+               , PARAM.goodWarehouseCd
+               , PARAM.defectWarehouseCd
                , PARAM.useYn
                , PARAM.description
                , PARAM.createBy

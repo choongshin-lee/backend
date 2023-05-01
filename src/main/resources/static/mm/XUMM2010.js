@@ -48,6 +48,21 @@ var VIEW= {
 	             $('#partnerCdNmSP11').val('');  
 	        }
 	    }
+	    else if(index == 1){
+		    let checkItem = widget.getCheckedRowItems(widget.grid[0]);
+		    if(btnId == 'customGridPopBtn2-3'){ // 커스텀 버튼 실행시 1 삭제(D) 2 TMP삽입(C) 3 프로시저실행(P) actionType 으로 시점 제어가능  		
+			    if(checkItem.length==0){
+				    //$('#' +'gridPop-'+btnId).modal('hide');
+				    result.msg = '상단에서 발주서 선택필수!';
+				    result.result = 'WARN';
+				    return;
+			    }
+			    $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
+		        $('#partnerCdSP21').jqxComboBox({disabled: true});
+		        $('#currencyCdSP21').val(checkItem[0]['currencyCd']);
+		        $('#currencyCdSP21').jqxComboBox({disabled: true});
+			}
+		}
         else if(index == 10){       
 	        if(btnId == 'customBtn11-1'){// 팝업에서 커스텀버튼(선택) 눌렀을떄 호출
 	            let checkItem = widget.getCheckedRowItems(widget.grid[index]);
@@ -80,7 +95,7 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
 	//momWidget.gridPopup.init(1,11,1,'XUDG0220', VIEW); 
-	momWidget.gridPopup.init(2,21,1,'XUSM8060', VIEW);
+	momWidget.gridPopup.init(2,21,1,'XUDG0400', VIEW);
 		
 	VIEW.init();
 });

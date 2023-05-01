@@ -6,48 +6,48 @@
 		SELECT A.*
 		FROM   (
 		 </if>
-		        SELECT MA.COMPANY_CD
-		             , MA.DIVISION_CD
-		             , MA.AREA_CD
-		             , MA.AREA_CD     AS KEY_ID
-		             , MA.AREA_NM
-		             , MA.LOCATION_CD
-		             , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MA.COMPANY_CD, MA.DIVISION_CD, MA.LOCATION_CD) FROM DUAL) AS LOCATION_NM
-		             , MA.LOGISTIC_USE_ID
-		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MA.COMPANY_CD, MA.DIVISION_CD, 'MD0020', MA.LOGISTIC_USE_ID, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS LOGISTIC_USE_NM
-		             , MA.STOCK_CONTROL_YN
-		             , MA.STOCK_RECEIPT_BLOCK_YN
-		             , MA.STOCK_RELEASE_BLOCK_YN
-		             , MA.NEGATIVE_STOCK_ALLOWED_YN
-		             , MA.STORAGING_CONTENTS_CD
-		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MA.COMPANY_CD, MA.DIVISION_CD, 'MD0021', MA.STORAGING_CONTENTS_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS STORAGING_CONTENTS_NM
-		             , MA.CYCLE_COUNTING_USER_NO
-		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MA.COMPANY_CD, MA.DIVISION_CD, MA.CYCLE_COUNTING_USER_NO) FROM DUAL ) AS CYCLE_COUNTING_USER_NM
-		             , TO_CHAR(MA.CYCLE_COUNTING_DATE ,'YYYY-MM-DD') AS CYCLE_COUNTING_DATE
-		             , MA.CYCLE_COUNTING_TERM
-		             , MA.CYCLE_COUNTING_UOM
-		             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MA.COMPANY_CD, MA.DIVISION_CD, MA.CYCLE_COUNTING_UOM) FROM DUAL) AS CYCLE_COUNTING_UOM_NM
-		             , MA.USE_YN
-		             , MA.DESCRIPTION
-		             , MA.UPDATE_BY      AS UPDATE_USER_NO
-		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MA.COMPANY_CD, MA.DIVISION_CD, MA.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-		             , TO_CHAR(MA.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-		             , COUNT(*) OVER()   AS TOTAL_COUNT
-		             , ROW_NUMBER() OVER(PARTITION BY MA.COMPANY_CD,MA.DIVISION_CD ORDER BY MA.AREA_CD) AS ROW_CNT
-		        FROM   MOM_AREA MA
-		        WHERE  MA.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-		        AND    MA.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
-		        <if test="areaCd != null and areaCd != ''">
-		          AND    UPPER(MA.AREA_CD) LIKE '%' || UPPER(#{areaCd, jdbcType=VARCHAR}) || '%' 
+		        SELECT ML.COMPANY_CD
+	                 , ML.DIVISION_CD
+	                 , ML.LOCATION_CD 
+	                 , ML.LOCATION_NM
+	                 , ML.WAREHOUSE_CD 
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(ML.COMPANY_CD, ML.DIVISION_CD, ML.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
+	                 , ML.LOGISTIC_USE_CD
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(ML.COMPANY_CD, ML.DIVISION_CD, 'MD0020', ML.LOGISTIC_USE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS LOGISTIC_USE_NM
+	                 , ML.STOCK_CONTROL_YN
+	                 , ML.STOCK_RECEIPT_BLOCK_YN
+	                 , ML.STOCK_RELEASE_BLOCK_YN
+	                 , ML.NEGATIVE_STOCK_ALLOWED_YN
+	                 , ML.STORAGING_CONTENTS_CD
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(ML.COMPANY_CD, ML.DIVISION_CD, 'MD0021', ML.STORAGING_CONTENTS_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS STORAGING_CONTENTS_NM
+	                 , ML.CYCLE_COUNTING_USER_NO
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(ML.COMPANY_CD, ML.DIVISION_CD, ML.CYCLE_COUNTING_USER_NO) FROM DUAL ) AS CYCLE_COUNTING_USER_NM
+	                 , TO_CHAR(ML.CYCLE_COUNTING_DATE ,'YYYY-MM-DD') AS CYCLE_COUNTING_DATE
+	                 , ML.CYCLE_COUNTING_TERM
+	                 , ML.CYCLE_COUNTING_UOM
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(ML.COMPANY_CD, ML.DIVISION_CD, ML.CYCLE_COUNTING_UOM) FROM DUAL) AS CYCLE_COUNTING_UOM_NM
+	                 , ML.USE_YN
+	                 , ML.DESCRIPTION
+	                 , ML.UPDATE_BY      AS UPDATE_USER_NO
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(ML.COMPANY_CD, ML.DIVISION_CD, ML.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+	                 , TO_CHAR(ML.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+	                 , COUNT(*) OVER()   AS TOTAL_COUNT
+	                 , ROW_NUMBER() OVER(PARTITION BY ML.COMPANY_CD,ML.DIVISION_CD ORDER BY ML.LOCATION_CD) AS ROW_CNT
+	                 , ROWIDTOCHAR(ML.ROWID)  AS KEY_ID
+	            FROM   MOM_LOCATION ML
+	            WHERE  ML.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	            AND    ML.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+		        <if test="locationCd != null and locationCd != ''">
+		        AND    UPPER(ML.LOCATION_CD) LIKE '%' || UPPER(#{locationCd, jdbcType=VARCHAR}) || '%' 
 		        </if>
-		        <if test="areaNm != null and areaNm != ''">
-		          AND    UPPER(MA.AREA_NM) LIKE '%' || UPPER(#{areaNm, jdbcType=VARCHAR}) || '%' 
+		        <if test="locationNm != null and locationNm != ''">
+		          AND    UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{locationNm, jdbcType=VARCHAR}) || '%' 
 		        </if>
-		         <if test="locationCd != null and locationCd != ''">
-		          AND    MA.LOCATION_CD = #{locationCd, jdbcType=VARCHAR}
+		         <if test="warehouseCd != null and warehouseCd != ''">
+		          AND    ML.WAREHOUSE_CD = #{warehouseCd, jdbcType=VARCHAR}
 		        </if>
 		         <if test="useYn != null and useYn != ''">
-		          AND    MA.USE_YN = #{useYn, jdbcType=VARCHAR}
+		          AND    ML.USE_YN = #{useYn, jdbcType=VARCHAR}
 		        </if>          
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		     ) A

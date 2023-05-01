@@ -38,8 +38,8 @@ var VIEW= {
 			    }
 		        $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
 		        $('#partnerCdSP21').jqxComboBox({disabled: true});
-				$('#departureLocationCdSP21').val(checkItem[0]['departureLocationCd']);
-				$('#departureLocationCdSP21').jqxComboBox({disabled: true});
+				$('#departureWarehouseCdSP21').val(checkItem[0]['departureWarehouseCd']);
+				$('#departureWarehouseCdSP21').jqxComboBox({disabled: true});
 				$('#iqcFlagSP21').val(checkItem[0]['iqcFlag']);
 				$('#iqcFlagSP21').jqxComboBox({disabled: true});
 			}
@@ -64,6 +64,7 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
-	momWidget.gridPopup.init(2,21,1,'XUSM8080', VIEW);
+	//momWidget.gridPopup.init(2,21,1,'XUSM8080', VIEW);
+	momWidget.gridPopup.init(2,21,1,'XUDG0410', VIEW);
 	VIEW.init();
 });

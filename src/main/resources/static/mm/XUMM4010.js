@@ -37,11 +37,11 @@ var VIEW= {
 				    return;
 			    }
 	            $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
-			    $('#departureLocationCdSP21').val(checkItem[0]['departureLocationCd']);
+			    $('#departureWarehouseCdSP21').val(checkItem[0]['departureWarehouseCd']);
 			    $('#iqcFlagSP21').val(checkItem[0]['iqcFlag']);
 			    $('#processCdSP21').val(checkItem[0]['processCd']);
 			    $('#partnerCdSP21').jqxComboBox({disabled: true});
-			    $('#departureLocationCdSP21').jqxComboBox({disabled: true});
+			    $('#departureWarehouseCdSP21').jqxComboBox({disabled: true});
 			    $('#iqcFlagSP21').jqxComboBox({disabled: true});
 			    $('#processCdSP21').jqxComboBox({disabled: true});
 			}
@@ -63,6 +63,7 @@ $(document).ready(function(event){
 	//momWidget.init(2, menuId, VIEW,'GRID');	
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUSM8100', VIEW);
+	//momWidget.gridPopup.init(2,21,1,'XUSM8100', VIEW);
+	momWidget.gridPopup.init(2,21,1,'XUDG0420', VIEW);
 	VIEW.init();
 });
