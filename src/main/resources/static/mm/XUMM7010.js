@@ -13,7 +13,7 @@ var VIEW= {
     searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         if(index==1){
 		    let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-		    param.receiveNo = checkItem[0].receiveNo;		  					
+		    param.receiptNo = checkItem[0].receiptNo;		  					
 		}
 		else if(index==0 ){	                                                
 		    AUIGrid.clearGridData(widget.grid[1]);
@@ -21,7 +21,7 @@ var VIEW= {
 	},
     cellClickCallBack: function(index,rowIndex,target,e) {			
 	    if(index==0){
-		    widget.findBtnClicked(1, {receiveNo:e.item['receiveNo']}, true, 'CELLCLICK',menuId,VIEW);
+		    widget.findBtnClicked(1, {receiptNo:e.item['receiptNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {

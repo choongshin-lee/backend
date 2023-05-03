@@ -19,12 +19,12 @@ var VIEW= {
 	},
 	copyCallBack: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 
 	    if(index ==0 && btnId =='copyBtn'){
-		    $('#receiveNoDP1').val('');		
+		    $('#receiptNoDP1').val('');		
 		}
 	},
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {receiveNo:e.item['receiveNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {receiptNo:e.item['receiptNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
@@ -49,7 +49,7 @@ var VIEW= {
 	    else if(index == 20){			    
 		    if(action='C'&& btnId == 'customBtn21-1'){ 
 			    for(var i=0,max=param.length; i<max;i++){
-				    param[i]['inoutNo'] = checkItem[0]['receiveNo'];
+				    param[i]['inoutNo'] = checkItem[0]['receiptNo'];
 					param[i]['inoutType'] = 'RD';
 			    }
 		    }

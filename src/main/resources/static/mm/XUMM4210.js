@@ -13,7 +13,7 @@ var VIEW= {
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
 		if(index ==0 && btnId =='copyBtn'){	
-			$('#receiveNoDP1').val('');	
+			$('#receiptNoDP1').val('');	
 		}
 	},
 	createCallInit: function(index,your,action,btnId,param,result) { //등록버튼 팝업띄우기 전에 호출되는 함수 
@@ -24,13 +24,13 @@ var VIEW= {
 				result.result = 'WARN';
 				return;
 			}
-			$('#receiveNoDP2').val(checkItem[0].receiveNo);   
+			$('#receiptNoDP2').val(checkItem[0].receiptNo);   
 		}
 	},
     searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         if(index==1){
 	        let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-			param.receiveNo = checkItem[0].receiveNo;
+			param.receiptNo = checkItem[0].receiptNo;
 		} 
 	    else if(index==0 ){	                                                
 		    AUIGrid.clearGridData(widget.grid[1]);

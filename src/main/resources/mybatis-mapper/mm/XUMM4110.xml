@@ -6,8 +6,8 @@
 		     , MPIM.DIVISION_CD
 		     , MPIM.PROCESS_CD
              , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
-		     , MPIM.INOUT_NO   AS RECEIVE_NO
-		     , MPIM.INOUT_NO   AS KEY_ID
+		     , MPIM.INOUT_NO            AS RECEIPT_NO
+		     , ROWIDTOCHAR(MPIM.ROWID)  AS KEY_ID   
 		     , MPIM.BL_NO
 	         , MPIM.IP_NO
 	         , MPIM.LC_NO    
@@ -15,18 +15,18 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.IP_CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS IP_CURRENCY_NM
 		     , MPIM.IP_EXCHANGE_RATE
 		     , TO_CHAR(MPIM.CC_DATE ,'YYYY-MM-DD')     AS CC_DATE	     
-		     , MPIM.TITLE        AS RECEIVE_TITLE
+		     , MPIM.TITLE        AS RECEIPT_TITLE
 		     , MP.PARTNER_CD
 	         , MP.PARTNER_NM
 		     , MPIM.DEPARTURE_VENDOR_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
-		     , MPIM.DEPARTURE_LOCATION_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_LOCATION_CD) FROM DUAL) AS DEPARTURE_LOCATION_NM
+		     , MPIM.DEPARTURE_WAREHOUSE_CD 
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM
 		     , MPIM.IQC_FLAG
 		     , MPIM.TAX_TYPE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
 		     , TO_CHAR(MPIM.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE
-		     , MPIM.AMOUNT           AS DEPARTURE_AMOUNT
+		     , MPIM.AMOUNT           AS RECEIPT_AMOUNT
 		     , MPIM.VENDOR_INVOICE
 		     , MPIM.DESCRIPTION
 		     , MPIM.CREATE_BY   AS CREATE_USER_NO
@@ -42,14 +42,14 @@
 		AND    MPIM.CREATE_DATE BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999  
 		AND    MPIM.STATE     = 'PIG'  -- 등록 
 		AND    MPIM.PROCESS_CD = 'RO'  --외자거래
-		<if test="receiveNo != null and receiveNo != ''">
-		AND    UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{receiveNo, jdbcType=VARCHAR}) || '%'
+		<if test="receiptNo != null and receiptNo != ''">
+		AND    UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{receiptNo, jdbcType=VARCHAR}) || '%'
 		</if>
 		<if test="partnerCdNm != null and partnerCdNm != ''">
 		AND    (UPPER(MPIM.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
 		</if>	
-	    <if test="receiveTitle != null and receiveTitle != ''">
-		AND    UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{receiveTitle, jdbcType=VARCHAR}) || '%'
+	    <if test="receiptTitle != null and receiptTitle != ''">
+		AND    UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{receiptTitle, jdbcType=VARCHAR}) || '%'
 		</if>
 		<if test="iqcFlag != null and iqcFlag != ''">
 		AND    MPIM.IQC_FLAG = #{iqcFlag, jdbcType=VARCHAR}
@@ -59,7 +59,7 @@
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MPID.COMPANY_CD
 		     , MPID.DIVISION_CD
-		     , MPID.INOUT_NO          AS RECEIVE_NO
+		     , MPID.INOUT_NO          AS RECEIPT_NO
 		     , MPID.SEQ
 		     , MPID.REFERENCE_NO  
              , MPID.REFERENCE_DTL_NO 
@@ -68,11 +68,11 @@
 		     , MI.ITEM_SPEC 
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MPID.INOUT_UNIT   AS PURCHASE_UNIT
-             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.INOUT_UNIT) FROM DUAL) AS PURCHASE_UNIT_NM
-             , MI.UNIT       
-             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UNIT) FROM DUAL) AS UNIT_NM
-		     , MPID.INOUT_QTY        AS RECEIVE_REQUEST_QTY
+		     , MPID.INOUT_UOM   AS PURCHASE_UOM
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.INOUT_UOM) FROM DUAL) AS PURCHASE_UOM_NM
+	         , MI.UOM        
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
+		     , MPID.INOUT_QTY        AS RECEIPT_REQUEST_QTY
 		     , MPID.CURRENCY_CD
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'SM0017', MPID.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
              , MPID.EXCHANGE_RATE
@@ -82,7 +82,7 @@
 		     , MPID.PO_OVER_RECEIPT_RATE
 		     , MPID.DESCRIPTION
 		     , MPID.PURCHASE_INOUT_ID
-		     , MPID.PURCHASE_INOUT_ID       AS KEY_ID
+		     , ROWIDTOCHAR(MPID.ROWID)  AS KEY_ID   
 		FROM   MOM_PURCHASE_INOUT_DTL MPID
 		     , MOM_ITEM MI
 		WHERE  MPID.COMPANY_CD = MI.COMPANY_CD(+)
@@ -90,7 +90,7 @@
 		AND    MPID.ITEM_ID     = MI.ITEM_ID(+)
 		AND    MPID.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 		AND    MPID.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
-		AND    MPID.INOUT_NO    = #{receiveNo, jdbcType=VARCHAR}
+		AND    MPID.INOUT_NO    = #{receiptNo, jdbcType=VARCHAR}
 		ORDER BY MPID.INOUT_NO 
 		       , MPID.SEQ
     </select>
@@ -123,7 +123,7 @@
 			                , LC_NO
 			                , DEPARTURE_DATE
 			                , DEPARTURE_VENDOR_CD
-			                , DEPARTURE_LOCATION_CD
+			                , DEPARTURE_WAREHOUSE_CD
 			                , CURRENCY_CD
 			                , EXCHANGE_RATE
 			                , VENDOR_INVOICE
@@ -138,9 +138,9 @@
 			                , CREATE_DATE )
         VALUES              ( #{item.companyCd, jdbcType=VARCHAR}
 			                , #{item.divisionCd, jdbcType=VARCHAR}
-			                , #{item.receiveNo, jdbcType=VARCHAR}
+			                , #{item.receiptNo, jdbcType=VARCHAR}
 			                , 'RO'
-			                , #{item.receiveTitle, jdbcType=VARCHAR}
+			                , #{item.receiptTitle, jdbcType=VARCHAR}
 			                , #{item.iqcFlag, jdbcType=VARCHAR}
 			                , #{item.partnerCd, jdbcType=VARCHAR}
 			                , #{item.blNo, jdbcType=VARCHAR}
@@ -151,7 +151,7 @@
 			                , #{item.lcNo, jdbcType=VARCHAR}
 			                , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
 			                , #{item.departureVendorCd, jdbcType=VARCHAR}
-			                , #{item.departureLocationCd, jdbcType=VARCHAR}
+			                , #{item.departureWarehouseCd, jdbcType=VARCHAR}
 			                , #{item.currencyCd, jdbcType=VARCHAR}
 			                , #{item.exchangeRate, jdbcType=NUMERIC}
 			                , #{item.vendorInvoice, jdbcType=VARCHAR}
@@ -208,11 +208,11 @@
 		VALUES              ( #{item.companyCd, jdbcType=VARCHAR}
 			                , #{item.divisionCd, jdbcType=VARCHAR}
 			                , 'RO'
-			                , #{item.receiveNo, jdbcType=VARCHAR}
+			                , #{item.receiptNo, jdbcType=VARCHAR}
 			                , #{item.purchaseInoutId, jdbcType=VARCHAR}
 			                , #{item.ioType, jdbcType=VARCHAR}
 			                , #{item.itemId, jdbcType=VARCHAR}
-			                , #{item.receiveRequestQty, jdbcType=NUMERIC}
+			                , #{item.receiptRequestQty, jdbcType=NUMERIC}
 			                , #{item.referenceNo, jdbcType=VARCHAR}
 			                , #{item.referenceDtlNo, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}

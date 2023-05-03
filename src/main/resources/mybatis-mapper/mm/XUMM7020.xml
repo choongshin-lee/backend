@@ -6,82 +6,73 @@
 		    SELECT A.*
 		    FROM   (
 		</if>  	    
-		    SELECT MII.COMPANY_CD
-			     , MII.DIVISION_CD 
-			     , MII.ITEM_INOUT_NO                  AS GR_NO      
-			     , MII.ITEM_INOUT_SEQ                 AS SEQ
-			     , TO_CHAR(MII.IO_DATE ,'YYYY-MM-DD') AS RECEIVE_DATE
-			     , MII.IO_TYPE
-			     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
-			     , MII.ITEM_INOUT_ID
-			     , MII.ITEM_INOUT_ID         AS KEY_ID	     
-			     , MII.LOCATION_CD           AS RECEIVE_LOCATION_CD                                          
-			     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.LOCATION_CD) FROM DUAL) AS RECEIVE_LOCATION_NM
-			     , MII.ITEM_ID
+		    SELECT MPM.COMPANY_CD
+			     , MPM.DIVISION_CD
+			     , MPM.INOUT_NO       AS RECEIPT_NO
+			     , MPD.SEQ
+			     , MPD.PURCHASE_INOUT_ID
+			     , TO_CHAR(MPD.RECEIPT_DATE ,'YYYY-MM-DD') AS RECEIPT_DATE
+			     , MPD.IO_TYPE
+			     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
+			     , MPM.DEPARTURE_WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
+			     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.DEPARTURE_WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
+			     , MPD.ITEM_ID
 			     , MI.ITEM_NM
 			     , MI.ITEM_SPEC
 			     , MI.ITEM_TYPE
 			     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE,  #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-			     , MII.INOUT_UNIT       AS STANDARD_UNIT
-			     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD,MII.INOUT_UNIT)  FROM DUAL)  AS STANDARD_UNIT_NM
-			     ,  MII.INOUT_QTY       AS STANDARD_UNIT_QTY
-			     , MII.UNIT        
-			     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD,MII.UNIT)  FROM DUAL)  AS UNIT_NM
-			     , MII.QTY          AS RECEIVE_QTY
-			     , MII.PARTNER_CD   
-			     , MPI.VENDOR_NM	AS PARTNER_NM
-			     , MPI.DEPARTURE_VENDOR_CD
-			     , MPI.DEPARTURE_VENDOR_NM
-			     , MII.CURRENCY_CD
-			     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MII.COMPANY_CD, MII.DIVISION_CD, 'SM0017', MII.CURRENCY_CD,  #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-			     , MII.EXCHANGE_RATE
-			      ,MII.UNIT_PRICE 
-			     , MII.AMOUNT
-			     , MII.LOCAL_AMOUNT
-			     , MPI.PROCESS_CD
-	             , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.PROCESS_CD) FROM DUAL)  AS PROCESS_NM  
-			     , MPI.PURCHASE_INOUT_ID    
-			     , MPI.REFERENCE_NO
-                 , MPI.REFERENCE_DTL_NO
-			     , MII.CREATE_BY   AS CREATE_USER_NO      
-			     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM      
-			     , TO_CHAR(MII.CREATE_DATE ,'YYYY-MM-DD')     AS CREATE_DATE
-			FROM   MOM_ITEM_INOUT MII
+			     , MPD.INOUT_QTY            
+			     , MPD.CONVERSION_QTY
+			     , MPD.INOUT_UOM          AS      
+			     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.INOUT_UOM) FROM DUAL) AS PURCHASE_UOM_NM
+			     , MPD.CONVERSION_UOM
+			     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
+			     , MPD.RECEIPT_QTY    
+			     , MPM.VENDOR_CD      AS PARTNER_CD
+			     , MP.PARTNER_NM      
+			     , MPM.DEPARTURE_VENDOR_CD
+			     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD,MPM.DIVISION_CD, MPM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
+			     , MPD.CURRENCY_CD
+			     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'SM0017', MPD.CURRENCY_CD,  #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+			     , MPD.EXCHANGE_RATE
+			      ,MPD.UNIT_PRICE 
+			     , MPD.AMOUNT
+			     , MPD.LOCAL_AMOUNT
+			     , MPM.PROCESS_CD
+			     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM  
+			FROM   MOM_PURCHASE_INOUT_MST MPM
+			     , MOM_PURCHASE_INOUT_DTL MPD
 			     , MOM_ITEM MI
-			     , MOM_PURCHASE_INOUT_V MPI
-			WHERE  MII.COMPANY_CD   = MI.COMPANY_CD
-			AND    MII.DIVISION_CD  = MI.DIVISION_CD
-			AND    MII.ITEM_ID      = MI.ITEM_ID
-			AND    MII.COMPANY_CD   = MPI.COMPANY_CD
-			AND    MII.DIVISION_CD  = MPI.DIVISION_CD
-			AND    MII.ITEM_ORDER_ID = MPI.PURCHASE_INOUT_ID
-			AND    MII.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
-			AND    MII.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}	
-			AND    MII.IO_DATE  BETWEEN TO_DATE(#{rcvDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{rcvDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-			AND    MII.IO_CATEGORY = 'I'
-			<if    test="grNo != null and grNo != ''">
-			AND    (UPPER(MII.ITEM_INOUT_NO) LIKE '%' || UPPER(#{grNo, jdbcType=VARCHAR}) || '%')	  
-			</if>	
+			     , MOM_PARTNER MP
+			WHERE  MPM.COMPANY_CD  = MPD.COMPANY_CD
+			AND    MPM.DIVISION_CD = MPD.DIVISION_CD
+			AND    MPM.INOUT_NO    = MPD.INOUT_NO
+			AND    MPD.COMPANY_CD  = MI.COMPANY_CD
+			AND    MPD.DIVISION_CD = MI.DIVISION_CD
+			AND    MPD.ITEM_ID     = MI.ITEM_ID
+			AND    MPM.COMPANY_CD  = MP.COMPANY_CD
+			AND    MPM.DIVISION_CD = MP.DIVISION_CD
+			AND    MPM.VENDOR_CD   = MP.PARTNER_CD
+			AND    MPM.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+			AND    MPM.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  
+			AND    MPD.RECEIPT_DATE  BETWEEN TO_DATE(#{receiptDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{receiptDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 			<if test="partnerCdNm != null and partnerCdNm != ''">
-		    AND    (UPPER(MII.PARTNER_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MPI.VENDOR_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
+			  AND    (UPPER(MP.PARTNER_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
 			</if>
 			<if test="itemIdNm != null and itemIdNm != ''">
-			AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
+			AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')   
 			</if>
 			<if test="itemType != null and itemType != ''">
 			AND    MI.ITEM_TYPE IN (${itemType})
 			</if>
-			<if test="receiveLocationCd != null and receiveLocationCd != ''">
-			AND    MII.LOCATION_CD = #{receiveLocationCd, jdbcType=VARCHAR}
-			</if>	
-			<if    test="purchaseInoutId != null and purchaseInoutId != ''">
-			AND    (UPPER( MPI.PURCHASE_INOUT_ID ) LIKE '%' || UPPER(#{purchaseInoutId, jdbcType=VARCHAR}) || '%')	  
-			</if>	
+			<if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
+			AND    MPM.DEPARTURE_WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}
+			</if> 
 			<if test="ioType != null and ioType != ''">
-			AND    MII.IO_TYPE IN (${ioType})
+			AND    MPD.IO_TYPE IN (${ioType})
 			</if>
 			<if test="processCd != null and processCd != ''">
-			AND    MPI.PROCESS_CD IN (${processCd})
+			AND    MPM.PROCESS_CD IN (${processCd})
 			</if>
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
