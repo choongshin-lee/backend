@@ -20,20 +20,20 @@ var VIEW= {
 			result.param = {prNo:checkItem[0].prNo};
 		}
 	},
-    cellClickCallBack: function(index,rowIndex,target,e) {
-		if(index == 90 && e.dataField != 'poUserNoNm'){
-			var item = e.item;		
-            AUIGrid.setCellValue(widget.grid[0], rowIndex, "poUserNo", item['userNo']);
-            AUIGrid.setCellValue(widget.grid[0], rowIndex, "poUserNoNm", item['userNo'] +'('+item['userNm']+')');
-		}
-	},
-	cellEditCallBack: function(index,rowIndex,columnIndex,dataField,item,e) {
-	    if(index == 0){	
-		    if( item.poUserNoNm!=undefined){
-			    AUIGrid.setCellValue(widget.grid[0], rowIndex, "poUserNo", item['poUserNoNm']);
-		    }
-        }
-	},	
+//    cellClickCallBack: function(index,rowIndex,target,e) {
+//		if(index == 90 && e.dataField != 'poUserNoNm'){
+//			var item = e.item;		
+//            AUIGrid.setCellValue(widget.grid[0], rowIndex, "poUserNo", item['userNo']);
+//            AUIGrid.setCellValue(widget.grid[0], rowIndex, "poUserNoNm", item['userNo'] +'('+item['userNm']+')');
+//		}
+//	},
+//	cellEditCallBack: function(index,rowIndex,columnIndex,dataField,item,e) {
+//	    if(index == 0){	
+//		    if( item.poUserNoNm!=undefined){
+//			    AUIGrid.setCellValue(widget.grid[0], rowIndex, "poUserNo", item['poUserNoNm']);
+//		    }
+ //       }
+//	},	
 };
 
 $(document).ready(function(event){	

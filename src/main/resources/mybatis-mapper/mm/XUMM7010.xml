@@ -12,8 +12,8 @@
              , MP.PARTNER_NM					
 		     , MPIM.DEPARTURE_VENDOR_CD				
 		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM				
-		     , MPIM.DEPARTURE_WAREHOUSE_CD 
-             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM   				
+		     , MPIM.WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM   				
 		     , MPIM.BL_NO				
 		     , MPIM.IP_NO				
 		     , MPIM.IP_CURRENCY_CD				
@@ -38,18 +38,14 @@
 	         , ROWIDTOCHAR(MPIM.ROWID)            AS KEY_ID				
 		FROM   MOM_PURCHASE_INOUT_MST MPIM	
 		     , MOM_PARTNER MP
-		     , MOM_WAREHOUSE MWH
-	    WHERE  MPIM.COMPANY_CD             = MP.COMPANY_CD
-	    AND    MPIM.DIVISION_CD            = MP.DIVISION_CD
-	    AND    MPIM.VENDOR_CD              = MP.PARTNER_CD  
-	    AND    MPIM.COMPANY_CD             = MWH.COMPANY_CD
-	    AND    MPIM.DIVISION_CD            = MWH.DIVISION_CD
-	    AND    MPIM.DEPARTURE_WAREHOUSE_CD = MWH.WAREHOUSE_CD
-		AND    MPIM.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}				
-		AND    MPIM.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}			
+	    WHERE  MPIM.COMPANY_CD   = MP.COMPANY_CD
+	    AND    MPIM.DIVISION_CD  = MP.DIVISION_CD
+	    AND    MPIM.VENDOR_CD    = MP.PARTNER_CD  
+	    AND    MPIM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}				
+		AND    MPIM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}			
 		AND    MPIM.CREATE_DATE BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 		AND    ((MPIM.IQC_FLAG = 'Y' AND MPIM.STATE = 'PIIE') OR (MPIM.IQC_FLAG = 'N' AND MPIM.STATE = 'PIF'))
-        AND    MWH.WAREHOUSE_USE_YN = 'N'		
+        	
 	    <if test="receiptNo != null and receiptNo != ''">
 	    AND    (UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{receiptNo, jdbcType=VARCHAR}) || '%')	  
 	    </if>			
@@ -59,9 +55,9 @@
 	    <if test="receiptTitle != null and receiptTitle != ''">
 	    AND    (UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{receiptTitle, jdbcType=VARCHAR}) || '%')	  
 	    </if>				
-	    <if test="departureWarehouseCdNm != null and departureWarehouseCdNm != ''">
-	    AND    (UPPER(MPIM.DEPARTURE_LOCATION_CD) LIKE '%' || UPPER(#{departureWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{departureWarehouseCdNm, jdbcType=VARCHAR}) || '%')
-	    </if>				
+	    <if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
+	    AND      MPIM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}
+	    </if>			
 	    <if test="iqcFlag != null and iqcFlag != ''">
 	    AND     MPIM.IQC_FLAG = #{iqcFlag, jdbcType=VARCHAR}
 	    </if>				

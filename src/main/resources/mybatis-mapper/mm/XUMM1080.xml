@@ -39,11 +39,9 @@
 					      , MPD.REQUEST_QTY - NVL(MPD.PO_QTY, 0)  AS REMAIN_QTY
 					      , MPD.CURRENCY_CD
 					      , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'SM0017', MPD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-					      , MPD.UNIT_PRICE
-					      , MPD.AMOUNT
 					      , MPD.LOCAL_AMOUNT
-					      , MI.STORAGE_WAREHOUSE_CD  AS DEPARTURE_WAREHOUSE_CD
-		                  , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPD.COMPANY_CD,MPD.DIVISION_CD,MI.STORAGE_WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM
+					      , MI.STORAGE_WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
+		                  , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPD.COMPANY_CD,MPD.DIVISION_CD,MI.STORAGE_WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
 					      , MI.MAKER
 					      , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0007', MI.MAKER, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAKER_NM
 					      , MPD.STATE
@@ -53,7 +51,7 @@
 					      , MPD.COMPANY_CD
 					      , MPD.DIVISION_CD
 					      , MPD.PURCHASE_REQUEST_ID         
-					      , MPD.PURCHASE_REQUEST_ID AS KEY_ID                   
+					      , ROWIDTOCHAR(MPD.ROWID)  AS KEY_ID                    
 					FROM    MOM_PR_DTL MPD
 					      , MOM_PR_MST MPM   
 					      , MOM_ITEM MI
@@ -94,7 +92,7 @@
 		</if>  			
 	</select>
      <delete id="remove_customBtn1-1" parameterType="java.util.List">
-       DELETE FROM MOM_PROC_PR_RECEIVE_CANCEL
+       DELETE FROM MOM_PROC_PR_RECEIPT_CANCEL
       <where>
        <foreach collection="list" item="item" open="" close="" separator="OR">
         (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
@@ -106,7 +104,7 @@
     </delete>  
     <insert id="create_customBtn1-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_PR_RECEIVE_CANCEL( COMPANY_CD
+        INTO MOM_PROC_PR_RECEIPT_CANCEL( COMPANY_CD
 				                       , DIVISION_CD
 						               , PR_NO
 						               , PURCHASE_REQUEST_ID
@@ -128,7 +126,7 @@
         </foreach>
     </insert>
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MATERIAL_PKG.SP_PR_RECEIVE_CANCEL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+        { CALL MOM_MATERIAL_PKG.SP_PR_RECEIPT_CANCEL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 							                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 							                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 							                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  

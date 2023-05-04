@@ -61,6 +61,8 @@ var VIEW= {
 		        $('#partnerCdSP21').jqxComboBox({disabled: true});
 		        $('#currencyCdSP21').val(checkItem[0]['currencyCd']);
 		        $('#currencyCdSP21').jqxComboBox({disabled: true});
+		        $('#poUserNoSP21').val(checkItem[0]['poUserNo']);  
+		        $('#poUserNoSP21').jqxComboBox({disabled: true});
 			}
 		}
         else if(index == 10){       

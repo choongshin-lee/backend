@@ -13,8 +13,8 @@
 	         , MP.PARTNER_NM
 	         , MPIM.DEPARTURE_VENDOR_CD
 	         , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
-	         , MPIM.DEPARTURE_WAREHOUSE_CD 
-             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM
+	         , MPIM.WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
 	         , MPIM.BL_NO      
 	         , MPIM.IP_NO     
 	         , MPIM.IP_CURRENCY_CD      
@@ -124,7 +124,7 @@
 	                        , LC_NO 
 	                        , DEPARTURE_DATE
 	                        , DEPARTURE_VENDOR_CD
-	                        , DEPARTURE_LOCATION_CD
+	                        , WAREHOUSE_CD
 	                        , VENDOR_INVOICE
 	                        , FREE_YN
 	                        , TAX_TYPE
@@ -150,7 +150,7 @@
 			                , #{item.lcNo, jdbcType=VARCHAR}
 			                , ''
 			                , #{item.departureVendorCd, jdbcType=VARCHAR}
-			                , #{item.departureLocationCd, jdbcType=VARCHAR}
+			                , #{item.receiptWarehouseCd, jdbcType=VARCHAR}
 			                , #{item.vendorInvoice, jdbcType=VARCHAR}
 			                , #{item.freeYn, jdbcType=VARCHAR}
 			                , #{item.taxType, jdbcType=VARCHAR}

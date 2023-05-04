@@ -14,15 +14,12 @@
 		     , MPD.ITEM_ID
 		     , MPD.REQUEST_QTY                       AS PURCHASE_REQUEST_QTY                   
 	         , MPD.PO_QTY                            AS PURCHASE_ORDERED_QTY                     
-	         , MPD.REQUEST_QTY - NVL(MPD.PO_QTY, 0) - NVL(MPD.CLOSE_QTY,0) AS PO_PASSIBLE_QTY   
-	         , MPD.UNIT_PRICE  AS REF_UNIT_PRICE
-		     , MPD.CURRENCY_CD
+	         , MPD.REQUEST_QTY - NVL(MPD.PO_QTY, 0) - NVL(MPD.CLOSE_QTY,0) AS PO_PASSIBLE_QTY
+	         , MPD.LOCAL_AMOUNT   
+	         , MPD.CURRENCY_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'SM0017', MPD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM    
-		     , MPD.EXCHANGE_RATE
-		     , MPD.AMOUNT
-		     , MPD.LOCAL_AMOUNT
-		     , MI.STORAGE_WAREHOUSE_CD  AS DEPARTURE_WAREHOUSE_CD
-             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPD.COMPANY_CD,MPD.DIVISION_CD,MI.STORAGE_WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM
+		     , MI.STORAGE_WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPD.COMPANY_CD,MPD.DIVISION_CD,MI.STORAGE_WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
 		     , MI.ITEM_NM
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
@@ -65,9 +62,9 @@
 		AND    MPD.DIVISION_CD  = MI.DIVISION_CD
 		AND    MPD.ITEM_ID      = MI.ITEM_ID
 		AND    MPD.COMPANY_CD   = MUP.COMPANY_CD
-        AND     MPD.DIVISION_CD = MUP.DIVISION_CD
-        AND     MPD.ITEM_ID     = MUP.ITEM_ID
-        AND     MPD.CURRENCY_CD = MUP.CURRENCY_CD
+        AND    MPD.DIVISION_CD = MUP.DIVISION_CD
+        AND    MPD.ITEM_ID     = MUP.ITEM_ID
+        AND    MPD.CURRENCY_CD = MUP.CURRENCY_CD
 		AND    MPD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}                          
 		AND    MPD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}						   
 		AND    MPD.STATE        = 'PRR'       -- 접수건 
@@ -117,7 +114,7 @@
 			                , PURCHASE_UOM
 			                , QTY
 			                , UNIT_PRICE
-			                , DEPARTURE_WAREHOUSE_CD
+			                , WAREHOUSE_CD
 			                , IQC_FLAG
 			                , LOT_MANAGEMENT_YN
 			                , PO_OVER_RECEIPT_RATE
@@ -138,7 +135,7 @@
 			                , #{item.purchaseUom, jdbcType=VARCHAR}
 			                , #{item.poPassibleQty, jdbcType=NUMERIC}
 			                , #{item.refUnitPrice, jdbcType=NUMERIC}
-			                , #{item.departureWarehouseCd, jdbcType=VARCHAR}
+			                , #{item.receiptWarehouseCd, jdbcType=VARCHAR}
 			                , #{item.iqcFlag, jdbcType=VARCHAR}
 			                , #{item.lotManagementYn, jdbcType=VARCHAR}
 			                , #{item.poOverReceiptRate, jdbcType=NUMERIC}

@@ -55,6 +55,8 @@
                  , MI.SAFETY_STOCK_QTY
                  , MI.LOT_MANAGEMENT_YN
                  , MI.PO_OVER_RECEIPT_RATE
+                 , MI.PO_USER_NO     AS PO_USER_NO
+                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.PO_USER_NO) FROM DUAL ) AS PO_USER_NO_NM
                  , MI.USE_YN
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'SM0001', MI.USE_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS USE_YN_NM
                  , MI.DESCRIPTION
@@ -141,6 +143,7 @@
 						  , SAFETY_STOCK_QTY
 						  , LOT_MANAGEMENT_YN
 						  , PO_OVER_RECEIPT_RATE
+						  , PO_USER_NO
 						  , USE_YN
 						  , DESCRIPTION
 						  , DEL_YN
@@ -187,6 +190,7 @@
                           , #{item.safetyStockQty, jdbcType=NUMERIC}
                           , #{item.lotManagementYn, jdbcType=VARCHAR}
                           , #{item.poOverReceiptRate, jdbcType=NUMERIC}
+                          , #{item.poUserNo, jdbcType=VARCHAR}
                           , #{item.useYn, jdbcType=VARCHAR}
                           , #{item.description, jdbcType=VARCHAR}
                           , #{item.delYn, jdbcType=VARCHAR}
@@ -274,6 +278,7 @@
 						  , SAFETY_STOCK_QTY
 						  , LOT_MANAGEMENT_YN
 						  , PO_OVER_RECEIPT_RATE
+						  , PO_USER_NO
 						  , USE_YN
 						  , DESCRIPTION
 						  , DEL_YN
@@ -320,6 +325,7 @@
                           , #{item.safetyStockQty, jdbcType=NUMERIC}
                           , #{item.lotManagementYn, jdbcType=VARCHAR}
                           , #{item.poOverReceiptRate, jdbcType=NUMERIC}
+                          , #{item.poUserNo, jdbcType=VARCHAR}
                           , #{item.useYn, jdbcType=VARCHAR}
                           , #{item.description, jdbcType=VARCHAR}
                           , 'N'

@@ -36,11 +36,11 @@ var VIEW= {
 				    return;
 			    }
 			    $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
-		        $('#departureWarehouseCdSP21').val(checkItem[0]['departureWarehouseCd']);
+		        $('#receiptWarehouseCdSP21').val(checkItem[0]['receiptWarehouseCd']);
 		        $('#iqcFlagSP21').val(checkItem[0]['iqcFlag']);
 		        $('#processCdSP21').val(checkItem[0]['processCd']);
 		        $('#partnerCdSP21').jqxComboBox({disabled: true});
-		        $('#departureWarehouseCdSP21').jqxComboBox({disabled: true});
+		        $('#receiptWarehouseCdSP21').jqxComboBox({disabled: true});
 		        $('#iqcFlagSP21').jqxComboBox({disabled: true});
 		        $('#processCdSP21').jqxComboBox({disabled: true});
 		    }

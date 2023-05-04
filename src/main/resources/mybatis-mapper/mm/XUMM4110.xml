@@ -15,13 +15,13 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.IP_CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS IP_CURRENCY_NM
 		     , MPIM.IP_EXCHANGE_RATE
 		     , TO_CHAR(MPIM.CC_DATE ,'YYYY-MM-DD')     AS CC_DATE	     
-		     , MPIM.TITLE        AS RECEIPT_TITLE
+		     , MPIM.TITLE                              AS RECEIPT_TITLE
 		     , MP.PARTNER_CD
 	         , MP.PARTNER_NM
 		     , MPIM.DEPARTURE_VENDOR_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
-		     , MPIM.DEPARTURE_WAREHOUSE_CD 
-             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM
+		     , MPIM.WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
 		     , MPIM.IQC_FLAG
 		     , MPIM.TAX_TYPE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
@@ -123,7 +123,7 @@
 			                , LC_NO
 			                , DEPARTURE_DATE
 			                , DEPARTURE_VENDOR_CD
-			                , DEPARTURE_WAREHOUSE_CD
+			                , WAREHOUSE_CD
 			                , CURRENCY_CD
 			                , EXCHANGE_RATE
 			                , VENDOR_INVOICE
@@ -151,7 +151,7 @@
 			                , #{item.lcNo, jdbcType=VARCHAR}
 			                , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
 			                , #{item.departureVendorCd, jdbcType=VARCHAR}
-			                , #{item.departureWarehouseCd, jdbcType=VARCHAR}
+			                , #{item.receiptWarehouseCd, jdbcType=VARCHAR}
 			                , #{item.currencyCd, jdbcType=VARCHAR}
 			                , #{item.exchangeRate, jdbcType=NUMERIC}
 			                , #{item.vendorInvoice, jdbcType=VARCHAR}

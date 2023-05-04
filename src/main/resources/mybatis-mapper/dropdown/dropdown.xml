@@ -613,4 +613,19 @@
 	</if>
 	ORDER BY SORT_NO,LABEL
 	</select>  
+	<select id="get_DD00051" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
+	SELECT MU.USER_NO    AS CODE
+	     , MU.USER_NO      ||'('|| MU.USER_NM          ||')' AS LABEL 
+	FROM   MOM_DEPARTMENT MD
+	     , MOM_USER MU
+	WHERE  MD.COMPANY_CD    = MU.COMPANY_CD
+	AND    MD.DIVISION_CD   = MU.DIVISION_CD
+	AND    MD.DEPT_CD       = MU.DEPT_CD
+	AND    MD.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+	AND    MD.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+	AND    MD.PO_RECEIPT_YN = 'Y'
+	AND    MD.USE_YN        = 'Y'
+	AND    MU.USE_YN        = 'Y'
+	ORDER BY MU.USER_NM
+	</select>   	
 </mapper>
