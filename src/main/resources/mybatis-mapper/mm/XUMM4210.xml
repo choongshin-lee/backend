@@ -23,8 +23,6 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'MM0015', MPIM.FREE_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS FREE_YN_NM
 		     , MPIM.TAX_TYPE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
-		     , MPIM.REASON_CD  AS EXP_RCV_REASON_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'MM0016', MPIM.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EXP_RCV_REASON_NM
 		     , MPIM.DESCRIPTION
 		     , MPIM.CREATE_BY   AS CREATE_USER_NO
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
@@ -74,6 +72,8 @@
 		     , MPID.UNIT_PRICE
 		     , MPID.AMOUNT
 		     , MPID.LOCAL_AMOUNT
+		     , MPID.REASON_CD  AS EXCEPTION_REASON_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MM0016', MPID.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EXCEPTION_REASON_NM
 		     , MPID.DESCRIPTION
 		     , MPID.PURCHASE_INOUT_ID
 		     , ROWIDTOCHAR(MPID.ROWID)  AS KEY_ID 
@@ -115,7 +115,6 @@
 				                , VENDOR_INVOICE
 				                , FREE_YN
 				                , TAX_TYPE
-				                , REASON_CD
 				                , DESCRIPTION
 				                , DEL_YN
 				                , VAL_MSG
@@ -135,7 +134,6 @@
 				                , #{item.vendorInvoice, jdbcType=VARCHAR}
 				                , #{item.freeYn, jdbcType=VARCHAR}
 				                , #{item.taxType, jdbcType=VARCHAR}
-				                , #{item.expRcvReasonCd, jdbcType=VARCHAR}
 				                , #{item.description, jdbcType=VARCHAR}
 				                , #{item.delYn, jdbcType=VARCHAR}
 				                , #{item.valMsg, jdbcType=VARCHAR}
@@ -178,7 +176,8 @@
                             , EXCHANGE_RATE 
                             , UNIT_PRICE 
 			                , INOUT_QTY
-			                , INOUT_UNIT
+			                , INOUT_UOM
+			                , REASON_CD
 			                , DESCRIPTION
 			                , DEL_YN
 			                , VAL_MSG
@@ -196,7 +195,8 @@
 			                , #{item.exchangeRate, jdbcType=NUMERIC}
 			                , #{item.unitPrice, jdbcType=NUMERIC}
 			                , #{item.receiptRequestQty, jdbcType=NUMERIC}
-			                , #{item.unit, jdbcType=VARCHAR}
+			                , #{item.uom, jdbcType=VARCHAR}
+			                , #{item.exceptionReasonCd, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.delYn, jdbcType=VARCHAR}
 			                , #{item.valMsg, jdbcType=VARCHAR}

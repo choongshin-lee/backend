@@ -129,7 +129,6 @@
 			                , VENDOR_INVOICE
 			                , FREE_YN
 			                , TAX_TYPE
-			                , REASON_CD
 			                , DESCRIPTION
 			                , DEL_YN
 			                , VAL_MSG
@@ -157,7 +156,6 @@
 			                , #{item.vendorInvoice, jdbcType=VARCHAR}
 			                , #{item.freeYn, jdbcType=VARCHAR}
 			                , #{item.taxType, jdbcType=VARCHAR}
-			                , #{item.reasonCd, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.delYn, jdbcType=VARCHAR}
 			                , #{item.valMsg, jdbcType=VARCHAR}

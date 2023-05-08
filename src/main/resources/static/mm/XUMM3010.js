@@ -40,12 +40,25 @@ var VIEW= {
 		        $('#partnerCdSP21').jqxComboBox({disabled: true});
 				$('#departureWarehouseCdSP21').val(checkItem[0]['departureWarehouseCd']);
 				$('#departureWarehouseCdSP21').jqxComboBox({disabled: true});
+				$('#currencyCdSP21').val(checkItem[0]['currencyCd']);
+		        $('#currencyCdSP21').jqxComboBox({disabled: true});
 				$('#iqcFlagSP21').val(checkItem[0]['iqcFlag']);
 				$('#iqcFlagSP21').jqxComboBox({disabled: true});
 			}
 		    else if(btnId == 'customBtn2-2'){
 			    for(var i=0,max=param.length; i<max;i++){
 				    param[i]['inoutNo'] = checkItem[0]['departureNo'];
+				    param[i]['inoutUom'] = checkItem[0]['purchaseUom'];
+				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
+			    }
+		    }
+		    else if(btnId == 'customBtn2-3'){
+			    for(var i=0,max=param.length; i<max;i++){
+				    param[i]['inoutNo'] = checkItem[0]['departureNo'];
+				    param[i]['inoutUom'] = checkItem[0]['purchaseUom'];
+				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
 			    }
 		    }
 		}

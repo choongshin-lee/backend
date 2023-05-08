@@ -44,7 +44,25 @@ var VIEW= {
 			    $('#receiptWarehouseCdSP21').jqxComboBox({disabled: true});
 			    $('#iqcFlagSP21').jqxComboBox({disabled: true});
 			    $('#processCdSP21').jqxComboBox({disabled: true});
+			    $('#currencyCdSP21').val(checkItem[0]['currencyCd']);
+		        $('#currencyCdSP21').jqxComboBox({disabled: true});
 			}
+			else if(btnId == 'customBtn2-2'){
+			    for(var i=0,max=param.length; i<max;i++){
+				    param[i]['inoutNo'] = checkItem[0]['departureNo'];
+				    param[i]['inoutUom'] = checkItem[0]['purchaseUom'];
+				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
+			    }
+		    }
+		    else if(btnId == 'customBtn2-3'){
+			    for(var i=0,max=param.length; i<max;i++){
+				    param[i]['inoutNo'] = checkItem[0]['departureNo'];
+				    param[i]['inoutUom'] = checkItem[0]['purchaseUom'];
+				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
+			    }
+		    }
 		}
 	    else if(index == 20){			    
 		    if(action='C'&& btnId == 'customBtn21-1'){ 
