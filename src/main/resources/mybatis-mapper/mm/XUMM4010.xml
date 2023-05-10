@@ -70,7 +70,7 @@
 	         , MI.UOM        
 	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
 	         , MPID.INOUT_QTY        AS RECEIPT_REQUEST_QTY
-	         , MPID.CURRENCY_CD
+	         , MPID.UNIT_PRICE
 	         , MPID.AMOUNT
 	         , MPID.LOCAL_AMOUNT
 	         , MPID.PO_OVER_RECEIPT_RATE
@@ -193,6 +193,7 @@
                             , CURRENCY_CD
                             , EXCHANGE_RATE
                             , UNIT_PRICE
+                            , PO_OVER_RECEIPT_RATE
 	                        , REFERENCE_NO
 	                        , REFERENCE_DTL_NO
 	                        , DESCRIPTION
@@ -213,6 +214,7 @@
 	                        , #{item.currencyCd, jdbcType=VARCHAR}
 	                        , #{item.exchangeRate, jdbcType=NUMERIC}
 	                        , #{item.unitPrice, jdbcType=NUMERIC}
+	                        , #{item.poOverReceiptRate, jdbcType=NUMERIC}	
 			                , #{item.referenceNo, jdbcType=VARCHAR}
                             , #{item.referenceDtlNo, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}

@@ -15,6 +15,9 @@
          , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
          , MPIM.WAREHOUSE_CD  AS RETURN_WAREHOUSE_CD
          , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS RETURN_WAREHOUSE_NM
+         , MPIM.CURRENCY_CD
+		 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+		 , MPIM.EXCHANGE_RATE
          , MPIM.AMOUNT           AS RETURN_AMOUNT
          , MPIM.TAX_TYPE
          , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
@@ -48,8 +51,6 @@
           , MPID.DIVISION_CD
           , MPID.INOUT_NO          AS RETURN_NO
           , MPID.SEQ
-          , MPID.REFERENCE_NO      
-          , MPID.REFERENCE_DTL_NO 
           , MPID.ITEM_ID
           , MI.ITEM_NM
           , MI.ITEM_SPEC 
@@ -60,13 +61,9 @@
           , MI.UOM        
           , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
           , MPID.INOUT_QTY        AS RETURN_REQUEST_QTY
-          , MPID.CURRENCY_CD
-          , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'SM0017', MPID.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-          , MPID.EXCHANGE_RATE
           , MPID.UNIT_PRICE
           , MPID.AMOUNT
           , MPID.LOCAL_AMOUNT
-          , MPID.PO_OVER_RECEIPT_RATE
           , MPID.REASON_CD  AS RETURN_REASON_CD
           , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MM0018', MPID.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS RETURN_REASON_NM
           , MPID.DESCRIPTION
@@ -103,17 +100,10 @@
 	                        , PROCESS_CD
 	                        , TITLE
 	                        , VENDOR_CD
-	                        , BL_NO
-	                        , IP_NO
-	                        , IP_CURRENCY_CD
-	                        , IP_EXCHANGE_RATE
-	                        , CC_DATE
-	                        , LC_NO
-	                        , DEPARTURE_DATE
 	                        , DEPARTURE_VENDOR_CD
 	                        , WAREHOUSE_CD
-	                        , VENDOR_INVOICE
-	                        , FREE_YN
+	                        , CURRENCY_CD
+                            , EXCHANGE_RATE
 	                        , TAX_TYPE
 	                        , DESCRIPTION
 	                        , DEL_YN
@@ -127,17 +117,10 @@
 			                , 'TD'
 			                , #{item.returnTitle, jdbcType=VARCHAR}
 			                , #{item.partnerCd, jdbcType=VARCHAR}
-			                , #{item.blNo, jdbcType=VARCHAR}
-			                , #{item.ipNo, jdbcType=VARCHAR}
-			                , #{item.ipCurrencyCd, jdbcType=VARCHAR}
-			                , #{item.ipExchangeRate, jdbcType=NUMERIC}
-			                , ''
-			                , #{item.lcNo, jdbcType=VARCHAR}
-			                , ''
 			                , #{item.departureVendorCd, jdbcType=VARCHAR}
 			                , #{item.returnWarehouseCd, jdbcType=VARCHAR}
-			                , #{item.vendorInvoice, jdbcType=VARCHAR}
-			                , #{item.freeYn, jdbcType=VARCHAR}
+			                , #{item.currencyCd, jdbcType=VARCHAR}
+                            , #{item.exchangeRate, jdbcType=NUMERIC}
 			                , #{item.taxType, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.delYn, jdbcType=VARCHAR}
@@ -176,6 +159,7 @@
 	                        , INOUT_NO
 	                        , PURCHASE_INOUT_ID
 	                        , ITEM_ID
+	                        , INOUT_UOM
 	                        , INOUT_QTY
 	                        , CURRENCY_CD
 	                        , EXCHANGE_RATE
@@ -193,6 +177,7 @@
 		                    , #{item.returnNo, jdbcType=VARCHAR}
 		                    , #{item.purchaseInoutId, jdbcType=VARCHAR}
 		                    , #{item.itemId, jdbcType=VARCHAR}
+		                    , #{item.purchaseUom, jdbcType=VARCHAR}
 		                    , #{item.returnRequestQty, jdbcType=NUMERIC}
 		                    , #{item.currencyCd, jdbcType=VARCHAR}
                             , #{item.exchangeRate, jdbcType=NUMERIC}

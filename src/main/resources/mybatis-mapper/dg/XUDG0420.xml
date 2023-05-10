@@ -72,16 +72,19 @@
         AND    MPM.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
         AND    MPM.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
         AND    MPM.DO_INVOICE_YN = 'N'
-        AND    MPC.MARKET_CD     = DECODE(#{processCd, jdbcType=VARCHAR}, 'RD', 'D', 'O')
+        AND    MPC.MARKET_CD     = DECODE(#{processCd, jdbcType=VARCHAR}, 'RD', 'D', 'RO', 'O')
         AND    MPD.STATE         = 'POF'  --확정
         <if test="partnerCd != null and partnerCd != ''">
         AND    MPM.VENDOR_CD     = #{partnerCd, jdbcType=VARCHAR}
         </if>
-        <if test="departureWarehouseCd != null and departureWarehouseCd != ''">
+        <if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
         AND    MPD.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}
         </if>
         <if test="iqcFlag != null and iqcFlag != ''">
-        AND    MPD.IQC_FLAG              = #{iqcFlag, jdbcType=VARCHAR}
+        AND    MPD.IQC_FLAG     = #{iqcFlag, jdbcType=VARCHAR}
+        </if>
+        <if test="currencyCd != null and currencyCd != ''">
+        AND    MPM.CURRENCY_CD  = #{currencyCd, jdbcType=VARCHAR}
         </if>
     </select>
     <delete id="remove_customBtn21-1" parameterType="java.util.List">
@@ -110,6 +113,7 @@
 		                    , CURRENCY_CD
 		                    , EXCHANGE_RATE
 		                    , UNIT_PRICE
+		                    , PO_OVER_RECEIPT_RATE
 		                    , REFERENCE_NO
 		                    , REFERENCE_DTL_NO
 		                    , DESCRIPTION
@@ -130,6 +134,7 @@
 			                , #{item.currencyCd, jdbcType=VARCHAR}
                             , #{item.exchangeRate, jdbcType=NUMERIC}
                             , #{item.unitPrice, jdbcType=NUMERIC}	 
+                            , #{item.poOverReceiptRate, jdbcType=NUMERIC}	 
 						    , #{item.poNo, jdbcType=VARCHAR}
                             , #{item.purchaseOrderId, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUMM5020">
+<mapper namespace="com.mom.backend.XUMM5050">
 	<select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
     SELECT MPIM.COMPANY_CD
          , MPIM.DIVISION_CD
@@ -32,7 +32,7 @@
     AND    MPIM.VENDOR_CD    = MP.PARTNER_CD	
 	AND    MPIM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}			
     AND    MPIM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}		
-    AND    MPIM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999 					
+    AND    MPIM.CONFIRM_DATE BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999 					
     <if test="returnNo != null and returnNo != ''">
     AND    (UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{returnNo, jdbcType=VARCHAR}) || '%')	  
     </if>			
@@ -42,8 +42,8 @@
     <if test="returnTitle != null and returnTitle != ''">
     AND    (UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{returnTitle, jdbcType=VARCHAR}) || '%')	  
     </if>	
-	AND    MPIM.STATE       = 'PIG'  -- 등록 			
-	AND    MPIM.PROCESS_CD  = 'TD'   			
+	AND    MPIM.STATE       = 'PPG'  		
+	AND    MPIM.PROCESS_CD  = 'TD'   	
 	ORDER BY MPIM.INOUT_NO			
     </select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
@@ -66,6 +66,8 @@
           , MPID.UNIT_PRICE
           , MPID.AMOUNT
           , MPID.LOCAL_AMOUNT
+          , MPID.PENALTY_AMOUNT
+		  , MPID.PENALTY_LOCAL_AMOUNT
           , MPID.PO_OVER_RECEIPT_RATE
           , MPID.REASON_CD  AS RETURN_REASON_CD
           , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MM0018', MPID.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS RETURN_REASON_NM
@@ -84,50 +86,89 @@
             , MPID.SEQ
     </select>
     <delete id="remove_customBtn1-1" parameterType="java.util.List">
-      DELETE FROM MOM_PROC_PI_CONFIRM
-        <where>
-            <foreach collection="list" item="item" open="" close="" separator="OR">
-            (    COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-            AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-            AND  PROCESS_CD  = 'TD'
-            AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
-            )
-            </foreach>
-        </where>
+	    DELETE FROM MOM_PROC_PI_PENALTY_NOTICE
+	        <where>
+	            <foreach collection="list" item="item" open="" close="" separator="OR">
+		        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+		           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+		           AND  ACTION_TYPE = 'G'  
+		           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+		        )
+	            </foreach>
+	        </where>
     </delete>  
     <insert id="create_customBtn1-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_PI_CONFIRM( COMPANY_CD
-	                            , DIVISION_CD
-	                            , PROCESS_CD
-	                            , INOUT_NO
-	                            , IQC_FLAG
-	                            , DEPARTURE_DATE
-	                            , DESCRIPTION
-	                            , VAL_MSG
-	                            , MULTI_MSG
-	                            , CREATE_BY
-	                            , CREATE_DATE )
-        VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
-	                            , #{item.divisionCd, jdbcType=VARCHAR}
-	                            , 'TD'
-	                            , #{item.returnNo, jdbcType=VARCHAR}
-	                            , #{item.iqcFlag, jdbcType=VARCHAR}
-	                            , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-	                            , #{item.description, jdbcType=VARCHAR}
-	                            , #{item.valMsg, jdbcType=VARCHAR}
-	                            , #{item.multiMsg, jdbcType=VARCHAR}
-	                            , #{item.userId, jdbcType=VARCHAR}
-	                            , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-	                            )
+        INTO MOM_PROC_PI_PENALTY_NOTICE( COMPANY_CD
+			                           , DIVISION_CD
+			                           , ACTION_TYPE
+				                       , PROCESS_CD
+				                       , INOUT_NO
+				                       , VAL_MSG
+				                       , MULTI_MSG
+				                       , CREATE_BY
+				                       , CREATE_DATE)
+		VALUES                         ( #{item.companyCd, jdbcType=VARCHAR}
+				                       , #{item.divisionCd, jdbcType=VARCHAR}
+				                       , 'G'
+				                       , 'TD'
+				                       , #{item.returnNo, jdbcType=VARCHAR}
+					                   , #{item.valMsg, jdbcType=VARCHAR}
+					                   , #{item.multiMsg, jdbcType=VARCHAR}
+					                   , #{item.userId, jdbcType=VARCHAR}
+					                   , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+					                   )
         </foreach>
     </insert>
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-    { CALL MOM_MATERIAL_PKG.SP_PI_CONFIRM( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                         , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                         , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
-                                         , 'TD'                   
-                                         , #{userId,      jdbcType=VARCHAR, mode=IN} )}                   
-    </select>   
+	    { CALL MOM_MATERIAL_PKG.SP_PI_PENALTY_NOTICE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+			                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                        , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                        , #{divisionCd,  jdbcType=VARCHAR, mode=IN}	
+			                                        , 'G'
+			                                        , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
+    </select>  
+    <delete id="remove_customBtn1-2" parameterType="java.util.List">
+	    DELETE FROM MOM_PROC_PI_PENALTY_CONFIRM
+	        <where>
+	            <foreach collection="list" item="item" open="" close="" separator="OR">
+		        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+		           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+		           AND  ACTION_TYPE = 'C'  
+		           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+		        )
+	            </foreach>
+	        </where>
+    </delete>  
+    <insert id="create_customBtn1-2" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_PI_PENALTY_CONFIRM( COMPANY_CD
+			                            , DIVISION_CD
+			                            , ACTION_TYPE
+				                        , PROCESS_CD
+				                        , INOUT_NO
+				                        , VAL_MSG
+				                        , MULTI_MSG
+				                        , CREATE_BY
+				                        , CREATE_DATE)
+		VALUES                          ( #{item.companyCd, jdbcType=VARCHAR}
+				                        , #{item.divisionCd, jdbcType=VARCHAR}
+				                        , 'C'
+				                        , 'TD'
+				                        , #{item.returnNo, jdbcType=VARCHAR}
+					                    , #{item.valMsg, jdbcType=VARCHAR}
+					                    , #{item.multiMsg, jdbcType=VARCHAR}
+					                    , #{item.userId, jdbcType=VARCHAR}
+					                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+					                    )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn1-2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+	    { CALL MOM_MATERIAL_PKG.SP_PI_PENALTY_CONFIRM( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+			                                         , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                         , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}	
+			                                         , 'C'
+			                                         , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
+    </select> 
 </mapper>

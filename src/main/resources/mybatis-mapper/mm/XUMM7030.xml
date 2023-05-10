@@ -24,13 +24,14 @@
 		     , MPIM.IQC_FLAG				
 		     , MPIM.AMOUNT                                    AS RECEIPT_AMOUNT				
 		     , TO_CHAR(MPIM.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE				
-		     , MPIM.VENDOR_INVOICE				
+		     , MPIM.VENDOR_INVOICE
+		     , MPIM.CURRENCY_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+		     , MPIM.EXCHANGE_RATE					
 		     , MPIM.FREE_YN         AS FREE_YN				
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'MM0015', MPIM.FREE_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS FREE_YN_NM
 		     , MPIM.TAX_TYPE
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM				
-		     , MPIM.REASON_CD   AS EXP_RCV_REASON_CD				
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'MM0016', MPIM.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EXP_RCV_REASON_NM				
 		     , MPIM.DESCRIPTION				
 		     , MPIM.CREATE_BY   AS CREATE_USER_NO				
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM				
@@ -79,12 +80,11 @@
              , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MPID.DIVISION_CD, MPID.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
              , MPID.CONVERSION_QTY 
 		     , MPID.INOUT_QTY     AS RECEIPT_WAIT_QTY      
-		     , MPID.CURRENCY_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'SM0017', MPID.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
-		     , MPID.EXCHANGE_RATE
 		     , MPID.UNIT_PRICE
              , MPID.AMOUNT
              , MPID.LOCAL_AMOUNT
+             , MPID.REASON_CD   AS EXP_RCV_REASON_CD				
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MM0016', MPID.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EXP_RCV_REASON_NM
 		     , MPID.DESCRIPTION
 		     , MPID.PURCHASE_INOUT_ID
 		     , MPID.REFERENCE_NO
@@ -135,7 +135,7 @@
 		                                )
         </foreach>
     </insert>
-    <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
     { CALL MOM_MATERIAL_PKG.SP_PURCHASE_GR_CANCEL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 					                             , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 					                             , #{companyCd,   jdbcType=VARCHAR, mode=IN}

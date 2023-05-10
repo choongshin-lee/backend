@@ -103,6 +103,7 @@
 			                , CURRENCY_CD
 			                , EXCHANGE_RATE
 			                , UNIT_PRICE
+			                , PO_OVER_RECEIPT_RATE
 			                , REFERENCE_NO
 			                , REFERENCE_DTL_NO
 			                , DESCRIPTION
@@ -123,6 +124,7 @@
 			                , #{item.currencyCd, jdbcType=VARCHAR}
 			                , #{item.exchangeRate, jdbcType=NUMERIC}
 			                , #{item.unitPrice, jdbcType=NUMERIC}
+			                , #{item.poOverReceiptRate, jdbcType=NUMERIC}	
 			                , #{item.poNo, jdbcType=VARCHAR}
 			                , #{item.purchaseOrderId, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}

@@ -14,7 +14,13 @@ var VIEW= {
     searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수   
 	    if(index==0 ){	                                                
 		    AUIGrid.clearGridData(widget.grid[1]);
-		}  	 
+		}
+		else if(index==1){        
+            result.param = {processCd:'RO'};  
+        }  
+        else if(index==20){        
+            result.param = {processCd:'RO'};  
+        } 
 	},
 	copyCallBack: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 
 		if(index ==0 && btnId =='copyBtn'){
@@ -38,18 +44,31 @@ var VIEW= {
 			    $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
 		        $('#receiptWarehouseCdSP21').val(checkItem[0]['receiptWarehouseCd']);
 		        $('#iqcFlagSP21').val(checkItem[0]['iqcFlag']);
-		        $('#processCdSP21').val(checkItem[0]['processCd']);
+		        //$('#processCdSP21').val(checkItem[0]['processCd']);
 		        $('#partnerCdSP21').jqxComboBox({disabled: true});
 		        $('#receiptWarehouseCdSP21').jqxComboBox({disabled: true});
 		        $('#iqcFlagSP21').jqxComboBox({disabled: true});
-		        $('#processCdSP21').jqxComboBox({disabled: true});
+		        //$('#processCdSP21').jqxComboBox({disabled: true});
+		        $('#currencyCdSP21').val(checkItem[0]['currencyCd']);
+                $('#currencyCdSP21').jqxComboBox({disabled: true});
+		    }
+			else if(btnId == 'customBtn2-2' ){
+			    for(var i=0,max=param.length; i<max;i++){
+				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
+			    }
+		    }
+			else if(btnId == 'customBtn2-3'){
+			    for(var i=0,max=param.length; i<max;i++){
+				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
+			    }
 		    }
 		}
 	    else if(index == 20){			    
 		    if(action='C'&& btnId == 'customBtn21-1'){ 
 			    for(var i=0,max=param.length; i<max;i++){
 				    param[i]['inoutNo'] = checkItem[0]['receiptNo'];
-					param[i]['inoutType'] = 'RO';
 			    }
 		    }
 		}
