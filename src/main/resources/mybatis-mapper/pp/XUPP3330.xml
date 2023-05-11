@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUPP3100">
+<mapper namespace="com.mom.backend.XUPP3330">
 	<select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 	        SELECT A.*
@@ -8,12 +8,12 @@
 		    </if>	 	
 					WITH C_DEDUCT AS (SELECT MII.ITEM_ID
 					                       , TO_CHAR(MII.IO_DATE, 'YYYY-MM-DD') AS IO_DATE
-					                       , MII.LOCATION_CD
+					                       , MII.WAREHOUSE_CD
 					                       , MII.WO_RESULT_ID 
 					                       , MII.WO_RESULT_TYPE
 					                       , MII.WORK_ORDER_ID
 					                       , MII.QTY 
-					                       , MII.UNIT
+					                       , MII.UOM
 					                       , MII.CREATE_BY
 					                       , TO_CHAR(MII.CREATE_DATE, 'YYYY-MM-DD') AS CREATE_DATE
 					                       , MII.COMPANY_CD
@@ -31,8 +31,8 @@
 					                  <if test="deductItemId != null and deductItemId != ''">
 					                  AND    MII.ITEM_ID   = #{deductItemId, jdbcType=VARCHAR}
 					                  </if>
-					                  <if test="locationCd != null and locationCd != ''">
-					                  AND    MII.LOCATION_CD   = #{locationCd, jdbcType=VARCHAR}
+					                  <if test="warehouseCd != null and warehouseCd != ''">
+					                  AND    MII.WAREHOUSE_CD   = #{warehouseCd, jdbcType=VARCHAR}
 					                  </if>
 					                  )
 					SELECT CD.WORK_ORDER_ID
@@ -43,11 +43,11 @@
 					     , MI.ITEM_SPEC      AS DEDUCT_ITEM_SPEC
 					     , MI.ITEM_TYPE      AS DEDUCT_ITEM_TYPE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(CD.COMPANY_CD, CD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DEDUCT_ITEM_TYPE_NM 
-					     , CD.LOCATION_CD    
-					     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(CD.COMPANY_CD, CD.DIVISION_CD, CD.LOCATION_CD) FROM DUAL) AS LOCATION_NM     
+					     , CD.WAREHOUSE_CD    
+					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(CD.COMPANY_CD, CD.DIVISION_CD, CD.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM     
 					     , CD.IO_DATE        AS DEDUCT_DATE
-					     , CD.UNIT           
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(CD.COMPANY_CD,CD.DIVISION_CD, 'MD0003', CD.UNIT, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS UNIT_NM    
+					     , CD.UOM           
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(CD.COMPANY_CD,CD.DIVISION_CD, 'MD0003', CD.UOM, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS UOM_NM    
 					     , CD.QTY            AS DEDUCT_QTY
 					     , CD.CREATE_BY      AS DEDUCT_BY
 					     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(CD.COMPANY_CD, CD.DIVISION_CD, CD.CREATE_BY) FROM DUAL ) AS DEDUCT_BY_NM

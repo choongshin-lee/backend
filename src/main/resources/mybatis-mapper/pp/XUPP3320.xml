@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUPP3090">
+<mapper namespace="com.mom.backend.XUPP3320">
     <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -43,12 +43,12 @@
 					     , MWG.WORK_GROUP_NM
 					     , MWO.WORK_CENTER_CD
 					     , MWC.WORK_CENTER_NM
-					     , MWO.CONSUME_LOCATION_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_LOCATION_CD) FROM DUAL) AS CONSUME_LOCATION_NM  
-					     , MWO.GOOD_LOCATION_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.GOOD_LOCATION_CD) FROM DUAL) AS GOOD_LOCATION_NM
-					     , MWO.DEFECT_LOCATION_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.DEFECT_LOCATION_CD) FROM DUAL) AS DEFECT_LOCATION_NM
+					     , MWO.CONSUME_WAREHOUSE_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_WAREHOUSE_CD) FROM DUAL) AS CONSUME_WAREHOUSE_NM  
+					     , MWO.GOOD_WAREHOUSE_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.GOOD_WAREHOUSE_CD) FROM DUAL) AS GOOD_WAREHOUSE_NM
+					     , MWO.DEFECT_WAREHOUSE_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.DEFECT_WAREHOUSE_CD) FROM DUAL) AS DEFECT_WAREHOUSE_NM
  		                 , MWO.ROUTING_ID
 					     , (SELECT MOM_COMMON_PKG.FN_GET_ROUTING_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.ROUTING_ID) FROM DUAL) AS ROUTING_NM
 					     , MWO.WO_STATE
@@ -119,9 +119,9 @@
 	         , MWL.WO_RESULT_ID
 	         , MWL.WO_RESULT_TYPE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWL.COMPANY_CD, MWL.DIVISION_CD, 'PP0013', MWL.WO_RESULT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_RESULT_TYPE_NM
-	         , MWO.CONSUME_LOCATION_CD  AS DEDUCT_LOCATION_CD
-	         , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_LOCATION_CD) FROM DUAL) AS DEDUCT_LOCATION_NM
-	         , NVL((SELECT MOM_STOCK_PKG.FN_GET_ITEM_LOCATION_STOCK_QTY(MWL.COMPANY_CD, MWL.DIVISION_CD, MWL.ITEM_ID, MWO.CONSUME_LOCATION_CD) FROM DUAL),0) AS CURRENT_STOCK_QTY
+	         , MWO.CONSUME_WAREHOUSE_CD  AS DEDUCT_WAREHOUSE_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.CONSUME_WAREHOUSE_CD) FROM DUAL) AS DEDUCT_WAREHOUSE_NM
+	         , NVL((SELECT MOM_STOCK_PKG.FN_GET_ITEM_WAREHOUSE_STOCK_QTY(MWL.COMPANY_CD, MWL.DIVISION_CD, MWL.ITEM_ID, MWO.CONSUME_WAREHOUSE_CD) FROM DUAL),0) AS CURRENT_STOCK_QTY
 	         , MWL.ITEM_ID
 	         , MI.ITEM_NM
 	         , MI.ITEM_SPEC
@@ -175,7 +175,7 @@
                                  , WORK_ORDER_ID
                                  , WO_RESULT_ID 
                                  , ITEM_ID
-                                 , DEDUCT_LOCATION_CD
+                                 , DEDUCT_WAREHOUSE_CD
                          		 , WO_RESULT_TYPE 
                                  , DEDUCT_QTY 
                                  , ACTION_TYPE 
@@ -189,7 +189,7 @@
                                  , #{item.workOrderId, jdbcType=VARCHAR}
                                  , #{item.woResultId , jdbcType=VARCHAR}
                                  , #{item.itemId, jdbcType=VARCHAR}
-                                 , #{item.deductLocationCd, jdbcType=VARCHAR}
+                                 , #{item.deductWarehouseCd, jdbcType=VARCHAR}
                                  , #{item.woResultType, jdbcType=VARCHAR}
                                  , #{item.deductQty, jdbcType=NUMERIC}
                                  , #{item.actionType, jdbcType=NUMERIC}
