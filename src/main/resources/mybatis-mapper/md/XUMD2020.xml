@@ -13,8 +13,6 @@
 		     , MB.MRP_FLAG
 		     , MB.DEDUCT_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MB.COMPANY_CD,MB.DIVISION_CD, 'MD0006', MB.DEDUCT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS DEDUCT_TYPE_NM
-		     , MB.CHARGE_YN  
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MB.COMPANY_CD,MB.DIVISION_CD, 'MM0015', MB.CHARGE_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS CHARGE_YN_NM
 		     , TO_CHAR(MB.START_DATE,'YYYY-MM-DD') AS START_DATE
 		     , TO_CHAR(MB.END_DATE,'YYYY-MM-DD') AS END_DATE          
 		     , MB.SORT_NO  
@@ -106,7 +104,6 @@
 						 , PHANTOM_FLAG
 						 , MRP_FLAG
 						 , DEDUCT_TYPE
-						 , CHARGE_YN
 						 , SORT_NO
 						 , DESCRIPTION
 						 , DEL_YN
@@ -124,7 +121,6 @@
                          , #{item.phantomFlag,        jdbcType=VARCHAR}
 			             , #{item.mrpFlag,            jdbcType=VARCHAR}
 			             , #{item.deductType,         jdbcType=VARCHAR}
-			             , #{item.chargeYn,           jdbcType=VARCHAR}
 			             , #{item.sortNo,             jdbcType=NUMERIC}
                          , #{item.description, jdbcType=VARCHAR}
                          , #{item.delYn, jdbcType=VARCHAR}
@@ -174,7 +170,6 @@
 						 , PHANTOM_FLAG
 						 , MRP_FLAG
 						 , DEDUCT_TYPE
-						 , CHARGE_YN
 						 , SORT_NO
 						 , DESCRIPTION
 						 , DEL_YN
@@ -192,7 +187,6 @@
                          , #{item.phantomFlag,       jdbcType=VARCHAR}
 			             , #{item.mrpFlag,           jdbcType=VARCHAR}
 			             , #{item.deductType,        jdbcType=VARCHAR}
-			             , #{item.chargeYn,          jdbcType=VARCHAR}
 			             , #{item.sortNo,            jdbcType=NUMERIC}
                          , #{item.description,       jdbcType=VARCHAR}
                          , 'N'

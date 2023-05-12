@@ -41,6 +41,8 @@
 		                 ,(SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.CONSUME_WAREHOUSE_CD) FROM DUAL ) AS CONSUME_WAREHOUSE_NM
 		                 ,(SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.GOOD_WAREHOUSE_CD) FROM DUAL ) AS GOOD_WAREHOUSE_NM
 		                 ,(SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.DEFECT_WAREHOUSE_CD) FROM DUAL ) AS DEFECT_WAREHOUSE_NM
+		                 , MB.CHARGE_YN  
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MB.COMPANY_CD,MB.DIVISION_CD, 'MM0015', MB.CHARGE_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS CHARGE_YN_NM
 		                 , MB.USE_YN
 		                 , MB.DESCRIPTION
 		                 , MB.CREATE_BY   AS CREATE_USER_NO
@@ -140,6 +142,7 @@
 			                , CONSUME_WAREHOUSE_CD
 			                , GOOD_WAREHOUSE_CD
 			                , DEFECT_WAREHOUSE_CD
+			                , CHARGE_YN
 			                , USE_YN
 			                , DESCRIPTION
 			                , CREATE_BY
@@ -159,6 +162,7 @@
 			                , #{item.consumeWarehouseCd, jdbcType=VARCHAR}
 			                , #{item.goodWarehouseCd, jdbcType=VARCHAR}
 			                , #{item.defectWarehouseCd, jdbcType=VARCHAR}
+			                , #{item.chargeYn, jdbcType=VARCHAR}
 			                , #{item.useYn, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.userId, jdbcType=VARCHAR}
@@ -199,9 +203,10 @@
 			                , PROCESS_LT_UOM
 			                , PRIORITY
 			                , YIELD
-			                , CONSUME_LOCATION_CD
-			                , GOOD_LOCATION_CD
-			                , DEFECT_LOCATION_CD
+			                , CONSUME_WAREHOUSE_CD
+			                , GOOD_WAREHOUSE_CD
+			                , DEFECT_WAREHOUSE_CD
+			                , CHARGE_YN
 			                , USE_YN
 			                , DESCRIPTION
 			                , CREATE_BY
@@ -218,9 +223,10 @@
 			                , #{item.processLtUom, jdbcType=VARCHAR}
 			                , #{item.priority, jdbcType=NUMERIC}
 			                , #{item.yield, jdbcType=NUMERIC}
-			                , #{item.consumeLocationCd, jdbcType=VARCHAR}
-			                , #{item.goodLocationCd, jdbcType=VARCHAR}
-			                , #{item.defectLocationCd, jdbcType=VARCHAR}
+			                , #{item.consumeWarehouseCd, jdbcType=VARCHAR}
+			                , #{item.goodWarehouseCd, jdbcType=VARCHAR}
+			                , #{item.defectWarehouseCd, jdbcType=VARCHAR}
+			                , #{item.chargeYn, jdbcType=VARCHAR}
 			                , #{item.useYn, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.userId, jdbcType=VARCHAR}
