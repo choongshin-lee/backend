@@ -12,14 +12,12 @@
 		                 , MDM.DR_NM
 		                 , MDM.PROCESS_CD
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
-		                 , MDM.ISSUE_LOCATION_CD
-		                 , ML.LOCATION_NM           AS ISSUE_LOCATION_NM
+		                 , MDM.ISSUE_WAREHOUSE_CD 
+	                     , MWH.WAREHOUSE_NM           AS ISSUE_WAREHOUSE_NM
 		                 , MDM.CUSTOMER_CD
 		                 , MP.PARTNER_NM            AS CUSTOMER_NM
 		                 , TO_CHAR(MDM.SHIPPING_DUE_DATE ,'YYYY-MM-DD') AS SHIPPING_DUE_DATE
-		                 , MDM.STATE
-		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'WM0001', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
-		                 , MDM.LOCATION_USE_YN
+		                 , MDM.WAREHOUSE_USE_YN
 		                 , MDM.DESCRIPTION
 		                 , MDM.UPDATE_BY      AS UPDATE_USER_NO
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
@@ -30,13 +28,13 @@
 		                 , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDM.DR_NO) AS ROW_CNT
 		            FROM   MOM_DR_MST MDM
 		                 , MOM_PARTNER MP
-		                 , MOM_LOCATION ML
+		                 , MOM_WAREHOUSE MWH
 		            WHERE  MDM.COMPANY_CD          = MP.COMPANY_CD
 		            AND    MDM.DIVISION_CD         = MP.DIVISION_CD
 		            AND    MDM.CUSTOMER_CD         = MP.PARTNER_CD
-		            AND    MDM.COMPANY_CD          = ML.COMPANY_CD
-                    AND    MDM.DIVISION_CD         = ML.DIVISION_CD
-                    AND    MDM.ISSUE_LOCATION_CD   = ML.LOCATION_CD
+		            AND    MDM.COMPANY_CD          = MWH.COMPANY_CD
+	                AND    MDM.DIVISION_CD         = MWH.DIVISION_CD
+	                AND    MDM.ISSUE_WAREHOUSE_CD  = MWH.WAREHOUSE_CD
 		            AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 		            AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}	
 		            AND    MDM.STATE               = 'DRG'
@@ -48,8 +46,8 @@
 		            <if test="customerCdNm != null and customerCdNm != ''">
 	                AND    (UPPER(MDM.CUSTOMER_CD) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%')
 	                </if> 
-	                <if test="issueLocationCdNm != null and issueLocationCdNm != ''">
-	                AND    (UPPER(MDM.ISSUE_LOCATION_CD) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(ML.LOCATION_NM) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%')    
+	                <if test="issueWarehouseCdNm != null and issueWarehouseCdNm != ''">
+		            AND    (UPPER(MDM.ISSUE_WAREHOUSE_CD) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
 	                </if> 	
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
@@ -67,17 +65,17 @@
 	         , MI.ITEM_TYPE
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
              , MDD.REQUEST_QTY                                                                                          AS ISSUE_REQUEST_QTY
-             , MDD.UNIT 
-             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
-             , MDD.LOCATION_CD                                                                                          AS STORAGE_LOCATION_CD
-             , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.LOCATION_CD) FROM DUAL) AS STORAGE_LOCATION_NM
+             , MDD.DELIVERY_UOM  
+             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DELIVERY_UOM) FROM DUAL) AS DELIVERY_UOM_NM
+             , MDD.CONVERSION_UOM   
+             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
+             , MDD.WAREHOUSE_CD              AS STORAGE_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.WAREHOUSE_CD) FROM DUAL) AS STORAGE_WAREHOUSE_NM
              , MDD.LC_NO
              , MDD.TRACKING_NO
              , MDD.CARTON_NO
              , MDD.REFERENCE_NO
              , MDD.REFERENCE_DTL_NO
-             , MDD.STATE
-             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'WM0002', MDD.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
              , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
              , MDD.DELIVERY_REQUEST_ID
              , MDD.DESCRIPTION
@@ -114,7 +112,7 @@
                             , PROCESS_CD
                             , DR_NO
                             , DR_NM
-                            , ISSUE_LOCATION_CD
+                            , ISSUE_WAREHOUSE_CD
                             , CUSTOMER_CD
                             , SHIPPING_DUE_DATE
                             , DESCRIPTION
@@ -129,7 +127,7 @@
                             , 'EC'
                             , #{item.drNo, jdbcType=VARCHAR}
                             , #{item.drNm, jdbcType=VARCHAR}
-                            , #{item.issueLocationCd, jdbcType=VARCHAR}
+                            , #{item.issueWarehouseCd, jdbcType=VARCHAR}
                             , #{item.customerCd, jdbcType=VARCHAR}
                             , #{item.shippingDueDate, jdbcType=VARCHAR}
                             , #{item.description, jdbcType=VARCHAR}
@@ -171,8 +169,9 @@
                             , IO_TYPE
                             , ITEM_ID
                             , REQUEST_QTY
-                            , UNIT
-                            , LOCATION_CD
+                            , DELIVERY_UOM
+		                    , CONVERSION_UOM
+		                    , WAREHOUSE_CD
                             , LC_NO
                             , TRACKING_NO
                             , CARTON_NO
@@ -197,8 +196,9 @@
 		                    , #{item.ioType, jdbcType=VARCHAR}
 		                    , #{item.itemId, jdbcType=VARCHAR}
 		                    , #{item.issueRequestQty, jdbcType=NUMERIC}
-		                    , #{item.unit, jdbcType=VARCHAR}
-		                    , #{item.storageLocationCd, jdbcType=VARCHAR}
+		                    , #{item.deliveryUom, jdbcType=VARCHAR}
+		                    , #{item.conversionUom, jdbcType=VARCHAR}
+		                    , #{item.storageWarehouseCd, jdbcType=VARCHAR}
 		                    , #{item.lcNo, jdbcType=VARCHAR}
 		                    , #{item.trackingNo, jdbcType=VARCHAR}
 		                    , #{item.cartonNo, jdbcType=VARCHAR}

@@ -8,15 +8,15 @@
 		     , MSO.SHIP_TO_NM	
 		     , MSO.SO_NO
 		     , MSO.SO_SEQ
-		     , MSO.STORAGE_LOCATION_CD   AS SHIPPING_LOCATION_CD
-             , MSO.STORAGE_LOCATION_NM   AS SHIPPING_LOCATION_NM
+		     , MSO.STORAGE_WAREHOUSE_CD    AS SHIPPING_WAREHOUSE_CD
+             , MSO.STORAGE_WAREHOUSE_NM    AS SHIPPING_WAREHOUSE_NM
 		     , MSO.ITEM_ID
 		     , MSO.ITEM_NM
 		     , MSO.ITEM_SPEC
 		     , MSO.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSO.COMPANY_CD, MSO.DIVISION_CD, 'MD0002', MSO.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MSO.SO_UNIT
-		     , MSO.SO_UNIT_NM   
+		     , MSO.SO_UOM
+             , MSO.SO_UOM_NM    
 		     , MSO.SO_CONFIRM_DATE
 		     , MSO.ORDER_QTY
 		     , MSO.SHIPPING_QTY
@@ -76,8 +76,11 @@
 			                   , IO_TYPE
 			                   , ITEM_ID
 			                   , REQUEST_QTY
-			                   , UNIT
-			                   , LOCATION_CD
+			                   , DELIVERY_UOM
+			                   , WAREHOUSE_CD
+			                   , CURRENCY_CD
+			                   , EXCHANGE_RATE
+			                   , UNIT_PRICE
 			                   , LC_NO
 			                   , TRACKING_NO
 			                   , CARTON_NO
@@ -100,8 +103,11 @@
 			                   , #{item.ioType, jdbcType=VARCHAR}
 			                   , #{item.itemId, jdbcType=VARCHAR}
 			                   , #{item.remainQty, jdbcType=NUMERIC}
-			                   , #{item.soUnit, jdbcType=VARCHAR}
-			                   , #{item.shippingLocationCd, jdbcType=VARCHAR}
+			                   , #{item.soUom, jdbcType=VARCHAR}
+			                   , #{item.shippingWarehouseCd, jdbcType=VARCHAR}
+			                   , #{item.currencyCd, jdbcType=VARCHAR}
+			                   , #{item.exchangeRate, jdbcType=NUMERIC}
+			                   , #{item.unitPrice, jdbcType=NUMERIC}
 			                   , #{item.lcNo, jdbcType=VARCHAR}
 			                   , #{item.trackingNo, jdbcType=VARCHAR}
 			                   , #{item.cartonNo, jdbcType=VARCHAR}

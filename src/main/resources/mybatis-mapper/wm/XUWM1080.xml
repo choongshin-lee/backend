@@ -7,36 +7,37 @@
 		    FROM   (
 		</if>
 		            SELECT MDR.*
-					     , MLR.LOCATION_NM   AS REQUEST_LOCATION_NM                                      
-					     , MLI.LOCATION_NM   AS ISSUE_LOCATION_NM
-					     , MP.PARTNER_NM     AS CUSTOMER_NM
+					     , MHR.WAREHOUSE_NM     AS REQUEST_WAREHOUSE_NM                            
+					     , MHI.WAREHOUSE_NM     AS ISSUE_WAREHOUSE_NM
+					     , MP.PARTNER_NM     	AS CUSTOMER_NM
 					     , MI.ITEM_NM
 					     , MI.ITEM_SPEC
 					     , MI.ITEM_TYPE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, 'KR') FROM DUAL)  AS ITEM_TYPE_NM
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, MDR.FORWARDER_CD) FROM DUAL) AS FORWARDER_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_LOGISTICS_RESOURCE_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, MDR.LOGISTICS_RESOURCE_CD) FROM DUAL) AS LOGISTICS_RESOURCE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, 'IC0002', MDR.MAIN_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAIN_STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, 'IC0003', MDR.DTL_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS DTL_STATE_NM
-					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, MDR.UNIT ) FROM DUAL) AS UNIT_NM
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, MDR.DELIVERY_UOM ) FROM DUAL) AS DELIVERY_UOM_NM
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, MDR.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDR.COMPANY_CD, MDR.DIVISION_CD, 'SM0017', MDR.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM    
 					     , (MDR.DELIVERY_REQUEST_ID)            AS KEY_ID
 					     , COUNT(*) OVER()                    AS TOTAL_COUNT
 					     , ROW_NUMBER() OVER(PARTITION BY MDR.COMPANY_CD,MDR.DIVISION_CD ORDER BY MDR.DELIVERY_REQUEST_ID) AS ROW_CNT
 					FROM   MOM_DELIVERY_REQUEST_V MDR
-					     , MOM_LOCATION MLR
-					     , MOM_LOCATION MLI
+					     , MOM_WAREHOUSE MHI
+                         , MOM_WAREHOUSE MHR
 					     , MOM_PARTNER  MP
 					     , MOM_ITEM     MI
-					WHERE  MDR.COMPANY_CD           = MLR.COMPANY_CD(+)
-					AND    MDR.DIVISION_CD          = MLR.DIVISION_CD(+)
-					AND    MDR.REQUEST_LOCATION_CD  = MLR.LOCATION_CD(+)
-					AND    MDR.COMPANY_CD           = MLI.COMPANY_CD
-					AND    MDR.DIVISION_CD          = MLI.DIVISION_CD
-					AND    MDR.ISSUE_LOCATION_CD    = MLI.LOCATION_CD
-					AND    MDR.COMPANY_CD           = MP.COMPANY_CD
-					AND    MDR.DIVISION_CD          = MP.DIVISION_CD
-					AND    MDR.CUSTOMER_CD          = MP.PARTNER_CD
+					WHERE  MDR.COMPANY_CD           = MHI.COMPANY_CD(+)
+	                AND    MDR.DIVISION_CD          = MHI.DIVISION_CD(+)
+	                AND    MDR.ISSUE_WAREHOUSE_CD   = MHI.WAREHOUSE_CD(+)
+	                AND    MDR.COMPANY_CD           = MHR.COMPANY_CD(+)
+	                AND    MDR.DIVISION_CD          = MHR.DIVISION_CD(+)
+	                AND    MDR.REQUEST_WAREHOUSE_CD = MHR.WAREHOUSE_CD(+)
+					AND    MDR.COMPANY_CD           = MP.COMPANY_CD(+)
+					AND    MDR.DIVISION_CD          = MP.DIVISION_CD(+)
+					AND    MDR.CUSTOMER_CD          = MP.PARTNER_CD(+)
 					AND    MDR.COMPANY_CD           = MI.COMPANY_CD
 					AND    MDR.DIVISION_CD          = MI.DIVISION_CD
 					AND    MDR.ITEM_ID              = MI.ITEM_ID   
@@ -51,8 +52,8 @@
 					<if test="customerCdNm != null and customerCdNm != ''">
 					AND    (UPPER(MDR.CUSTOMER_CD) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%')   
 					</if> 
-					<if test="requestLocationCdNm != null and requestLocationCdNm != ''">
-					AND    (UPPER(MDR.REQUEST_LOCATION_CD) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLR.LOCATION_NM) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%')   
+					<if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
+					AND    (UPPER(MDR.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MHR.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
 					</if> 
 					<if test="processCd != null and processCd != ''">
 					AND    MDR.PROCESS_CD  = #{processCd, jdbcType=VARCHAR}
