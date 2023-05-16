@@ -12,12 +12,12 @@
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 					     , MDM.DO_NO
 					     , MDM.DO_NM
-					     , MDM.ISSUE_LOCATION_CD         
-					     , MLI.LOCATION_NM          AS ISSUE_LOCATION_NM
-					     , MDM.REQUEST_LOCATION_CD
-                         , MLR.LOCATION_NM          AS REQUEST_LOCATION_NM
-					     , MDM.PARTNER_CD	        AS CUSTOMER_CD
-					     , MP.PARTNER_NM            AS CUSTOMER_NM
+					     , MDM.ISSUE_WAREHOUSE_CD
+		                 , MHI.WAREHOUSE_NM            AS ISSUE_WAREHOUSE_NM
+		                 , MDM.REQUEST_WAREHOUSE_CD
+		                 , MHR.WAREHOUSE_NM            AS REQUEST_WAREHOUSE_NM
+					     , MDM.PARTNER_CD	           AS CUSTOMER_CD
+					     , MP.PARTNER_NM               AS CUSTOMER_NM
 					     , TO_CHAR(MDM.ISSUE_DUE_DATE  ,'YYYY-MM-DD') AS ISSUE_DUE_DATE
 					     , MDM.DESCRIPTION
 					     , MDM.UPDATE_BY      AS UPDATE_USER_NO
@@ -28,22 +28,22 @@
 					     , COUNT(*) OVER()                                   AS TOTAL_COUNT
 					     , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDM.DO_NO) AS ROW_CNT
 					FROM   MOM_DELIVERY_ORDER_MST MDM
-					     , MOM_LOCATION MLI
-					     , MOM_LOCATION MLR
+					     , MOM_WAREHOUSE MHI
+                         , MOM_WAREHOUSE MHR
                          , MOM_PARTNER MP
-					WHERE  MDM.COMPANY_CD          = MLI.COMPANY_CD
-					AND    MDM.DIVISION_CD         = MLI.DIVISION_CD
-					AND    MDM.ISSUE_LOCATION_CD   = MLI.LOCATION_CD
-					AND    MDM.COMPANY_CD          = MLR.COMPANY_CD
-                    AND    MDM.DIVISION_CD         = MLR.DIVISION_CD
-                    AND    MDM.ISSUE_LOCATION_CD   = MLR.LOCATION_CD
-					AND    MDM.COMPANY_CD          = MP.COMPANY_CD
-					AND    MDM.DIVISION_CD         = MP.DIVISION_CD
-					AND    MDM.PARTNER_CD          = MP.PARTNER_CD
-					AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
-					AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
-					AND    MDM.STATE               = 'DOG'
-					AND    MDM.PROCESS_TYPE        IN ('ITS', 'OBS')
+					WHERE  MDM.COMPANY_CD           = MHI.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD          = MHI.DIVISION_CD(+)
+	                AND    MDM.ISSUE_WAREHOUSE_CD   = MHI.WAREHOUSE_CD(+)
+	                AND    MDM.COMPANY_CD           = MHR.COMPANY_CD(+)
+	                AND    MDM.DIVISION_CD          = MHR.DIVISION_CD(+)
+	                AND    MDM.REQUEST_WAREHOUSE_CD = MHR.WAREHOUSE_CD(+)
+					AND    MDM.COMPANY_CD           = MP.COMPANY_CD(+)
+					AND    MDM.DIVISION_CD          = MP.DIVISION_CD(+)
+					AND    MDM.PARTNER_CD           = MP.PARTNER_CD(+)
+					AND    MDM.COMPANY_CD           = #{companyCd, jdbcType=VARCHAR}
+					AND    MDM.DIVISION_CD          = #{divisionCd, jdbcType=VARCHAR}  
+					AND    MDM.STATE                = 'DOG'
+					AND    MDM.PROCESS_TYPE         IN ('ITS', 'OBS')
 					AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					<if test="processType != null and processType != ''">
 					AND    MDM.PROCESS_TYPE  = #{processType, jdbcType=VARCHAR}
@@ -54,12 +54,12 @@
 					<if test="customerCd != null and customerCd != ''">
 					AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCd, jdbcType=VARCHAR}) || '%')   
 					</if> 
-					<if test="issueLocationCd != null and issueLocationCd != ''">
-					AND    (UPPER(MLI.LOCATION_NM)  LIKE '%' || UPPER(#{issueLocationCd, jdbcType=VARCHAR}) ||   '%')   
-					</if> 
-					<if test="requestLocationCd != null and requestLocationCd != ''">
-					AND    (UPPER(MLR.LOCATION_NM)  LIKE '%' || UPPER(#{requestLocationCd, jdbcType=VARCHAR}) ||   '%')   
-					</if>  
+					<if test="issueWarehouseCdNm != null and issueWarehouseCdNm != ''">
+	                AND    (UPPER(MDM.ISSUE_WAREHOUSE_CD) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MHI.WAREHOUSE_NM) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
+	                </if> 
+	                <if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
+	                AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MHR.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
+	                </if>    
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
@@ -75,10 +75,12 @@
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MDD.UNIT    AS UNIT
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
+		     , MDD.DELIVERY_UOM
+             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DELIVERY_UOM ) FROM DUAL) AS DELIVERY_UOM_NM
+             , MDD.CONVERSION_UOM
+             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
 		     , (SELECT MOM_STOCK_PKG.FN_GET_DR_REQUEST_QTY_BY_DO(MDD.COMPANY_CD, MDD.DIVISION_CD,MDD.REFERENCE_DTL_NO) FROM DUAL) AS DR_REQUEST_QTY
-		     , MDD.QTY            AS CONFIRM_WAIT_QTY
+		     , MDD.DO_QTY            AS CONFIRM_WAIT_QTY
 		     , MDD.CURRENCY_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 		     , MDD.EXCHANGE_RATE

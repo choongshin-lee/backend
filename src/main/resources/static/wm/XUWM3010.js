@@ -39,9 +39,9 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#issueLocationCdSP21').val(checkItem[0]['issueLocationCd']);
+                $('#issueWarehouseCdSP21').val(checkItem[0]['issueWarehouseCd']);
                 $('#customerCdSP21').val(checkItem[0]['customerCd']);
-                $('#issueLocationCdSP21').jqxComboBox({disabled: true});
+                $('#issueWarehouseCdSP21').jqxComboBox({disabled: true});
                 $('#customerCdSP21').jqxComboBox({disabled: true});
             }
         }
@@ -59,6 +59,6 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0190', VIEW);	
+	momWidget.gridPopup.init(2,21,1,'XUDG0450', VIEW);	
 	VIEW.init();
 });

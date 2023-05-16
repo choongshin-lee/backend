@@ -7124,6 +7124,7 @@ var momWidget = {
 
                     $('#calendar-pop').attr('rowIndex', e.rowIndex);
                     $('#calendar-pop').attr('columnIndex', e.columnIndex);
+                    $('#calendar-pop').attr('grideIndex', index);       //선택된 그리드 번호 추가 내용(2023.05.16)
                     $('#calendar-pop').css('display', 'block');
                     let td = AUIGrid.getCellElementByIndex(that.grid[index], e.rowIndex, e.columnIndex); // 0, 0 번째 TD 얻기
                     let offset = $(td).offset();
@@ -9182,11 +9183,16 @@ var momWidget = {
             $('#calendar-pop').css('display', 'none');
             let rowIndex = Number($('#calendar-pop').attr('rowIndex'));
             let columnIndex = Number($('#calendar-pop').attr('columnIndex'));
-            let dataField = AUIGrid.getColumnLayout(that.grid[index])[columnIndex]['dataField'];
-            let item = AUIGrid.getGridData(that.grid[index])[rowIndex];
-            AUIGrid.setCellValue(that.grid[index], rowIndex, columnIndex, nowTime);
+            let grideIndex = $('#calendar-pop').attr('grideIndex');        //2023.05.16
+            //let dataField = AUIGrid.getColumnLayout(that.grid[index])[columnIndex]['dataField'];
+            let dataField = AUIGrid.getColumnLayout(that.grid[grideIndex])[columnIndex]['dataField'];
+            //let item = AUIGrid.getGridData(that.grid[grideIndex])[rowIndex];
+            let item = AUIGrid.getGridData(that.grid[grideIndex])[rowIndex];
+            //AUIGrid.setCellValue(that.grid[grideIndex], rowIndex, columnIndex, nowTime);
+            AUIGrid.setCellValue(that.grid[grideIndex], rowIndex, columnIndex, nowTime);
             if (your != undefined && your.calendarGridSaveCallBack != undefined) {
-                your.calendarGridSaveCallBack(index, rowIndex, columnIndex, dataField, item, nowTime, e);
+                //your.calendarGridSaveCallBack(grideIndex, rowIndex, columnIndex, dataField, item, nowTime, e);
+                your.calendarGridSaveCallBack(grideIndex, rowIndex, columnIndex, dataField, item, nowTime, e);
             }
         });
         $(document).on('click', '#' + calendarPopCloseBtnId, function (e) {

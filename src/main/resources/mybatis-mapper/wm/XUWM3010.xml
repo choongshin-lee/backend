@@ -12,8 +12,8 @@
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 					     , MDM.DO_NO
 					     , MDM.DO_NM
-					     , MDM.ISSUE_LOCATION_CD         
-					     , MLI.LOCATION_NM          AS ISSUE_LOCATION_NM
+					     , MDM.ISSUE_WAREHOUSE_CD         
+					     , MWH.WAREHOUSE_NM          AS ISSUE_WAREHOUSE_NM
 					     , MDM.PARTNER_CD	        AS CUSTOMER_CD
 					     , MP.PARTNER_NM            AS CUSTOMER_NM
 					     , TO_CHAR(MDM.ISSUE_DUE_DATE  ,'YYYY-MM-DD') AS ISSUE_DUE_DATE
@@ -26,11 +26,11 @@
 					     , COUNT(*) OVER()                                   AS TOTAL_COUNT
 					     , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD,MDM.DIVISION_CD ORDER BY MDM.DO_NO) AS ROW_CNT
 					FROM   MOM_DELIVERY_ORDER_MST MDM
-					     , MOM_LOCATION MLI
+					     , MOM_WAREHOUSE   MWH
                          , MOM_PARTNER MP
-					WHERE  MDM.COMPANY_CD          = MLI.COMPANY_CD
-					AND    MDM.DIVISION_CD         = MLI.DIVISION_CD
-					AND    MDM.ISSUE_LOCATION_CD   = MLI.LOCATION_CD
+					WHERE  MDM.COMPANY_CD          = MWH.COMPANY_CD
+					AND    MDM.DIVISION_CD         = MWH.DIVISION_CD
+					AND    MDM.ISSUE_WAREHOUSE_CD  = MWH.WAREHOUSE_CD
 					AND    MDM.COMPANY_CD          = MP.COMPANY_CD
 					AND    MDM.DIVISION_CD         = MP.DIVISION_CD
 					AND    MDM.PARTNER_CD          = MP.PARTNER_CD
@@ -45,8 +45,8 @@
 					<if test="customerCd != null and customerCd != ''">
 					AND    (UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCd, jdbcType=VARCHAR}) || '%')   
 					</if> 
-					<if test="issueLocationCd != null and issueLocationCd != ''">
-					AND    (UPPER(MLI.LOCATION_NM)  LIKE '%' || UPPER(#{issueLocationCd, jdbcType=VARCHAR}) ||   '%')   
+					<if test="issueWarehouseCd != null and issueWarehouseCd != ''">
+					AND    (UPPER(MWH.WAREHOUSE_NM)  LIKE '%' || UPPER(#{issueWarehouseCd, jdbcType=VARCHAR}) ||   '%')   
 					</if> 
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
@@ -63,10 +63,12 @@
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MDD.UNIT    AS UNIT
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UNIT ) FROM DUAL) AS UNIT_NM
+		     , MDD.DELIVERY_UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DELIVERY_UOM ) FROM DUAL) AS DELIVERY_UOM_NM
+		     , MDD.CONVERSION_UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
 		     , (SELECT MOM_STOCK_PKG.FN_GET_DR_REQUEST_QTY_BY_DO(MDD.COMPANY_CD, MDD.DIVISION_CD,MDD.REFERENCE_DTL_NO) FROM DUAL) AS DR_REQUEST_QTY
-		     , MDD.QTY            AS ISSUE_WAIT_QTY
+		     , MDD.DO_QTY            AS ISSUE_WAIT_QTY
 		     , MDD.CURRENCY_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'SM0017', MDD.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 		     , MDD.EXCHANGE_RATE
@@ -112,8 +114,8 @@
                             , PROCESS_TYPE
                             , DO_NO
                             , DO_NM
-                            , ISSUE_LOCATION_CD
-                            , REQUEST_LOCATION_CD
+                            , ISSUE_WAREHOUSE_CD
+                            , REQUEST_WAREHOUSE_CD
                             , PARTNER_CD
                             , ISSUE_DUE_DATE
                             , DESCRIPTION
@@ -128,8 +130,8 @@
                             , 'OBS'
                             , #{item.doNo, jdbcType=VARCHAR}
                             , #{item.doNm, jdbcType=VARCHAR}
-                            , #{item.issueLocationCd, jdbcType=VARCHAR}
-                            , #{item.requestLocationCd, jdbcType=VARCHAR}
+                            , #{item.issueWarehouseCd, jdbcType=VARCHAR}
+                            , #{item.requestWarehouseCd, jdbcType=VARCHAR}
                             , #{item.customerCd, jdbcType=VARCHAR}
                             , #{item.issueDueDate, jdbcType=VARCHAR}
                             , #{item.description, jdbcType=VARCHAR}
@@ -172,7 +174,8 @@
                             , QTY
                             , ISSUE_WAIT_QTY
                             , ITEM_ID
-                            , UNIT
+                            , DELIVERY_UOM
+                            , CONVERSION_UOM
                             , CURRENCY_CD
                             , EXCHANGE_RATE
                             , UNIT_PRICE
@@ -195,7 +198,8 @@
                             , #{item.drRequestQty, jdbcType=NUMERIC}
                             , #{item.issueWaitQty, jdbcType=NUMERIC}
                             , #{item.itemId, jdbcType=VARCHAR}
-                            , #{item.unit, jdbcType=VARCHAR}
+                            , #{item.deliveryUom, jdbcType=VARCHAR}
+                            , #{item.conversionUom, jdbcType=VARCHAR}
                             , #{item.currencyCd, jdbcType=VARCHAR}
                             , #{item.exchangeRate, jdbcType=NUMERIC}
                             , #{item.unitPrice, jdbcType=NUMERIC}

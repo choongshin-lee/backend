@@ -99,7 +99,7 @@
         <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close=";END;">
         UPDATE MOM_DEMAND 
         SET    PRIORITY    = #{item.priority, jdbcType=NUMERIC}
-             , DUE_DATE    = TO_DATE(#{item.dueDate,  jdbcType=VARCHAR},'YYYY-MM-DD')       
+             , DUE_DATE    = SUBSTR(#{item.dueDate,  jdbcType=VARCHAR},1,10)      
              , DESCRIPTION = #{item.description, jdbcType=VARCHAR}
              , UPDATE_BY   = #{item.userId, jdbcType=VARCHAR}
              , UPDATE_DATE = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})

@@ -39,10 +39,10 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#issueLocationCdSP21').val(checkItem[0]['issueLocationCd']);
-                $('#requestLocationCdSP21').val(checkItem[0]['requestLocationCd']);
-                $('#issueLocationCdSP21').jqxComboBox({disabled: true});
-                $('#requestLocationCdSP21').jqxComboBox({disabled: true});
+                $('#issueWarehouseCdSP21').val(checkItem[0]['issueWarehouseCd']);
+                $('#requestWarehouseCdSP21').val(checkItem[0]['requestWarehouseCd']);
+                $('#issueWarehouseCdSP21').jqxComboBox({disabled: true});
+                $('#requestWarehouseCdSP21').jqxComboBox({disabled: true});
             }
         }
         else if(index == 20){         
