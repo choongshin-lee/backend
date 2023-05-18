@@ -19,10 +19,10 @@
 	                     , MI.ITEM_SPEC
 	                     , MI.ITEM_TYPE
 	                     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-	                     , MPD.FROM_LOCATION_CD   AS REQUEST_LOCATION_CD
-	                     , MLF.LOCATION_NM        AS REQUEST_LOCATION_NM
-	                     , MPD.TO_LOCATION_CD     AS ISSUE_LOCATION_CD 
-	                     , MLT.LOCATION_NM        AS ISSUE_LOCATION_NM
+	                     , MPD.FROM_WAREHOUSE_CD    AS REQUEST_WAREHOUSE_CD
+                         , MWF.WAREHOUSE_NM        AS REQUEST_WAREHOUSE_NM
+                         , MPD.TO_WAREHOUSE_CD      AS ISSUE_WAREHOUSE_CD 
+                         , MWT.WAREHOUSE_NM        AS ISSUE_WAREHOUSE_NM
 	                     , MPD.QTY                AS ISSUE_QTY
 	                     , MPD.APPLY_FLAG
 	                     , TO_CHAR(MPD.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE
@@ -33,31 +33,31 @@
 	                     , ROW_NUMBER() OVER(PARTITION BY MPD.COMPANY_CD,MPD.DIVISION_CD ORDER BY MPD.REFERENCE_DTL_NO) AS ROW_CNT
 	                FROM   MOM_PRODUCT_DELIVERY_SHEET MPD
 	                     , MOM_ITEM MI
-	                     , MOM_LOCATION MLF
-	                     , MOM_LOCATION MLT
-	                WHERE  MPD.COMPANY_CD       = MI.COMPANY_CD
-	                AND    MPD.DIVISION_CD      = MI.DIVISION_CD
-	                AND    MPD.ITEM_ID          = MI.ITEM_ID     
-	                AND    MPD.COMPANY_CD       = MLF.COMPANY_CD
-	                AND    MPD.DIVISION_CD      = MLF.DIVISION_CD
-	                AND    MPD.FROM_LOCATION_CD = MLF.LOCATION_CD     
-	                AND    MPD.COMPANY_CD       = MLT.COMPANY_CD
-	                AND    MPD.DIVISION_CD      = MLT.DIVISION_CD
-	                AND    MPD.TO_LOCATION_CD   = MLT.LOCATION_CD   
-	                AND    MPD.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
-	                AND    MPD.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR} 
-	                AND    MPD.CREATE_DATE      BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+	                     , MOM_WAREHOUSE MWF
+                         , MOM_WAREHOUSE MWT
+	                WHERE  MPD.COMPANY_CD        = MI.COMPANY_CD
+	                AND    MPD.DIVISION_CD       = MI.DIVISION_CD
+	                AND    MPD.ITEM_ID           = MI.ITEM_ID     
+	                AND    MPD.COMPANY_CD        = MWF.COMPANY_CD
+                    AND    MPD.DIVISION_CD       = MWF.DIVISION_CD
+                    AND    MPD.FROM_WAREHOUSE_CD = MWF.WAREHOUSE_CD      
+                    AND    MPD.COMPANY_CD        = MWT.COMPANY_CD
+                    AND    MPD.DIVISION_CD       = MWT.DIVISION_CD
+                    AND    MPD.TO_WAREHOUSE_CD   = MWT.WAREHOUSE_CD    
+	                AND    MPD.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
+	                AND    MPD.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR} 
+	                AND    MPD.CREATE_DATE       BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 	                <if test="applyFlag != null and applyFlag != ''">
 					AND    MPD.APPLY_FLAG  = #{applyFlag, jdbcType=VARCHAR}
 					</if>   
 					<if test="processCd != null and processCd != ''">
 					AND    MPD.PROCESS_CD  = #{processCd, jdbcType=VARCHAR}
 					</if>  
-					<if test="requestLocationCdNm != null and requestLocationCdNm != ''">
-	                AND    (UPPER(MPD.FROM_LOCATION_CD) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLF.LOCATION_NM) LIKE '%' || UPPER(#{requestLocationCdNm, jdbcType=VARCHAR}) || '%')    
+					<if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
+	                AND    (UPPER(MPD.FROM_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWF.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
 	                </if> 
-	                <if test="issueLocationCdNm != null and issueLocationCdNm != ''">
-	                AND    (UPPER(MPD.TO_LOCATION_CD) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MLT.LOCATION_NM) LIKE '%' || UPPER(#{issueLocationCdNm, jdbcType=VARCHAR}) || '%')    
+	                <if test="issueWarehouseCdNm != null and issueWarehouseCdNm != ''">
+	                AND    (UPPER(MPD.TO_WAREHOUSE_CD) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWT.WAREHOUSE_NM) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
 	                </if> 
 	                <if test="itemIdNm != null and itemIdNm != ''">
 	                AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  

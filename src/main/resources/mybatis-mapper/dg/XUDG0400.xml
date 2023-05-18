@@ -62,9 +62,8 @@
 		AND    MPD.DIVISION_CD  = MI.DIVISION_CD
 		AND    MPD.ITEM_ID      = MI.ITEM_ID
 		AND    MPD.COMPANY_CD   = MUP.COMPANY_CD
-        AND    MPD.DIVISION_CD = MUP.DIVISION_CD
-        AND    MPD.ITEM_ID     = MUP.ITEM_ID
-        AND    MPD.CURRENCY_CD = MUP.CURRENCY_CD
+        AND    MPD.DIVISION_CD  = MUP.DIVISION_CD
+        AND    MPD.ITEM_ID      = MUP.ITEM_ID
 		AND    MPD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}                          
 		AND    MPD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}						   
 		AND    MPD.STATE        = 'PRR'       -- 접수건 
