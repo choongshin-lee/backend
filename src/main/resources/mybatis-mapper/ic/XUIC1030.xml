@@ -5,7 +5,7 @@
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
         SELECT A.*
         FROM   (
-    </if>
+    </if> 
                 SELECT MDM.COMPANY_CD
 		             , MDM.DIVISION_CD
 		             , MDM.DO_NO           AS SHIPPING_REQUEST_NO

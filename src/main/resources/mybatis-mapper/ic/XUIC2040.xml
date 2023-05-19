@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUIC1040">
+<mapper namespace="com.mom.backend.XUIC2040">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
         SELECT A.*
@@ -14,19 +14,9 @@
 				     , MDD.DELIVERY_ORDER_ID
 				     , MDM.ISSUE_WAREHOUSE_CD
 				     , MWH.WAREHOUSE_NM              AS ISSUE_WAREHOUSE_NM
-				     , MDM.PARTNER_CD                AS CUSTOMER_CD  
-				     , MP.PARTNER_NM                 AS CUSTOMER_NM
-				     , MDM.FORWARDER_CD
-				     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.FORWARDER_CD) FROM DUAL) AS FORWARDER_NM
-				     , MDM.DERIVERY_TO_ADRESS
-				     , MDM.LOGISTICS_RESOURCE_CD
-				     , (SELECT MOM_COMMON_PKG.FN_GET_LOGISTICS_RESOURCE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.LOGISTICS_RESOURCE_CD) FROM DUAL) AS LOGISTICS_RESOURCE_NM
-				     , MDM.PARTIAL_SHIPMENT_YN
-				     , MDM.SHIPPING_MARK
-				     , MDM.NAME_PLATE
-				     , MDM.INSPECTION_REPORT_YN
-				     , MDM.TRANSIT_INSURANCE_YN
-				     , MDD.ITEM_ID
+				     , MDM.PARTNER_CD                
+				     , MP.PARTNER_NM                 
+				      MDD.ITEM_ID
 				     , MI.ITEM_NM
 				     , MI.ITEM_SPEC
 				     , MI.ITEM_TYPE
@@ -74,13 +64,13 @@
 				AND    MDD.ITEM_ID              = MI.ITEM_ID     
 				AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 				AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
-				AND    MDM.PROCESS_CD          = 'CR'
+				AND    MDM.PROCESS_CD          = 'CS'
 				AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 				<if test="shippingRequestNo != null and shippingRequestNo != ''">
 				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{shippingRequestNo, jdbcType=VARCHAR}) || '%')   
 				</if>
-				<if test="customerCdNm != null and customerCdNm != ''">
-				AND    (UPPER(MDM.PARTNER_CD) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%')
+				<if test="partnerCdNm != null and partnerCdNm != ''">
+				AND    (UPPER(MDM.PARTNER_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')
 				</if> 
 				<if test="issueWarehouseCdNm != null and issueWarehouseCdNm != ''">
 				AND    (UPPER(MDM.ISSUE_WAREHOUSE_CD) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
