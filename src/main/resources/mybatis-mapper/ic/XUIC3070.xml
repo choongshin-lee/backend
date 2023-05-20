@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUIC2040">
+<mapper namespace="com.mom.backend.XUIC3070">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
         SELECT A.*
@@ -9,19 +9,22 @@
                 SELECT MDM.COMPANY_CD 
 				     , MDM.DIVISION_CD
 				     , MDM.DO_NO                    AS SHIPPING_REQUEST_NO
-				     , MDM.DO_NM                    AS SHIPPING_REQUEST_NM
+				     , MDM.DO_NM		            AS SHIPPING_REQUEST_NM	
+				     , MDM.DO_NO                    AS SHIPPING_NO
+				     , MDM.DO_NM                    AS SHIPPING_NM
 				     , MDD.SEQ
 				     , MDD.DELIVERY_ORDER_ID
 				     , MDM.ISSUE_WAREHOUSE_CD
 				     , MWH.WAREHOUSE_NM              AS ISSUE_WAREHOUSE_NM
 				     , MDM.PARTNER_CD                
-				     , MP.PARTNER_NM                 
+				     , MP.PARTNER_NM                
 				     , MDD.ITEM_ID
 				     , MI.ITEM_NM
 				     , MI.ITEM_SPEC
 				     , MI.ITEM_TYPE
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-				     , MDD.QTY                       AS SHIPPING_REQUEST_QTY
+				     , MDD.QTY                               AS SHIPPING_REQUEST_QTY
+				     , DECODE(MDM.STATE, 'DO', MDD.QTY, 0 )  AS SHIPPING_QTY
 				     , MDD.DO_UOM                    AS SHIPPING_UOM 
 				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS SHIPPING_UOM_NM
 				     , MDD.CONVERSION_UOM
@@ -33,12 +36,15 @@
 				     , MDD.AMOUNT
 				     , MDD.LOCAL_AMOUNT
 				     , TO_CHAR(MDM.ISSUE_DUE_DATE ,'YYYY-MM-DD')      AS SHIPPING_DUE_DATE
+				     , TO_CHAR(MDM.DO_DATE  ,'YYYY-MM-DD')            AS SHIPPING_DATE
 				     , MDM.STATE
 					 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'IC0002', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 				     , TO_CHAR(MDM.CREATE_DATE , 'YYYY-MM-DD HH24:MI:SS')      AS CREATE_DATE
 				     , TO_CHAR(MDM.CONFIRM_DATE ,'YYYY-MM-DD')      AS CONFIRM_DATE
 				     , MDM.CONFIRM_USER_NO
 				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
+				     , MDM.DO_USER_NO      AS SHIPPING_USER_NO
+		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.DO_USER_NO) FROM DUAL ) AS SHIPPING_USER_NM
 					 , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
 				     , COUNT(*) OVER()   AS TOTAL_COUNT
 				     , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD, MDM.DIVISION_CD ORDER BY MDD.DO_NO) AS ROW_CNT
@@ -64,8 +70,8 @@
 				AND    MDD.ITEM_ID              = MI.ITEM_ID     
 				AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 				AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
-				AND    MDM.PROCESS_CD          = 'CS'
-				AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+				AND    MDM.PROCESS_CD          = 'NI'
+				AND    MDM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 				<if test="shippingRequestNo != null and shippingRequestNo != ''">
 				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{shippingRequestNo, jdbcType=VARCHAR}) || '%')   
 				</if>
