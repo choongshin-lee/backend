@@ -8,20 +8,21 @@
     </if>
                 SELECT MDM.COMPANY_CD
 		             , MDM.DIVISION_CD
-		             , MDM.DO_NO           
-		             , MDM.DO_NM		  
+		             , MDM.DO_NO             AS DELIVERY_NO
+		             , MDM.DO_NM		     AS DELIVERY_NM
 		             , MDM.PROCESS_CD
 		             , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
 		             , MDM.REQUEST_WAREHOUSE_CD
 				     , MWR.WAREHOUSE_NM            AS REQUEST_WAREHOUSE_NM
 				     , MDM.ISSUE_WAREHOUSE_CD
 				     , MWI.WAREHOUSE_NM            AS ISSUE_WAREHOUSE_NM
-		             , TO_CHAR(MDM.ISSUE_DUE_DATE  ,'YYYY-MM-DD') AS DO_DUE_DATE
-		             , TO_CHAR(MDM.DO_DATE  ,'YYYY-MM-DD')        AS DO_DATE
-		             , MDM.DO_USER_NO      AS DO_USER_NO
-		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.DO_USER_NO) FROM DUAL ) AS DO_USER_NM
+		             , TO_CHAR(MDM.ISSUE_DUE_DATE  ,'YYYY-MM-DD') AS DELIVERY_DUE_DATE
+		             , TO_CHAR(MDM.DO_DATE  ,'YYYY-MM-DD')        AS DELIVERY_DATE
+		             , MDM.DO_USER_NO      AS DELIVERY_USER_NO
+		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.DO_USER_NO) FROM DUAL ) AS DELIVERY_USER_NM
 		             , MDM.DESCRIPTION
-		             , MDM.WAREHOUSE_USE_YN 
+		             , MDM.ISSUE_WH_USE_YN    AS ISSUE_WAREHOUSE_USE_YN 
+                     , MDM.REQUEST_WH_USE_YN  AS REQUEST_WAREHOUSE_USE_YN 
 		             , MDM.UPDATE_BY      AS UPDATE_USER_NO
 		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		             , TO_CHAR(MDM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
@@ -45,9 +46,9 @@
 		        AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
 		        AND    MDM.STATE               = 'DO'
 		        AND    MDM.PROCESS_CD          = 'IM'
-		        AND    MDM.DO_DATE  BETWEEN TO_DATE(#{doDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{doDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-		        <if test="doNo != null and doNo != ''">
-		        AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{doNo, jdbcType=VARCHAR}) || '%')   
+		        AND    MDM.DO_DATE  BETWEEN TO_DATE(#{deliveryDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{deliveryDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+		        <if test="deliveryNo != null and deliveryNo != ''">
+		        AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{deliveryNo, jdbcType=VARCHAR}) || '%')   
 		        </if>
 		        <if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
 		        AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWR.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
@@ -63,7 +64,7 @@
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         SELECT MDD.COMPANY_CD
 		     , MDD.DIVISION_CD
-		     , MDD.DO_NO               
+		     , MDD.DO_NO                     AS DELIVERY_NO   
 		     , MDD.SEQ
 		     , MDD.DELIVERY_ORDER_ID
 		     , MDD.ITEM_ID
@@ -71,9 +72,9 @@
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MDD.QTY                AS DO_QTY
-		     , MDD.DO_UOM             
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM) FROM DUAL) AS DO_UOM_NM
+		     , MDD.QTY                AS DELIVERY_QTY
+		     , MDD.DO_UOM       	  AS DELIVERY_UOM	      
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM) FROM DUAL) AS DELIVERY_UOM_NM
 		     , MDD.CONVERSION_QTY         
 		     , MDD.CONVERSION_UOM   
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
@@ -85,15 +86,21 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		     , TO_CHAR(MDD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 		     , MDD.IO_TYPE
-		   , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
-		FROM   MOM_DO_DTL MDD
-		     , MOM_ITEM MI
-		WHERE  MDD.COMPANY_CD   = MI.COMPANY_CD
-		AND    MDD.DIVISION_CD  = MI.DIVISION_CD
-		AND    MDD.ITEM_ID      = MI.ITEM_ID
+		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
+		     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WH_AVAILABLE_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL) AS AVAILABLE_QTY
+             , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WAREHOUSE_STOCK_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL) AS CURRENT_STOCK_QTY
+        FROM   MOM_DO_MST MDM
+             , MOM_DO_DTL MDD
+             , MOM_ITEM MI
+        WHERE  MDM.COMPANY_CD   = MDD.COMPANY_CD
+        AND    MDM.DIVISION_CD  = MDD.DIVISION_CD
+        AND    MDM.DO_NO        = MDD.DO_NO
+        AND    MDD.COMPANY_CD   = MI.COMPANY_CD
+        AND    MDD.DIVISION_CD  = MI.DIVISION_CD
+        AND    MDD.ITEM_ID      = MI.ITEM_ID
         AND    MDD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
         AND    MDD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
-        AND    MDD.DO_NO        = #{doNo, jdbcType=VARCHAR}  
+        AND    MDD.DO_NO        = #{deliveryNo, jdbcType=VARCHAR}  
     </select> 
     <delete id="remove_customBtn1-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_GOODS_ISSUE_CANCEL
@@ -122,7 +129,7 @@
           VALUES                          ( #{item.companyCd, jdbcType=VARCHAR}
 		                                  , #{item.divisionCd, jdbcType=VARCHAR}
 		                                  , 'IM'
-		                                  , #{item.doNo, jdbcType=VARCHAR}
+		                                  , #{item.deliveryNo, jdbcType=VARCHAR}
 		                                  , #{item.description, jdbcType=VARCHAR}
 		                                  , #{item.valMsg, jdbcType=VARCHAR}
 		                                  , #{item.multiMsg, jdbcType=VARCHAR}

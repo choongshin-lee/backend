@@ -8,8 +8,8 @@
     </if>
                 SELECT MDM.COMPANY_CD
 				     , MDM.DIVISION_CD
-				     , MDM.DO_NO           AS REQUEST_NO
-				     , MDM.DO_NM           AS REQUEST_NM 
+				     , MDM.DO_NO           AS DELIVERY_REQUEST_NO
+				     , MDM.DO_NM           AS DELIVERY_REQUEST_NM 
 				     , MDM.PROCESS_CD
 				     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
 				     , MDM.REQUEST_WAREHOUSE_CD
@@ -19,9 +19,10 @@
 				     , MDM.CURRENCY_CD
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'SM0017', MDM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 				     , MDM.EXCHANGE_RATE
-				     , TO_CHAR(MDM.ISSUE_DUE_DATE  ,'YYYY-MM-DD')  AS ISSUE_DUE_DATE
+				     , TO_CHAR(MDM.ISSUE_DUE_DATE  ,'YYYY-MM-DD')  AS DELIVERY_DUE_DATE
 				     , MDM.DESCRIPTION
-				     , MDM.WAREHOUSE_USE_YN 
+				     , MDM.ISSUE_WH_USE_YN    AS ISSUE_WAREHOUSE_USE_YN 
+                     , MDM.REQUEST_WH_USE_YN  AS REQUEST_WAREHOUSE_USE_YN 
 				     , MDM.UPDATE_BY      AS UPDATE_USER_NO
 				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 				     , TO_CHAR(MDM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
@@ -45,10 +46,11 @@
 		        AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
 		        AND    MDM.STATE               = 'DRF'
 		        AND    MDM.PROCESS_CD          = 'IM'
-		        AND    MDM.WAREHOUSE_USE_YN    = 'N' 
+		        AND    MDM.ISSUE_WH_USE_YN     = 'N' 
+		        AND    MDM.REQUEST_WH_USE_YN   = 'N'
 		        AND    MDM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-		        <if test="requestNo != null and requestNo != ''">
-		        AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{requestNo, jdbcType=VARCHAR}) || '%')   
+		        <if test="deliveryRequestNo != null and deliveryRequestNo != ''">
+		        AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{deliveryRequestNo, jdbcType=VARCHAR}) || '%')   
 		        </if>
 		        <if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
 		        AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWR.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
@@ -64,7 +66,7 @@
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         SELECT MDD.COMPANY_CD
 		     , MDD.DIVISION_CD
-		     , MDD.DO_NO                AS REQUEST_NO
+		     , MDD.DO_NO                AS DELIVERY_REQUEST_NO
 		     , MDD.SEQ
 		     , MDD.DELIVERY_ORDER_ID
 		     , MDD.ITEM_ID
@@ -72,9 +74,9 @@
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MDD.QTY                AS REQUEST_QTY
-		     , MDD.DO_UOM             AS ISSUE_UOM 
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM) FROM DUAL) AS ISSUE_UOM_NM
+		     , MDD.QTY                AS DELIVERY_REQUEST_QTY
+             , MDD.DO_UOM             AS DELIVERY_UOM 
+             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM) FROM DUAL) AS DELIVERY_UOM_NM
 		     , MDD.CONVERSION_QTY         
 		     , MDD.CONVERSION_UOM   
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
@@ -89,15 +91,21 @@
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		     , TO_CHAR(MDD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 		     , MDD.IO_TYPE
-		   , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
-		FROM   MOM_DO_DTL MDD
-		     , MOM_ITEM MI
-		WHERE  MDD.COMPANY_CD   = MI.COMPANY_CD
-		AND    MDD.DIVISION_CD  = MI.DIVISION_CD
-		AND    MDD.ITEM_ID      = MI.ITEM_ID
+		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
+		     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WH_AVAILABLE_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL) AS AVAILABLE_QTY
+             , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WAREHOUSE_STOCK_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL) AS CURRENT_STOCK_QTY
+        FROM   MOM_DO_MST MDM
+             , MOM_DO_DTL MDD
+             , MOM_ITEM MI
+        WHERE  MDM.COMPANY_CD   = MDD.COMPANY_CD
+        AND    MDM.DIVISION_CD  = MDD.DIVISION_CD
+        AND    MDM.DO_NO        = MDD.DO_NO
+        AND    MDD.COMPANY_CD   = MI.COMPANY_CD
+        AND    MDD.DIVISION_CD  = MI.DIVISION_CD
+        AND    MDD.ITEM_ID      = MI.ITEM_ID
         AND    MDD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
         AND    MDD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
-        AND    MDD.DO_NO        = #{requestNo, jdbcType=VARCHAR}  
+        AND    MDD.DO_NO        = #{deliveryRequestNo, jdbcType=VARCHAR}  
     </select> 
     <delete id="remove_customBtn1-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_GOODS_ISSUE
@@ -126,7 +134,7 @@
           VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
                                   , #{item.divisionCd, jdbcType=VARCHAR}
                                   , 'IM'
-                                  , #{item.requestNo, jdbcType=VARCHAR}
+                                  , #{item.deliveryRequestNo, jdbcType=VARCHAR}
                                   , #{item.description, jdbcType=VARCHAR}
                                   , #{item.valMsg, jdbcType=VARCHAR}
                                   , #{item.multiMsg, jdbcType=VARCHAR}

@@ -8,8 +8,8 @@
     </if>
                 SELECT MDM.COMPANY_CD 
 				     , MDM.DIVISION_CD
-				     , MDM.DO_NO                    AS REQUEST_NO
-				     , MDM.DO_NM                    AS REQUEST_NM
+				     , MDM.DO_NO                    AS DELIVERY_REQUEST_NO
+				     , MDM.DO_NM                    AS DELIVERY_REQUEST_NM
 				     , MDD.SEQ
 				     , MDD.DELIVERY_ORDER_ID
 				     , MDM.REQUEST_WAREHOUSE_CD
@@ -21,12 +21,14 @@
 				     , MI.ITEM_SPEC
 				     , MI.ITEM_TYPE
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-				     , MDD.QTY                       AS REQUEST_QTY
-				     , MDD.DO_UOM                    AS ISSUE_UOM 
-				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS ISSUE_UOM_NM
+				     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WH_AVAILABLE_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL) AS AVAILABLE_QTY
+                     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WAREHOUSE_STOCK_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL) AS CURRENT_STOCK_QTY
+				     , MDD.QTY                       AS DELIVERY_REQUEST_QTY
+				     , MDD.DO_UOM                    AS DELIVERY_UOM 
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS DELIVERY_UOM_NM
 				     , MDD.CONVERSION_UOM
 				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
-				     , TO_CHAR(MDM.ISSUE_DUE_DATE ,'YYYY-MM-DD')      AS ISSUE_DUE_DATE
+				     , TO_CHAR(MDM.ISSUE_DUE_DATE ,'YYYY-MM-DD')      AS DELIVERY_DUE_DATE
 				     , MDM.STATE
 					 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'IC0002', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 				     , TO_CHAR(MDM.CREATE_DATE , 'YYYY-MM-DD HH24:MI:SS')      AS CREATE_DATE
@@ -60,8 +62,8 @@
 				AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
 				AND    MDM.PROCESS_CD          = 'IM'
 				AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-				<if test="requestNo != null and requestNo != ''">
-				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{requestNo, jdbcType=VARCHAR}) || '%')   
+				<if test="deliveryRequestNo != null and deliveryRequestNo != ''">
+				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{deliveryRequestNo, jdbcType=VARCHAR}) || '%')   
 				</if>
 				<if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
 		        AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWR.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   

@@ -372,16 +372,16 @@
     ORDER BY MPC.PO_TYPE_NM
     </select>  
     <select id="get_DD00036" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
-    SELECT AREA_CD     AS CODE 
-         , AREA_CD  ||'('|| AREA_NM    ||')' AS LABEL
-    FROM   MOM_AREA   
+    SELECT LOCATION_CD     AS CODE 
+         , LOCATION_CD  ||'('|| LOCATION_NM    ||')' AS LABEL
+    FROM   MOM_LOCATION   
     WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
     AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
-    <if test="locationCd != null and locationCd != ''">
-    AND    LOCATION_CD = #{locationCd , jdbcType=VARCHAR}  
+    <if test="warehouseCd != null and warehouseCd != ''">
+    AND    WAREHOUSE_CD = #{warehouseCd , jdbcType=VARCHAR}  
     </if>
     AND    USE_YN      = 'Y'
-    ORDER BY AREA_NM    
+    ORDER BY LOCATION_NM    
     </select>     
     <select id="get_DD00037" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
     SELECT IDENTIFICATION_STOCK_ID      AS CODE 
@@ -407,7 +407,7 @@
     <select id="get_DD00039" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
     SELECT MLT.RECEIPT_TYPE_CD       AS CODE 
          , MLT.RECEIPT_TYPE_CD  ||'('|| MLT.RECEIPT_TYPE_NM       ||')' AS LABEL
-    FROM   MOM_LOCATION_RECEIPT_TYPE MLT   
+    FROM   MOM_WAREHOUSE_RECEIPT_TYPE MLT   
     WHERE  MLT.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
     AND    MLT.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
     AND    MLT.USE_YN      = 'Y'
@@ -428,27 +428,27 @@
     ORDER BY RECEIPT_TYPE_NM    
     </select>      
     <select id="get_DD00040" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">  
-	SELECT MLM.LOCATION_CD  AS CODE 
-	     , MLM.LOCATION_CD ||'('||ML.LOCATION_NM       ||')' AS LABEL
-	FROM   MOM_LOCATION_MANAGER MLM
-	     , MOM_LOCATION ML
-	WHERE  MLM.COMPANY_CD   = ML.COMPANY_CD
-	AND    MLM.DIVISION_CD  = ML.DIVISION_CD
-	AND    MLM.LOCATION_CD  = ML.LOCATION_CD
+	SELECT MLM.WAREHOUSE_CD  AS CODE 
+	     , MLM.WAREHOUSE_CD ||'('||ML.WAREHOUSE_NM       ||')' AS LABEL
+	FROM   MOM_WAREHOUSE_MANAGER MLM
+	     , MOM_WAREHOUSE ML
+	WHERE  MLM.COMPANY_CD    = ML.COMPANY_CD
+	AND    MLM.DIVISION_CD   = ML.DIVISION_CD
+	AND    MLM.WAREHOUSE_CD  = ML.WAREHOUSE_CD
 	AND    MLM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
     AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR} 
 	AND    MLM.USE_YN       = 'Y'
-	<if test="locationCd != null and locationCd != ''">
-	AND    MLM.LOCATION_CD = #{locationCd, jdbcType=VARCHAR} 
+	<if test="warehouseCd != null and warehouseCd != ''">
+	AND    MLM.WAREHOUSE_CD = #{warehouseCd, jdbcType=VARCHAR} 
 	</if>
-	GROUP BY MLM.LOCATION_CD
-	       , ML.LOCATION_NM
-	ORDER BY ML.LOCATION_NM 
+	GROUP BY MLM.WAREHOUSE_CD
+	       , ML.WAREHOUSE_NM
+	ORDER BY ML.WAREHOUSE_NM 
     </select> 
     <select id="get_DD00041" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">  
 	SELECT MU.USER_NO  AS CODE 
 	     , MU.USER_NO ||'('||MU.USER_NM   ||')' AS LABEL
-	FROM   MOM_LOCATION_MANAGER MLM
+	FROM   MOM_WAREHOUSE_MANAGER MLM
 	     , MOM_USER MU
 	WHERE  MLM.COMPANY_CD   = MU.COMPANY_CD
 	AND    MLM.DIVISION_CD  = MU.DIVISION_CD
@@ -456,8 +456,8 @@
 	AND    MLM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
     AND    MLM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR} 
 	AND    MLM.USE_YN       = 'Y'
-	<if test="locationCd != null and locationCd != ''">
-	AND    MLM.LOCATION_CD = #{locationCd, jdbcType=VARCHAR} 
+	<if test="warehouseCd != null and warehouseCd != ''">
+	AND    MLM.WAREHOUSE_CD = #{warehouseCd, jdbcType=VARCHAR} 
 	</if>
 	GROUP BY MU.USER_NO
 	       , MU.USER_NM
@@ -539,30 +539,30 @@
     ORDER BY PROCESS_TYPE
     </select>   
     <select id="get_DD00046" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
-	SELECT MLP.LOCATION_CD   AS CODE 
-	     , MLP.LOCATION_CD ||'('|| ML.LOCATION_NM      ||')' AS LABEL
-	FROM   MOM_LOCATION_PROCESS_TYPE MLP
-	     , MOM_LOCATION ML
-	WHERE  MLP.COMPANY_CD  = ML.COMPANY_CD
-	AND    MLP.DIVISION_CD = ML.DIVISION_CD
-	AND    MLP.LOCATION_CD = ML.LOCATION_CD
-	AND    MLP.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-	AND    MLP.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
-	<if test="processType != null and processType != ''">
-	AND    MLP.PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
-	</if>
-	<if test="actionTypeCd != null and actionTypeCd != ''">
-	AND    MLP.PROCESS_TYPE IN (SELECT  MPT.PROCESS_TYPE
-    						    FROM    MOM_PROCESS_TYPE MPT
-                                WHERE   MPT.COMPANY_CD     = MLP.COMPANY_CD
-                                AND     MPT.DIVISION_CD    = MLP.DIVISION_CD
+	SELECT MWP.WAREHOUSE_CD    AS CODE 
+         , MWP.WAREHOUSE_CD ||'('|| MWH.WAREHOUSE_NM      ||')' AS LABEL
+    FROM   MOM_WAREHOUSE_PROCESS_TYPE MWP
+         , MOM_WAREHOUSE MWH
+    WHERE  MWP.COMPANY_CD  = MWH.COMPANY_CD
+    AND    MWP.DIVISION_CD = MWH.DIVISION_CD
+    AND    MWP.WAREHOUSE_CD = MWH.WAREHOUSE_CD 
+    AND    MWP.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+    AND    MWP.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+    <if test="processType != null and processType != ''">
+    AND    MWP.PROCESS_TYPE = #{processType, jdbcType=VARCHAR} 
+    </if>
+    <if test="actionTypeCd != null and actionTypeCd != ''">
+    AND    MWP.PROCESS_TYPE IN (SELECT  MPT.PROCESS_TYPE
+                                FROM    MOM_PROCESS_TYPE MPT
+                                WHERE   MPT.COMPANY_CD     = MWP.COMPANY_CD
+                                AND     MPT.DIVISION_CD    = MWP.DIVISION_CD
                                 AND     MPT.ACTION_TYPE_CD = #{actionTypeCd, jdbcType=VARCHAR} 
                                 AND     MPT.USE_YN         = 'Y' )
     </if>
-	AND    MLP.USE_YN      = 'Y'
-	GROUP BY MLP.LOCATION_CD
-           , ML.LOCATION_NM
-	ORDER BY ML.LOCATION_NM 
+    AND    MWP.USE_YN      = 'Y'
+    GROUP BY MWP.WAREHOUSE_CD
+           , MWH.WAREHOUSE_NM
+    ORDER BY MWH.WAREHOUSE_NM   
 	</select>     
 	<select id="get_DD00047" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
     SELECT LOGISTICS_UNIT_CD       AS CODE 

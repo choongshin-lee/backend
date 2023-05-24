@@ -55,7 +55,7 @@
 		</if>
     </select>
     <delete id="remove_createBtn1" parameterType="java.util.List">
-    DELETE FROM MOM_PROC_AREA
+    DELETE FROM MOM_PROC_LOCATION
         <where>
             <foreach collection="list" item="item" open="" close="" separator="OR">
           (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
@@ -67,69 +67,70 @@
     </delete>  
     <insert id="create_createBtn1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_AREA( COMPANY_CD
-                          , DIVISION_CD
-                          , AREA_CD
-                          , AREA_NM
-                          , LOCATION_CD
-                          , LOGISTIC_USE_ID
-                          , STOCK_CONTROL_YN
-                          , STOCK_RECEIPT_BLOCK_YN
-                          , STOCK_RELEASE_BLOCK_YN
-                          , NEGATIVE_STOCK_ALLOWED_YN
-                          , STORAGING_CONTENTS_CD
-                          , CYCLE_COUNTING_USER_NO
-                          , CYCLE_COUNTING_TERM
-                          , CYCLE_COUNTING_UOM
-                          , USE_YN
-                          , DESCRIPTION
-                          , DEL_YN
-                          , VAL_MSG
-                          , MULTI_MSG
-                          , CREATE_BY
-                          , CREATE_DATE)
-        VALUES            ( #{item.companyCd, jdbcType=VARCHAR}
-	                      , #{item.divisionCd, jdbcType=VARCHAR}
-	                      , #{item.areaCd, jdbcType=VARCHAR}
-	                      , #{item.areaNm, jdbcType=VARCHAR}
-	                      , #{item.locationCd, jdbcType=VARCHAR}
-	                      , #{item.logisticUseId, jdbcType=VARCHAR}
-	                      , #{item.stockControlYn, jdbcType=VARCHAR}
-	                      , #{item.stockReceiptBlockYn, jdbcType=VARCHAR}
-	                      , #{item.stockReleaseBlockYn, jdbcType=VARCHAR}
-	                      , #{item.negativeStockAllowedYn, jdbcType=VARCHAR}
-	                      , #{item.storagingContentsCd, jdbcType=VARCHAR}
-	                      , #{item.cycleCountingUserNo, jdbcType=VARCHAR}
-	                      , #{item.cycleCountingTerm, jdbcType=NUMERIC}
-	                      , #{item.cycleCountingUom, jdbcType=VARCHAR}
-	                      , #{item.useYn, jdbcType=VARCHAR}
-	                      , #{item.description, jdbcType=VARCHAR}
-	                      , #{item.delYn, jdbcType=VARCHAR}
-	                      , #{item.valMsg, jdbcType=VARCHAR}
-	                      , #{item.multiMsg, jdbcType=VARCHAR}
-	                      , #{item.userId, jdbcType=VARCHAR}
-	                      , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-                          )
+        INTO MOM_PROC_LOCATION( COMPANY_CD
+							  , DIVISION_CD
+							  , LOCATION_CD
+							  , LOCATION_NM
+							  , WAREHOUSE_CD
+							  , LOGISTIC_USE_CD
+							  , STOCK_CONTROL_YN
+							  , STOCK_RECEIPT_BLOCK_YN
+							  , STOCK_RELEASE_BLOCK_YN
+							  , NEGATIVE_STOCK_ALLOWED_YN
+							  , STORAGING_CONTENTS_CD
+							  , CYCLE_COUNTING_USER_NO
+							  , CYCLE_COUNTING_TERM
+							  , CYCLE_COUNTING_UOM
+							  , USE_YN
+							  , DESCRIPTION
+							  , DEL_YN
+						   	  , VAL_MSG
+							  , MULTI_MSG
+							  , CREATE_BY
+							  , CREATE_DATE
+							  )
+        VALUES                ( #{item.companyCd, jdbcType=VARCHAR}
+		                      , #{item.divisionCd, jdbcType=VARCHAR}
+		                      , #{item.locationCd, jdbcType=VARCHAR}
+		                      , #{item.locationNm, jdbcType=VARCHAR}
+		                      , #{item.warehouseCd, jdbcType=VARCHAR}
+		                      , #{item.logisticUseId, jdbcType=VARCHAR}
+		                      , #{item.stockControlYn, jdbcType=VARCHAR}
+		                      , #{item.stockReceiptBlockYn, jdbcType=VARCHAR}
+		                      , #{item.stockReleaseBlockYn, jdbcType=VARCHAR}
+		                      , #{item.negativeStockAllowedYn, jdbcType=VARCHAR}
+		                      , #{item.storagingContentsCd, jdbcType=VARCHAR}
+		                      , #{item.cycleCountingUserNo, jdbcType=VARCHAR}
+		                      , #{item.cycleCountingTerm, jdbcType=NUMERIC}
+		                      , #{item.cycleCountingUom, jdbcType=VARCHAR}
+		                      , #{item.useYn, jdbcType=VARCHAR}
+		                      , #{item.description, jdbcType=VARCHAR}
+		                      , #{item.delYn, jdbcType=VARCHAR}
+		                      , #{item.valMsg, jdbcType=VARCHAR}
+		                      , #{item.multiMsg, jdbcType=VARCHAR}
+		                      , #{item.userId, jdbcType=VARCHAR}
+		                      , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+	                          )
         </foreach>
     </insert>
     <select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_AREA( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                                 , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                                 , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                                 , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                                 , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
-                                                 , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_LOCATION( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+	                                                 , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+	                                                 , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+	                                                 , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+	                                                 , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
+	                                                 , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select> 
     <select id="get_excelUpBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT NVL(VAL_MSG,'PASS') AS VAL_MSG
 	         , MULTI_MSG      
-	    FROM   MOM_PROC_AREA
+	    FROM   MOM_PROC_LOCATION
 	    WHERE  COMPANY_CD  = #{companyCd , jdbcType=VARCHAR}
 	    AND    DIVISION_CD = #{divisionCd , jdbcType=VARCHAR}
 	    AND    CREATE_BY    = #{userId , jdbcType=VARCHAR}
   </select> 
     <delete id="remove_excelUpBtnV1" parameterType="java.util.List">
-    DELETE FROM MOM_PROC_AREA
+    DELETE FROM MOM_PROC_LOCATION
         <where>
             <foreach collection="list" item="item" open="" close="" separator="OR">
           (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
@@ -141,57 +142,58 @@
     </delete>  
     <insert id="create_excelUpBtnV1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_AREA( COMPANY_CD
-                          , DIVISION_CD
-                          , AREA_CD
-                          , AREA_NM
-                          , LOCATION_CD
-                          , LOGISTIC_USE_ID
-                          , STOCK_CONTROL_YN
-                          , STOCK_RECEIPT_BLOCK_YN
-                          , STOCK_RELEASE_BLOCK_YN
-                          , NEGATIVE_STOCK_ALLOWED_YN
-                          , STORAGING_CONTENTS_CD
-                          , CYCLE_COUNTING_USER_NO
-                          , CYCLE_COUNTING_TERM
-                          , CYCLE_COUNTING_UOM
-                          , USE_YN
-                          , DESCRIPTION
-                          , DEL_YN
-                          , VAL_MSG
-                          , MULTI_MSG
-                          , CREATE_BY
-                          , CREATE_DATE)
-        VALUES            ( #{item.companyCd, jdbcType=VARCHAR}
-	                      , #{item.divisionCd, jdbcType=VARCHAR}
-	                      , #{item.areaCd, jdbcType=VARCHAR}
-	                      , #{item.areaNm, jdbcType=VARCHAR}
-	                      , #{item.locationCd, jdbcType=VARCHAR}
-	                      , #{item.logisticUseId, jdbcType=VARCHAR}
-	                      , #{item.stockControlYn, jdbcType=VARCHAR}
-	                      , #{item.stockReceiptBlockYn, jdbcType=VARCHAR}
-	                      , #{item.stockReleaseBlockYn, jdbcType=VARCHAR}
-	                      , #{item.negativeStockAllowedYn, jdbcType=VARCHAR}
-	                      , #{item.storagingContentsCd, jdbcType=VARCHAR}
-	                      , #{item.cycleCountingUserNo, jdbcType=VARCHAR}
-	                      , #{item.cycleCountingTerm, jdbcType=NUMERIC}
-	                      , #{item.cycleCountingUom, jdbcType=VARCHAR}
-	                      , #{item.useYn, jdbcType=VARCHAR}
-	                      , #{item.description, jdbcType=VARCHAR}
-	                      , 'N'
-	                      , #{item.valMsg, jdbcType=VARCHAR}
-	                      , #{item.multiMsg, jdbcType=VARCHAR}
-	                      , #{item.userId, jdbcType=VARCHAR}
-	                      , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-                          )
+        INTO MOM_PROC_LOCATION( COMPANY_CD
+							  , DIVISION_CD
+							  , LOCATION_CD
+							  , LOCATION_NM
+							  , WAREHOUSE_CD
+							  , LOGISTIC_USE_CD
+							  , STOCK_CONTROL_YN
+							  , STOCK_RECEIPT_BLOCK_YN
+							  , STOCK_RELEASE_BLOCK_YN
+							  , NEGATIVE_STOCK_ALLOWED_YN
+							  , STORAGING_CONTENTS_CD
+							  , CYCLE_COUNTING_USER_NO
+							  , CYCLE_COUNTING_TERM
+							  , CYCLE_COUNTING_UOM
+							  , USE_YN
+							  , DESCRIPTION
+							  , DEL_YN
+						   	  , VAL_MSG
+							  , MULTI_MSG
+							  , CREATE_BY
+							  , CREATE_DATE
+							  )
+        VALUES                ( #{item.companyCd, jdbcType=VARCHAR}
+		                      , #{item.divisionCd, jdbcType=VARCHAR}
+		                      , #{item.locationCd, jdbcType=VARCHAR}
+		                      , #{item.locationNm, jdbcType=VARCHAR}
+		                      , #{item.warehouseCd, jdbcType=VARCHAR}
+		                      , #{item.logisticUseId, jdbcType=VARCHAR}
+		                      , #{item.stockControlYn, jdbcType=VARCHAR}
+		                      , #{item.stockReceiptBlockYn, jdbcType=VARCHAR}
+		                      , #{item.stockReleaseBlockYn, jdbcType=VARCHAR}
+		                      , #{item.negativeStockAllowedYn, jdbcType=VARCHAR}
+		                      , #{item.storagingContentsCd, jdbcType=VARCHAR}
+		                      , #{item.cycleCountingUserNo, jdbcType=VARCHAR}
+		                      , #{item.cycleCountingTerm, jdbcType=NUMERIC}
+		                      , #{item.cycleCountingUom, jdbcType=VARCHAR}
+		                      , #{item.useYn, jdbcType=VARCHAR}
+		                      , #{item.description, jdbcType=VARCHAR}
+		                      , 'N'
+		                      , #{item.valMsg, jdbcType=VARCHAR}
+		                      , #{item.multiMsg, jdbcType=VARCHAR}
+		                      , #{item.userId, jdbcType=VARCHAR}
+		                      , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+	                          )
         </foreach>
     </insert>
     <select id="proc_excelUpBtnV1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_AREA( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                                 , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                                 , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                                 , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                                 , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
-                                                 , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_LOCATION( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+	                                                 , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+	                                                 , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+	                                                 , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+	                                                 , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
+	                                                 , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select>  
 </mapper>    

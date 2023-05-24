@@ -10,8 +10,8 @@
                      , MLU.DIVISION_CD
                      , MLU.LOGISTICS_UNIT_CD 
                      , MLU.LOGISTICS_UNIT_NM
-                     , MLU.AREA_CD
-                     , (SELECT MOM_COMMON_PKG.FN_GET_AREA_NAME(MLU.COMPANY_CD, MLU.DIVISION_CD, MLU.AREA_CD) FROM DUAL) AS AREA_NM
+                     , MLU.LOCATION_CD
+                     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MLU.COMPANY_CD, MLU.DIVISION_CD, MLU.LOCATION_CD) FROM DUAL) AS LOCATION_NM
                      , MLU.STATE                     AS LOGISTICS_UNIT_STATE
                      , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLU.COMPANY_CD, MLU.DIVISION_CD, 'MD0022', MLU.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS LOGISTICS_UNIT_STATE_NM
                      , MLU.IDENTIFICATION_STOCK_ID   AS STOCK_ID 
@@ -76,7 +76,7 @@
                                     , DIVISION_CD
                                     , LOGISTICS_UNIT_CD
                                     , LOGISTICS_UNIT_NM
-                                    , AREA_CD
+                                    , LOCATION_CD
                                     , IDENTIFICATION_STOCK_ID
                                     , RESOURCE_CD
                                     , MULTI_PRODUCT_YN
@@ -91,7 +91,7 @@
                                     , #{item.divisionCd, jdbcType=VARCHAR}
                                     , #{item.logisticsUnitCd, jdbcType=VARCHAR}
                                     , #{item.logisticsUnitNm, jdbcType=VARCHAR}
-                                    , #{item.areaCd, jdbcType=VARCHAR}
+                                    , #{item.locationCd, jdbcType=VARCHAR}
                                     , #{item.stockId, jdbcType=VARCHAR}
                                     , #{item.resourceCd, jdbcType=VARCHAR}
                                     , #{item.multiProductYn, jdbcType=VARCHAR}
@@ -137,7 +137,7 @@
                                     , DIVISION_CD
                                     , LOGISTICS_UNIT_CD
                                     , LOGISTICS_UNIT_NM
-                                    , AREA_CD
+                                    , LOCATION_CD
                                     , IDENTIFICATION_STOCK_ID
                                     , RESOURCE_CD
                                     , MULTI_PRODUCT_YN
@@ -152,7 +152,7 @@
                                     , #{item.divisionCd, jdbcType=VARCHAR}
                                     , #{item.logisticsUnitCd, jdbcType=VARCHAR}
                                     , #{item.logisticsUnitNm, jdbcType=VARCHAR}
-                                    , #{item.areaCd, jdbcType=VARCHAR}
+                                    , #{item.locationCd, jdbcType=VARCHAR}
                                     , #{item.stockId, jdbcType=VARCHAR}
                                     , #{item.resourceCd, jdbcType=VARCHAR}
                                     , #{item.multiProductYn, jdbcType=VARCHAR}
