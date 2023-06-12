@@ -1,4 +1,4 @@
-var menuId = 'XUWM1020';
+var menuId = 'XUWL3010';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -30,13 +30,13 @@ var VIEW= {
 			widget.findBtnClicked(1, {receiptId:e.item['receiptId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {receiptId:e.item['receiptId'],referenceNo:e.item['shippingRequestNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(2, {receiptId:e.item['receiptId'],referenceNo:e.item['deliveryRequestNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
 	    if(index == 1){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
 	        let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-	        if(btnId == 'customGridPopBtn2-3'){ 
+	        if(btnId == 'customGridPopBtn2-2'){ 
                 if(checkItem.length==0){
                     result.msg = '상단에서 접수번호 선택필수!';
                     result.result = 'WARN';
@@ -63,8 +63,6 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
 	momWidget.init(3, menuId, VIEW);
-	//momWidget.gridPopup.init(1,11,1,'XUDG0140', VIEW); 
-	//momWidget.gridPopup.init(2,21,1,'XUDG0190', VIEW);  
-	momWidget.gridPopup.init(2,21,1,'XUDG0470', VIEW);  
+	momWidget.gridPopup.init(2,21,1,'XUDG0480', VIEW);  
 	VIEW.init();
 });

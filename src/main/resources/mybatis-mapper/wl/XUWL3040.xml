@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUWL3040">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+		    SELECT A.*
+		    FROM   (
+		</if>
+		            SELECT MWM.COMPANY_CD
+					     , MWM.DIVISION_CD
+					     , MWM.RECEIPT_ID
+					     , MWM.RECEIPT_NM
+					     , MWD.SEQ
+					     , MWD.RECEIPT_DETAIL_ID 
+					     , MWM.WAREHOUSE_CD       AS RECEIPT_WAREHOUSE_CD
+					     , MWH.WAREHOUSE_NM	      AS RECEIPT_WAREHOUSE_NM		
+					     , MWM.STATE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, 'WM0002', MWM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+					     , MWD.ITEM_ID
+					     , MI.ITEM_NM
+					     , MI.ITEM_SPEC
+					     , MI.ITEM_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+					     , MWD.RECEIPT_QTY
+					     , MWD.INOUT_UOM      AS RECEIPT_UOM
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MWD.COMPANY_CD, MWD.DIVISION_CD, MWD.INOUT_UOM) FROM DUAL) AS RECEIPT_UOM_NM
+					     , MWD.CONVERSION_QTY
+					     , MWD.CONVERSION_UOM
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MWD.COMPANY_CD, MWD.DIVISION_CD, MWD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
+					     , MWD.REFERENCE_NO
+					     , MWD.REFERENCE_DTL_NO
+					     , MWD.IO_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MWD.COMPANY_CD, MWD.DIVISION_CD, MWD.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
+					     , MWM.IO_RECEIPT_TYPE
+                         , (SELECT MOM_COMMON_PKG.FN_GET_WH_IO_RECEIPT_TYPE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.IO_RECEIPT_TYPE) FROM DUAL)  AS IO_RECEIPT_TYPE_NM
+					     , TO_CHAR(MWM.CONFIRM_DATE ,'YYYY-MM-DD HH24:MI:SS')   AS CONFIRM_DATE
+					     , MWM.CONFIRM_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
+					     , TO_CHAR(MWM.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS CREATE_DATE
+					     , MWM.CREATE_BY
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
+					     , TO_CHAR(MWM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS UPDATE_DATE
+					     , MWM.UPDATE_BY
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+					     , ROWIDTOCHAR(MWM.ROWID)            AS KEY_ID
+					     , COUNT(*) OVER()                               AS TOTAL_COUNT
+					     , ROW_NUMBER() OVER(PARTITION BY MWD.COMPANY_CD, MWD.DIVISION_CD ORDER BY MWD.RECEIPT_DETAIL_ID) AS ROW_CNT
+					FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
+					     , MOM_WAREHOUSE_RECEIPT_DTL MWD
+					     , MOM_WAREHOUSE MWH
+					     , MOM_ITEM MI
+					WHERE  MWM.COMPANY_CD      = MWD.COMPANY_CD
+					AND    MWM.DIVISION_CD     = MWD.DIVISION_CD
+					AND    MWM.RECEIPT_ID      = MWD.RECEIPT_ID
+					AND    MWM.COMPANY_CD      = MWH.COMPANY_CD
+					AND    MWM.DIVISION_CD     = MWH.DIVISION_CD
+					AND    MWM.WAREHOUSE_CD    = MWH.WAREHOUSE_CD
+					AND    MWD.COMPANY_CD      = MI.COMPANY_CD
+					AND    MWD.DIVISION_CD     = MI.DIVISION_CD
+					AND    MWD.ITEM_ID         = MI.ITEM_ID
+					AND    MWM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+					AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
+					AND    MWM.IO_RECEIPT_TYPE = 'WMO'
+					AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					<if test="receiptId != null and receiptId != ''">
+					AND    (UPPER(MWM.RECEIPT_ID) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%')   
+					</if>
+					<if test="receiptWarehouseCdNm != null and receiptWarehouseCdNm != ''">
+					AND    (UPPER(MWM.WAREHOUSE_CD) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
+					</if> 
+		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+				       ) A
+				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+		</if>               
+    </select>   
+</mapper>     

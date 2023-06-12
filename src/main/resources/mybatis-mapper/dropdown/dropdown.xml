@@ -627,5 +627,21 @@
 	AND    MD.USE_YN        = 'Y'
 	AND    MU.USE_YN        = 'Y'
 	ORDER BY MU.USER_NM
-	</select>   	
+	</select> 
+	<select id="get_DD00052" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
+	SELECT MUM.WAREHOUSE_CD    AS CODE 
+         , MUM.WAREHOUSE_CD ||'('|| MWH.WAREHOUSE_NM      ||')' AS LABEL
+    FROM   MOM_USER_WH_IO_RECEIPT_MAP MUM
+         , MOM_WAREHOUSE MWH
+    WHERE  MUM.COMPANY_CD      = MWH.COMPANY_CD
+    AND    MUM.DIVISION_CD     = MWH.DIVISION_CD
+    AND    MUM.WAREHOUSE_CD    = MWH.WAREHOUSE_CD    
+    AND    MUM.USE_YN          = 'Y'
+    AND    MWH.USE_YN          = 'Y'
+    AND    MUM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+    AND    MUM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+    AND    MUM.USER_NO         = #{userId, jdbcType=VARCHAR}
+    AND    MUM.IO_RECEIPT_TYPE = #{ioReceiptType, jdbcType=VARCHAR} 
+    ORDER BY MWH.WAREHOUSE_NM
+	</select>       	
 </mapper>
