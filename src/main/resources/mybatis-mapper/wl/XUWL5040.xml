@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUWL5040">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+		    SELECT A.*
+		    FROM   (
+		</if>
+		            SELECT MLM.COMPANY_CD
+					     , MLM.DIVISION_CD
+					     , MLM.LOCATION_DO_NO
+					     , MLM.LOCATION_DO_NM
+					     , MLM.WAREHOUSE_CD
+					     , MWH.WAREHOUSE_NM
+					     , MLM.ISSUE_LOCATION_CD
+					     , MLI.LOCATION_NM           AS ISSUE_LOCATION_NM 
+					     , MLM.REQUEST_LOCATION_CD
+					     , MLR.LOCATION_NM           AS REQUEST_LOCATION_NM
+					     , MLD.ITEM_ID
+					     , MI.ITEM_NM
+					     , MI.ITEM_SPEC
+					     , MI.ITEM_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+					     , MLD.QTY                  AS DELIVERY_REQUEST_QTY
+					     , MLD.UOM      
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UOM) FROM DUAL) AS UOM_NM
+					     , MLM.STATE
+							 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, 'WM0005', MLM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+					     , MLM.DESCRIPTION          
+					     , MLD.UPDATE_BY      AS UPDATE_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+					     , TO_CHAR(MLD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+					     , ROWIDTOCHAR(MLD.ROWID)            AS KEY_ID
+					     , COUNT(*) OVER()                               AS TOTAL_COUNT
+							 , ROW_NUMBER() OVER(PARTITION BY MLD.COMPANY_CD, MLD.DIVISION_CD ORDER BY MLD.LOCATION_DO_NO, MLD.ITEM_ID) AS ROW_CNT
+					FROM   MOM_LOCATION_DO_MST MLM
+					     , MOM_LOCATION_DO_DTL MLD
+					     , MOM_WAREHOUSE MWH
+					     , MOM_LOCATION MLI
+					     , MOM_LOCATION MLR
+					     , MOM_ITEM MI
+					WHERE  MLM.COMPANY_CD        = MLD.COMPANY_CD
+					AND    MLM.DIVISION_CD       = MLD.DIVISION_CD
+					AND    MLM.LOCATION_DO_NO    = MLD.LOCATION_DO_NO     
+					AND    MLM.COMPANY_CD        = MWH.COMPANY_CD
+					AND    MLM.DIVISION_CD       = MWH.DIVISION_CD
+					AND    MLM.WAREHOUSE_CD      = MWH.WAREHOUSE_CD
+					AND    MLM.COMPANY_CD        = MLI.COMPANY_CD
+					AND    MLM.DIVISION_CD       = MLI.DIVISION_CD
+					AND    MLM.ISSUE_LOCATION_CD   = MLI.LOCATION_CD
+					AND    MLM.COMPANY_CD          = MLR.COMPANY_CD
+					AND    MLM.DIVISION_CD         = MLR.DIVISION_CD
+					AND    MLM.REQUEST_LOCATION_CD = MLR.LOCATION_CD
+					AND    MLD.COMPANY_CD        = MI.COMPANY_CD
+					AND    MLD.DIVISION_CD       = MI.DIVISION_CD
+					AND    MLD.ITEM_ID           = MI.ITEM_ID
+					AND    MLM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+					AND    MLM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
+					AND    MLM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					<if test="locationDoNo != null and locationDoNo != ''">
+					AND    (UPPER(MLM.LOCATION_DO_NO) LIKE '%' || UPPER(#{locationDoNo, jdbcType=VARCHAR}) || '%')   
+					</if>
+					<if test="warehouseCdNm != null and warehouseCdNm != ''">
+					AND    (UPPER(MWH.WAREHOUSE_CD) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%')    
+					</if> 
+		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+				       ) A
+				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+		</if>               
+    </select>   
+</mapper>     
