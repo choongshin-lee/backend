@@ -600,6 +600,7 @@
     </if>
 	</select>  
 	<select id="get_DD00050" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	
 	SELECT CODE
 	     , NVL((SELECT MOM_COMMON_PKG.FN_GET_MULTI_LANGUAGE(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR},#{langCd, jdbcType=VARCHAR},'CODE',#{groupCd, jdbcType=VARCHAR}|| '_' ||CODE)
 	            FROM   DUAL ),CODE ||'('|| CODE_NM ||')') AS LABEL
@@ -643,5 +644,53 @@
     AND    MUM.USER_NO         = #{userId, jdbcType=VARCHAR}
     AND    MUM.IO_RECEIPT_TYPE = #{ioReceiptType, jdbcType=VARCHAR} 
     ORDER BY MWH.WAREHOUSE_NM
-	</select>       	
+	</select>  
+	<select id="get_DD00053" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	SELECT IO_RECEIPT_TYPE        AS CODE 
+         , IO_RECEIPT_TYPE     ||'('|| IO_RECEIPT_TYPE_NM      ||')' AS LABEL
+    FROM   MOM_WH_IO_RECEIPT_TYPE  
+    WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    ORDER BY IO_RECEIPT_TYPE   
+	</select>   
+	<select id="get_DD00054" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	SELECT CODE
+	     , NVL((SELECT MOM_COMMON_PKG.FN_GET_MULTI_LANGUAGE(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR},#{langCd, jdbcType=VARCHAR},'CODE',#{groupCd, jdbcType=VARCHAR}|| '_' ||CODE)
+	            FROM   DUAL ),CODE ||'('|| CODE_NM ||')') AS LABEL
+	FROM   MOM_CODE
+	WHERE  DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+	AND    COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND    GROUP_CD    = 'MD0020'
+	AND    USE_YN      = 'Y'
+	<if test="attribute1 != null and attribute1 != ''">
+	AND    ATTRIBUTE1  = 'Y'
+	</if>
+	ORDER BY SORT_NO,LABEL
+	</select>    
+	<select id="get_DD00055" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	SELECT LOCATION_CD   AS CODE 
+	     , LOCATION_CD ||'('|| LOCATION_NM      ||')' AS LABEL
+	FROM  ( SELECT ML.LOCATION_CD
+	             , ML.LOCATION_NM
+	             , 0   AS SORT_NO
+	        FROM   MOM_LOCATION ML
+	        WHERE  ML.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+	        AND    ML.WAREHOUSE_CD    = #{warehouseCd, jdbcType=VARCHAR}
+	        AND    ML.LOGISTIC_USE_CD = #{zonCd, jdbcType=VARCHAR}
+	        AND    ML.ITEM_ID         = #{itemId, jdbcType=VARCHAR}
+	        AND    ML.STORAGE_TYPE    = 'F'
+	        UNION ALL 
+	        SELECT ML.LOCATION_CD
+	             , ML.LOCATION_NM
+	             , 1   AS SORT_NO
+	        FROM   MOM_LOCATION ML
+	        WHERE  ML.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+	        AND    ML.WAREHOUSE_CD    = #{warehouseCd, jdbcType=VARCHAR}
+	        AND    ML.LOGISTIC_USE_CD = #{zonCd, jdbcType=VARCHAR}
+	        AND    ML.STORAGE_TYPE    = 'R'  )
+	ORDER BY SORT_NO
+	       , LOCATION_CD	
+	</select>    
 </mapper>

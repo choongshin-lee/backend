@@ -1,4 +1,4 @@
-var menuId = 'XUWL5010';
+var menuId = 'XUWL5050';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -9,7 +9,6 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
-	    
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
 	},
@@ -30,7 +29,9 @@ var VIEW= {
                 result.result = 'WARN';
                 return;
             }
-            $('#locationDoNoDP3').val(checkItem[0]['locationDoNo']);	
+            $('#itemIdDP3').val(checkItem[0]['itemId']);	
+            $('#warehouseCdDP3').val(checkItem[0]['warehouseCd']);
+            $('#zoneCdDP3').val(checkItem[0]['zoneCd']);
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
@@ -38,16 +39,20 @@ var VIEW= {
             AUIGrid.clearGridData(widget.grid[1]);   
           //  AUIGrid.clearGridData(widget.grid[2]);   
         }
-        else if(index ==1){                                            
+        else if(index ==1){        
             AUIGrid.clearGridData(widget.grid[2]);   
+        }
+        else if(index ==2){                                            
+            let checkItem = widget.getCheckedRowItems(widget.grid[1]);
+            result.param = {itemId:checkItem[0].itemId};
         }
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {warehouseCd:e.item['warehouseCd']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {locationDoNo:e.item['locationDoNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {locationDoNo:e.item['locationDoNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(2, {deliveryOrderId:e.item['deliveryOrderId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
@@ -77,6 +82,5 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
 	momWidget.init(3, menuId, VIEW);
-	momWidget.gridPopup.init(3,31,1,'XUDG0510', VIEW);  
 	VIEW.init();
 });

@@ -14,6 +14,10 @@
 	                 , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(ML.COMPANY_CD, ML.DIVISION_CD, ML.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
 	                 , ML.LOGISTIC_USE_CD
 	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(ML.COMPANY_CD, ML.DIVISION_CD, 'MD0020', ML.LOGISTIC_USE_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS LOGISTIC_USE_NM
+	                 , ML.STORAGE_TYPE
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(ML.COMPANY_CD, ML.DIVISION_CD, 'MD0013', ML.STORAGE_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS STORAGE_TYPE_NM
+	                 , ML.ITEM_ID
+	                 , (SELECT MOM_COMMON_PKG.FN_GET_ITEM_NAME(ML.COMPANY_CD, ML.DIVISION_CD, ML.ITEM_ID) FROM DUAL) AS ITEM_NM
 	                 , ML.STOCK_CONTROL_YN
 	                 , ML.STOCK_RECEIPT_BLOCK_YN
 	                 , ML.STOCK_RELEASE_BLOCK_YN
@@ -73,6 +77,8 @@
 							  , LOCATION_NM
 							  , WAREHOUSE_CD
 							  , LOGISTIC_USE_CD
+							  , STORAGE_TYPE
+							  , ITEM_ID
 							  , STOCK_CONTROL_YN
 							  , STOCK_RECEIPT_BLOCK_YN
 							  , STOCK_RELEASE_BLOCK_YN
@@ -95,6 +101,8 @@
 		                      , #{item.locationNm, jdbcType=VARCHAR}
 		                      , #{item.warehouseCd, jdbcType=VARCHAR}
 		                      , #{item.logisticUseId, jdbcType=VARCHAR}
+		                      , #{item.storageType, jdbcType=VARCHAR}
+		                      , #{item.itemId, jdbcType=VARCHAR}
 		                      , #{item.stockControlYn, jdbcType=VARCHAR}
 		                      , #{item.stockReceiptBlockYn, jdbcType=VARCHAR}
 		                      , #{item.stockReleaseBlockYn, jdbcType=VARCHAR}
@@ -148,6 +156,8 @@
 							  , LOCATION_NM
 							  , WAREHOUSE_CD
 							  , LOGISTIC_USE_CD
+							  , STORAGE_TYPE
+							  , ITEM_ID
 							  , STOCK_CONTROL_YN
 							  , STOCK_RECEIPT_BLOCK_YN
 							  , STOCK_RELEASE_BLOCK_YN
@@ -170,6 +180,8 @@
 		                      , #{item.locationNm, jdbcType=VARCHAR}
 		                      , #{item.warehouseCd, jdbcType=VARCHAR}
 		                      , #{item.logisticUseId, jdbcType=VARCHAR}
+		                      , #{item.storageType, jdbcType=VARCHAR}
+		                      , #{item.itemId, jdbcType=VARCHAR}
 		                      , #{item.stockControlYn, jdbcType=VARCHAR}
 		                      , #{item.stockReceiptBlockYn, jdbcType=VARCHAR}
 		                      , #{item.stockReleaseBlockYn, jdbcType=VARCHAR}

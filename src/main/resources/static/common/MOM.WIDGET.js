@@ -7361,10 +7361,10 @@ var momWidget = {
 					     AUIGrid.setCheckedRowsByIds(e.pid, rowId);
 				}*/
                 } else if (selectionMode == 'multipleCells' || selectionMode == 'multipleRows') {
-                    if (AUIGrid.isCheckedRowById(e.pid, rowId)) {
-                        AUIGrid.addUncheckedRowsByIds(e.pid, rowId);
+                   if (AUIGrid.isCheckedRowById(e.pid, rowId)) {
+                        //AUIGrid.addUncheckedRowsByIds(e.pid, rowId);
                     } else {
-                        AUIGrid.addCheckedRowsByIds(e.pid, rowId);
+                        //AUIGrid.addCheckedRowsByIds(e.pid, rowId);
                     }
 
 
