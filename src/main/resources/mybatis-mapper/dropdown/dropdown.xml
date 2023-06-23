@@ -677,7 +677,7 @@
 	        WHERE  ML.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
 	        AND    ML.WAREHOUSE_CD    = #{warehouseCd, jdbcType=VARCHAR}
-	        AND    ML.LOGISTIC_USE_CD = #{zonCd, jdbcType=VARCHAR}
+	        AND    ML.LOGISTIC_USE_CD = #{zoneCd, jdbcType=VARCHAR}
 	        AND    ML.ITEM_ID         = #{itemId, jdbcType=VARCHAR}
 	        AND    ML.STORAGE_TYPE    = 'F'
 	        UNION ALL 
@@ -688,7 +688,7 @@
 	        WHERE  ML.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
 	        AND    ML.WAREHOUSE_CD    = #{warehouseCd, jdbcType=VARCHAR}
-	        AND    ML.LOGISTIC_USE_CD = #{zonCd, jdbcType=VARCHAR}
+	        AND    ML.LOGISTIC_USE_CD = #{zoneCd, jdbcType=VARCHAR}
 	        AND    ML.STORAGE_TYPE    = 'R'  )
 	ORDER BY SORT_NO
 	       , LOCATION_CD	

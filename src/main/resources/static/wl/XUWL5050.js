@@ -24,7 +24,7 @@ var VIEW= {
 		}
 		else if(index==2){	
 			let checkItem = widget.getCheckedRowItems(widget.grid[1]); 
-		    if(checkItem.length==0){
+			if(checkItem.length==0){
                 result.msg = '좌측에서 이동지시 정보 선택필수!';
                 result.result = 'WARN';
                 return;
@@ -32,6 +32,15 @@ var VIEW= {
             $('#itemIdDP3').val(checkItem[0]['itemId']);	
             $('#warehouseCdDP3').val(checkItem[0]['warehouseCd']);
             $('#zoneCdDP3').val(checkItem[0]['zoneCd']);
+            
+            mom_ajax('R', 'DD.DD00055', {itemId: $('#itemIdDP3').val(),warehouseCd: $('#warehouseCdDP3').val(),zoneCd: $('#zoneCdDP3').val()}, function (result, data) {
+	            if (result == 'SUCCESS') {
+	                if(result != 'SUCCESS') {
+			            momWidget.splashHide();
+				        return;							     
+			        }
+	            }
+            });
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
@@ -41,10 +50,6 @@ var VIEW= {
         }
         else if(index ==1){        
             AUIGrid.clearGridData(widget.grid[2]);   
-        }
-        else if(index ==2){                                            
-            let checkItem = widget.getCheckedRowItems(widget.grid[1]);
-            result.param = {itemId:checkItem[0].itemId};
         }
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
