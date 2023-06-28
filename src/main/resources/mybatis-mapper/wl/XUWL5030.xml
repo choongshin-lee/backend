@@ -37,7 +37,7 @@
 					<if test="warehouseCdNm != null and warehouseCdNm != ''">
 					AND    (UPPER(MWH.WAREHOUSE_CD) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
-					AND    MLM.STATE               = 'WLF'
+					AND    MLM.STATE               = 'LDF'
 					AND    EXISTS ( SELECT '*'
 					                FROM   MOM_LOCATION_DO_DTL MLD
 					                WHERE  MLD.COMPANY_CD     = MLM.COMPANY_CD

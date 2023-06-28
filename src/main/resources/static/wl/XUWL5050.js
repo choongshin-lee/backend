@@ -29,6 +29,8 @@ var VIEW= {
                 result.result = 'WARN';
                 return;
             }
+            $('#locationDoNoDP3').val(checkItem[0]['locationDoNo']);
+            $('#deliveryOrderIdDP3').val(checkItem[0]['deliveryOrderId']);
             $('#itemIdDP3').val(checkItem[0]['itemId']);	
             $('#warehouseCdDP3').val(checkItem[0]['warehouseCd']);
             $('#zoneCdDP3').val(checkItem[0]['zoneCd']);
@@ -41,6 +43,7 @@ var VIEW= {
 			        }
 	            }
             });
+
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
@@ -61,24 +64,6 @@ var VIEW= {
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
-	    if(index == 2){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
-	        let checkItem = widget.getCheckedRowItems(widget.grid[1]);
-	        if(btnId == 'customGridPopBtn3-2'){ 
-                $('#warehouseCdSP31').val(checkItem[0]['warehouseCd']);
-                $('#zoneSP31').val(checkItem[0]['fromZone']);
-                $('#drNoSP21').val('');
-                $('#warehouseCdSP31').jqxComboBox({disabled: true});
-                $('#zoneSP31').jqxComboBox({disabled: true});
-            }
-	    }
-	    else if(index == 30){         
-            let checkItem = widget.getCheckedRowItems(widget.grid[1]);
-            if(action='C'&& btnId == 'customBtn31-1'){ 
-                for(var i=0,max=param.length; i<max;i++){
-                    param[i]['locationDoNo'] = checkItem[0]['locationDoNo'];
-                }
-            }
-        }
     },
 };
 

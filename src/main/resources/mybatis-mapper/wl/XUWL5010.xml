@@ -56,7 +56,7 @@
 		WHERE  MLM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
 		AND    MLM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}
 		AND    MLM.WAREHOUSE_CD        = #{warehouseCd, jdbcType=VARCHAR} 
-		AND    MLM.STATE               = 'WLG'
+		AND    MLM.STATE               = 'LDG'
 	</select>  
     <select id="get_findBtn3" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MLD.COMPANY_CD

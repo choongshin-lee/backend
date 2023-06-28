@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUWL5050">
+<mapper namespace="com.mom.backend.XUWL5060">
     <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -37,7 +37,12 @@
 					<if test="warehouseCdNm != null and warehouseCdNm != ''">
 					AND    (UPPER(MWH.WAREHOUSE_CD) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
-					AND    MLM.STATE               = 'LDF'
+					AND    EXISTS (SELECT  '*'
+					               FROM    MOM_LOCATION_DO_DTL MLD
+					               WHERE   MLM.COMPANY_CD = MLD.COMPANY_CD
+					               AND     MLM.DIVISION_CD = MLD.DIVISION_CD
+					               AND     MLM.LOCATION_DO_NO = MLD.LOCATION_DO_NO 
+					               AND     MLD.RESULT_QTY > 0)
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
@@ -86,8 +91,7 @@
 		AND    MLD.ITEM_ID        = MI.ITEM_ID 
 		AND    MLD.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
 		AND    MLD.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
-		AND    MLD.LOCATION_DO_NO = #{locationDoNo, jdbcType=VARCHAR}  
-	    AND    MLD.QTY - NVL(MLD.RESULT_QTY,0) > 0
+		AND    MLD.LOCATION_DO_NO = #{locationDoNo, jdbcType=VARCHAR} 
 	</select>  
     <select id="get_findBtn3" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MLR.COMPANY_CD
@@ -102,6 +106,7 @@
 		     , MLR.UPDATE_BY      AS UPDATE_USER_NO
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLR.COMPANY_CD, MLR.DIVISION_CD, MLR.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		     , TO_CHAR(MLR.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+		     , MLR.DO_RESULT_ID
 		     , ROWIDTOCHAR(MLR.ROWID)            AS KEY_ID
 		FROM   MOM_LOCATION_DO_RESULT MLR
 		     , MOM_LOCATION ML
@@ -112,7 +117,7 @@
 		AND    MLR.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
 		AND    MLR.DELIVERY_ORDER_ID = #{deliveryOrderId, jdbcType=VARCHAR} 
 	</select>  
-    <delete id="remove_customBtn3-1" parameterType="java.util.List">
+    <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_LOCATION_DO_RESULT
         <where>
 	        <foreach collection="list" item="item" open="" close="" separator="OR">
@@ -123,27 +128,21 @@
 	        </foreach>
         </where>
    </delete>  
-   <insert id="create_customBtn3-1" parameterType="java.util.List">
+   <insert id="create_customBtn2-1" parameterType="java.util.List">
        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-	       INTO MOM_PROC_LOCATION_DO_RESULT( COMPANY_CD
+	       INTO MOM_PROC_LOCATION_DO_CANCEL( COMPANY_CD
                     		               , DIVISION_CD
-                    		               , DO_RESULT_ID
                     		               , DELIVERY_ORDER_ID
-                    		               , LOCATION_CD
-                    		               , LOGISTICS_UNIT_CD
-                    		               , QTY
-			                               , DESCRIPTION
+                    		               , DO_RESULT_ID
+                    		               , DESCRIPTION
 			                               , VAL_MSG
 			                               , MULTI_MSG
 			                               , CREATE_BY
 			                               , CREATE_DATE )
            VALUES                          ( #{item.companyCd, jdbcType=VARCHAR}  
 				                           , #{item.divisionCd, jdbcType=VARCHAR} 
-				                           , #{item.doResultId, jdbcType=VARCHAR}
 				                           , #{item.deliveryOrderId, jdbcType=VARCHAR}
-				                           , #{item.locationCd, jdbcType=VARCHAR}
-				                           , #{item.logisticsUnitCd, jdbcType=VARCHAR}
-				                           , #{item.deliveryQty, jdbcType=NUMERIC}
+				                           , #{item.doResultId, jdbcType=VARCHAR}
 						                   , #{item.description, jdbcType=VARCHAR}
 						                   , #{item.valMsg, jdbcType=VARCHAR}
 						                   , #{item.multiMsg, jdbcType=VARCHAR}
@@ -152,11 +151,11 @@
 						                   )
         </foreach>
     </insert>
-    <select id="proc_customBtn3-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_LOCATION_DO_RESULT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                                , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                                , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                                , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
-                                                , #{userId,      jdbcType=VARCHAR, mode=IN} )}      
+    <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WMS_PKG.SP_LOCATION_DO_RESULT_CANCEL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                       , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                       , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                       , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                                       , #{userId,      jdbcType=VARCHAR, mode=IN} )}      
     </select>    	
 </mapper>    
