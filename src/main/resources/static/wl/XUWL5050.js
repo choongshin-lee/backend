@@ -3,7 +3,8 @@ var widget = momWidget;
 var that = undefined;
 var VIEW= {
 	initParam		: undefined, 
-	warehouseCd     : undefined,    
+	warehouseCd     : undefined, 
+	
 	init: function() {	
 		that = this;	
 		that.event();
@@ -41,6 +42,8 @@ var VIEW= {
 			            momWidget.splashHide();
 				        return;							     
 			        }
+			        var a = data[0].label;
+                    $('#locationCdDP3' ).val(a);   
 	            }
             });
 
@@ -74,3 +77,4 @@ $(document).ready(function(event){
 	momWidget.init(3, menuId, VIEW);
 	VIEW.init();
 });
+

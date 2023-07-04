@@ -45,7 +45,7 @@
 				                              AND    MIM.IO_RECEIPT_TYPE = 'WIP'
 				                              AND    MIM.USE_YN          = 'Y')                  
 				AND    MPIM.WAREHOUSE_CD      = #{receiptWarehouseCd, jdbcType=VARCHAR} 
-				AND    MDM.RECEIPT_WH_USE_YN  = 'Y'
+				AND    MPIM.RECEIPT_WH_USE_YN  = 'Y'
 		        <if test="receiptNo != null and receiptNo != ''">
 				AND    UPPER(MPIM.INOUT_NO ) LIKE '%' || UPPER(#{receiptNo, jdbcType=VARCHAR}) || '%'
 				</if>

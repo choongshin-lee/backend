@@ -12,8 +12,6 @@
                          , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD,MLR.DIVISION_CD, 'MD0036', MLR.RESOURCE_GROUP_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS RESOURCE_GROUP_NM
                          , MLR.RESOURCE_CD
                          , MLR.RESOURCE_NM
-                         , MLR.PICKING_YN 
-                         , MLR.UNLOADING_YN 
                          , MLR.USE_YN
                          , MLR.DESCRIPTION
                          , MLR.UPDATE_BY      AS UPDATE_USER_NO
@@ -57,8 +55,6 @@
                                         , RESOURCE_CD  
                                         , RESOURCE_NM  
                                         , RESOURCE_GROUP_CD 
-                                        , PICKING_YN
-                                        , UNLOADING_YN
                                         , USE_YN
                                         , DESCRIPTION
                                         , DEL_YN
@@ -72,8 +68,6 @@
                                        , #{item.resourceCd, jdbcType=VARCHAR}
                                        , #{item.resourceNm, jdbcType=VARCHAR}
                                        , #{item.resourceGroupCd, jdbcType=VARCHAR}
-                                       , #{item.pickingYn, jdbcType=VARCHAR}
-                                       , #{item.unloadingYn, jdbcType=VARCHAR}
                                        , #{item.useYn, jdbcType=VARCHAR}
                                        , #{item.description, jdbcType=VARCHAR}
                                        , #{item.delYn, jdbcType=VARCHAR}
@@ -118,8 +112,6 @@
                                         , RESOURCE_CD  
                                         , RESOURCE_NM  
                                         , RESOURCE_GROUP_CD 
-                                        , PICKING_YN
-                                        , UNLOADING_YN
                                         , USE_YN
                                         , DESCRIPTION
                                         , DEL_YN
@@ -133,8 +125,6 @@
                                         , #{item.resourceCd, jdbcType=VARCHAR}
                                         , #{item.resourceNm, jdbcType=VARCHAR}
                                         , #{item.resourceGroupCd, jdbcType=VARCHAR}
-                                        , #{item.pickingYn, jdbcType=VARCHAR}
-                                        , #{item.unloadingYn, jdbcType=VARCHAR}
                                         , #{item.useYn, jdbcType=VARCHAR}
                                         , #{item.description, jdbcType=VARCHAR}
                                         , 'N'

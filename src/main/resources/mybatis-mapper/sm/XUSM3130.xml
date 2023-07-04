@@ -6,8 +6,6 @@
 		     , MP.DIVISION_CD
 		     , MP.PROCESS_CD
 		     , MP.PROCESS_NM
-		     , MP.PROCESS_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_TYPE_NAME(MP.COMPANY_CD, MP.DIVISION_CD, MP.PROCESS_TYPE) FROM DUAL)  AS PROCESS_TYPE_NM
 		     , MP.USE_YN
 		     , MP.UPDATE_BY    AS UPDATE_USER_NO
 		     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MP.COMPANY_CD, MP.DIVISION_CD, MP.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
@@ -17,9 +15,6 @@
 		FROM   MOM_PROCESS MP
 		WHERE  MP.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 		AND    MP.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
-		<if test="processType != null and processType != ''">
-		AND    MP.PROCESS_TYPE IN (${processType})
-		</if>	
 		<if test="processNm != null and processNm != ''">
 		AND    UPPER(MP.PROCESS_NM) LIKE '%' || UPPER(#{processNm, jdbcType=VARCHAR}) || '%' 
 		</if>	
@@ -72,7 +67,6 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_PROCESS( COMPANY_CD
                              , DIVISION_CD
-                             , PROCESS_TYPE
                              , PROCESS_CD
                              , PROCESS_NM
                              , USE_YN
@@ -84,7 +78,6 @@
                              , CREATE_DATE)
         VALUES               ( #{item.companyCd, jdbcType=VARCHAR}
                              , #{item.divisionCd, jdbcType=VARCHAR}
-                             , #{item.processType, jdbcType=VARCHAR}
                              , #{item.processCd, jdbcType=VARCHAR}
                              , #{item.processNm, jdbcType=VARCHAR}
                              , #{item.useYn, jdbcType=VARCHAR}

@@ -7,7 +7,6 @@
 		     , MB.PARENT_ITEM_ID
 		     , MB.PARENT_ITEM_ID AS PARENT_ITEM_ID2
 		     , MB.CHILD_ITEM_ID     
-		     , MB.PARENT_ITEM_ID || '_' || MB.CHILD_ITEM_ID  AS KEY_ID
 		     , MB.REQ_QTY 
 		     , MB.PHANTOM_FLAG  
 		     , MB.MRP_FLAG
@@ -41,6 +40,7 @@
 		     , CONNECT_BY_ROOT(MB.CHILD_ITEM_ID)             AS BOM_ROOT
 		     , SYS_CONNECT_BY_PATH(MB.CHILD_ITEM_ID, ' -> ') AS BOM_PATH
 		     , CONNECT_BY_ISLEAF                             AS BOM_LEAF
+		     , SYS_CONNECT_BY_PATH(MB.CHILD_ITEM_ID, ' -> ')  AS KEY_ID
         FROM   MOM_BOM MB
 		     , MOM_ITEM MI
 		WHERE  MB.COMPANY_CD    = MI.COMPANY_CD

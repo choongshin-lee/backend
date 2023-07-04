@@ -21,8 +21,6 @@
 			             , MWH.WAREHOUSE_USE_YN
 			             , MWH.PURCHASE_WAREHOUSE_YN
 			             , MWH.SHIPPING_WAREHOUSE_YN
-			             , MWH.PICKING_CREATE_TYPE
-			             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWH.COMPANY_CD, MWH.DIVISION_CD, 'WM0009', MWH.PICKING_CREATE_TYPE, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS PICKING_CREATE_TYPE_NM
 			             , MWH.USE_YN
 			             , MWH.CREATE_BY  AS CREATE_USER_NO
 			             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWH.COMPANY_CD, MWH.DIVISION_CD, MWH.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
@@ -84,7 +82,6 @@
 			                   , WAREHOUSE_USE_YN
 			                   , PURCHASE_WAREHOUSE_YN
 			                   , SHIPPING_WAREHOUSE_YN
-			                   , PICKING_CREATE_TYPE
 			                   , USE_YN
 			                   , DESCRIPTION
 			                   , DEL_YN
@@ -103,7 +100,6 @@
 	                           , #{item.warehouseUseYn, jdbcType=VARCHAR}
 	                           , #{item.purchaseWarehouseYn, jdbcType=VARCHAR}
 	                           , #{item.shippingWarehouseYn, jdbcType=VARCHAR}
-	                           , #{item.pickingCreateType, jdbcType=VARCHAR}
 	                           , #{item.useYn, jdbcType=VARCHAR}
 	                           , #{item.description, jdbcType=VARCHAR}
 	                           , #{item.delYn, jdbcType=VARCHAR}
@@ -154,7 +150,6 @@
 			                   , WAREHOUSE_USE_YN
 			                   , PURCHASE_WAREHOUSE_YN
 			                   , SHIPPING_WAREHOUSE_YN
-			                   , PICKING_CREATE_TYPE
 			                   , USE_YN
 			                   , DESCRIPTION
 			                   , DEL_YN
@@ -173,7 +168,6 @@
 	                           , #{item.warehouseUseYn, jdbcType=VARCHAR}
 	                           , #{item.purchaseWarehouseYn, jdbcType=VARCHAR}
 	                           , #{item.shippingWarehouseYn, jdbcType=VARCHAR}
-	                           , #{item.pickingCreateType, jdbcType=VARCHAR}
 	                           , #{item.useYn, jdbcType=VARCHAR}
 	                           , #{item.description, jdbcType=VARCHAR}
 	                           , 'N'

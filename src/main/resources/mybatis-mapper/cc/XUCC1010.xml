@@ -194,5 +194,25 @@
 			                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
 			                                           , 'P'											  
 			                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                   
-    </select>        
+    </select>  
+    
+    <select id="get_dropdownlistContentcloseYearMonthSP1-select1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    
+    SELECT TO_CHAR(TRUNC(MAX(MC.DATE_ID), 'MONTH'), 'YYYY-MM')  AS CODE
+    FROM   MOM_CALENDAR MC
+    WHERE  1 = 1 
+    AND   MC.DATE_ID  <![CDATA[<=]]> MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR})
+    </select>
+    
+    <select id="get_dropdownlistContenttaxTypeSP1-select1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap"> 
+   SELECT  CODE
+   FROM    MOM_CODE
+   WHERE   COMPANY_CD = #{companyCd, jdbcType=VARCHAR}
+   AND     DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+   AND     GROUP_CD    = 'SM0029'
+   AND     USE_YN      = 'Y'
+   AND     SORT_NO     = '10'
+
+    </select>
+    
 </mapper>

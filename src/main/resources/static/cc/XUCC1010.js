@@ -9,6 +9,8 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
+		dateSelect();
+		codeSelect();
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
 		if(index ==0 && btnId =='copyBtn'){	
@@ -62,3 +64,26 @@ $(document).ready(function(event){
 	momWidget.gridPopup.init(2,21,1,'XUDG0350', VIEW);	
 	VIEW.init();
 });
+
+function dateSelect(){
+   mom_ajax('R', 'XUCC1010.dropdownlistContentcloseYearMonthSP1-select1', {}, function(result, data) {
+      if(result == 'SUCCESS') {
+
+         var a = data[0].code;
+         $('#closeYearMonthSP1' ).val(a);   
+      return;
+      }
+   }, undefined, undefined, this, false,'Y');
+      
+};
+
+function codeSelect(){
+   mom_ajax('R', 'XUCC1010.dropdownlistContenttaxTypeSP1-select1', {}, function(result, data) {
+      if(result == 'SUCCESS') {
+      var a = data[0].code;
+      $('#taxTypeSP1' ).val(a);
+      return;
+      }
+   }, undefined, undefined, this, false,'Y');
+
+};

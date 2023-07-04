@@ -18,8 +18,6 @@
                      , MIS.IDENTIFICATION_STOCK_NM   AS STOCK_NM
                      , MLU.RESOURCE_CD               
                      , MLR.RESOURCE_NM      
-                     , MLR.PICKING_YN 
-                     , MLR.UNLOADING_YN          
                      , MLU.MULTI_PRODUCT_YN
                      , MLU.DESCRIPTION
                      , MLU.UPDATE_BY       AS UPDATE_USER_NO

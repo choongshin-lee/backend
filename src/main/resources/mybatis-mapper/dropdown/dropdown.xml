@@ -569,7 +569,10 @@
          , LOGISTICS_UNIT_CD    ||'('|| LOGISTICS_UNIT_NM      ||')' AS LABEL
     FROM   MOM_LOGISTICS_UNIT  
     WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+    <if test="locationCd != null and locationCd != ''">
+    AND     LOCATION_CD = #{locationCd, jdbcType=VARCHAR} 
+    </if> 
     ORDER BY LOGISTICS_UNIT_CD
     </select>
     <select id="get_DD00048" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
@@ -675,22 +678,8 @@
 	             , 0   AS SORT_NO
 	        FROM   MOM_LOCATION ML
 	        WHERE  ML.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
-	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
-	        AND    ML.WAREHOUSE_CD    = #{warehouseCd, jdbcType=VARCHAR}
-	        AND    ML.LOGISTIC_USE_CD = #{zoneCd, jdbcType=VARCHAR}
-	        AND    ML.ITEM_ID         = #{itemId, jdbcType=VARCHAR}
-	        AND    ML.STORAGE_TYPE    = 'F'
-	        UNION ALL 
-	        SELECT ML.LOCATION_CD
-	             , ML.LOCATION_NM
-	             , 1   AS SORT_NO
-	        FROM   MOM_LOCATION ML
-	        WHERE  ML.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
-	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
-	        AND    ML.WAREHOUSE_CD    = #{warehouseCd, jdbcType=VARCHAR}
-	        AND    ML.LOGISTIC_USE_CD = #{zoneCd, jdbcType=VARCHAR}
-	        AND    ML.STORAGE_TYPE    = 'R'  )
+	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}  )
 	ORDER BY SORT_NO
-	       , LOCATION_CD	
+	       , LOCATION_CD
 	</select>    
 </mapper>

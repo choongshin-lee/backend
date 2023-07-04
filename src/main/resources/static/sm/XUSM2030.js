@@ -66,6 +66,7 @@ var XUSM2030 = {
 		
 		
 	},
+	
 	searchCallInit: function(index,your,action,btnId,param,result) {
 		if(index==1 && btnId== "saveBtn"){
 			result.param = {authGroupCd:that.paramTmp.authGroupCd};
