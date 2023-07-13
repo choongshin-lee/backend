@@ -34,6 +34,7 @@
                                                              , MB.DIVISION_CD
                                                              , (SELECT MOM_COMMON_PKG.FN_GET_PRIMARY_WORK_CENTER_CD(MB.COMPANY_CD, MB.DIVISION_CD, MB.CHILD_ITEM_ID) FROM DUAL)) 
                FROM   DUAL)  AS WORK_CENTER_NM
+		     , MB.START_POINT
 		     , MB.COMPANY_CD
 		     , MB.DIVISION_CD
 		     , MB.DESCRIPTION
@@ -104,6 +105,7 @@
 						 , PHANTOM_FLAG
 						 , MRP_FLAG
 						 , DEDUCT_TYPE
+						 , START_POINT
 						 , SORT_NO
 						 , DESCRIPTION
 						 , DEL_YN
@@ -121,6 +123,7 @@
                          , #{item.phantomFlag,        jdbcType=VARCHAR}
 			             , #{item.mrpFlag,            jdbcType=VARCHAR}
 			             , #{item.deductType,         jdbcType=VARCHAR}
+			             , #{item.startPoint,         jdbcType=VARCHAR}
 			             , #{item.sortNo,             jdbcType=NUMERIC}
                          , #{item.description, jdbcType=VARCHAR}
                          , #{item.delYn, jdbcType=VARCHAR}
@@ -170,6 +173,7 @@
 						 , PHANTOM_FLAG
 						 , MRP_FLAG
 						 , DEDUCT_TYPE
+						 , START_POINT
 						 , SORT_NO
 						 , DESCRIPTION
 						 , DEL_YN
@@ -187,6 +191,7 @@
                          , #{item.phantomFlag,       jdbcType=VARCHAR}
 			             , #{item.mrpFlag,           jdbcType=VARCHAR}
 			             , #{item.deductType,        jdbcType=VARCHAR}
+			             , #{item.startPoint,         jdbcType=VARCHAR}
 			             , #{item.sortNo,            jdbcType=NUMERIC}
                          , #{item.description,       jdbcType=VARCHAR}
                          , 'N'

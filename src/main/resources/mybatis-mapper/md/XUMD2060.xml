@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUMD2060">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        SELECT MHM.COMPANY_CD
+		     , MHM.DIVISION_CD
+		     , MHM.HCN_CD
+		     , MHM.ITEM_ID
+		     , MI.ITEM_NM
+		     , MHM.MAKER_HEAT_NO
+		     , MHM.USE_YN
+		     , MHM.DESCRIPTION
+		     , MI.ITEM_SPEC
+		     , MI.ITEM_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM
+		     , MHM.UPDATE_BY AS UPDATE_USER_NO
+		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MHM.COMPANY_CD, MHM.DIVISION_CD, MHM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+		     , TO_CHAR(MHM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+		     , ROWIDTOCHAR(MHM.ROWID) AS KEY_ID
+		     , COUNT(*) OVER() AS TOTAL_COUNT
+		     , ROW_NUMBER() OVER(PARTITION BY MHM.COMPANY_CD,MHM.DIVISION_CD ORDER BY MHM.HCN_CD) AS ROW_COUNT
+		FROM   MOM_HCN_MASTER MHM
+		     , MOM_ITEM MI
+		WHERE  MHM.COMPANY_CD   = MI.COMPANY_CD
+		AND    MHM.DIVISION_CD  = MI.DIVISION_CD
+		AND    MHM.ITEM_ID      = MI.ITEM_ID    
+		AND    MHM.COMPANY_CD   = #{companyCd,  jdbcType=VARCHAR}
+		AND    MHM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
+		<if test="hcnCd != null and hcnCd != ''">
+		AND    UPPER(MHM.HCN_CD) LIKE '%' || UPPER(#{hcnCd, jdbcType=VARCHAR}) || '%' 
+		</if>
+		<if test="itemIdNm != null and itemIdNm != ''">
+		AND    (UPPER(MHM.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')
+		</if>
+		<if test="useYn != null and useYn != ''">
+		AND    MHM.USE_YN = #{useYn, jdbcType=VARCHAR}
+	    </if>
+    </select>
+    <delete id="remove_createBtn1" parameterType="java.util.List">
+	    DELETE FROM MOM_PROC_HCN_MASTER
+	        <where>
+	            <foreach collection="list" item="item" open="" close="" separator="OR">
+	          (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+	             AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+	             AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+	          )
+	            </foreach>
+	        </where>
+    </delete>  
+    <insert id="create_createBtn1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_HCN_MASTER( COMPANY_CD
+							    , DIVISION_CD
+								, HCN_CD
+                                , ITEM_ID
+                                , MAKER_HEAT_NO
+								, USE_YN
+								, DESCRIPTION
+								, DEL_YN
+								, VAL_MSG
+								, MULTI_MSG
+								, CREATE_BY
+								, CREATE_DATE
+								)
+        VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
+			                    , #{item.divisionCd, jdbcType=VARCHAR}
+			                    , #{item.hcnCd, jdbcType=VARCHAR}
+				                , #{item.itemId, jdbcType=VARCHAR}
+				                , #{item.makerHeatNo, jdbcType=NUMERIC}
+			                    , #{item.useYn, jdbcType=VARCHAR}
+			                    , #{item.description, jdbcType=VARCHAR}
+			                    , #{item.delYn, jdbcType=VARCHAR}
+			                    , #{item.valMsg, jdbcType=VARCHAR}
+			                    , #{item.multiMsg, jdbcType=VARCHAR}
+			                    , #{item.userId, jdbcType=VARCHAR}
+			                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+		                        )
+        </foreach>
+    </insert>
+        <select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_DEMAND_ITEM_MAP( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+		                                                    , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                                , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                                , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+			                                                , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
+			                                                , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>  
+    <select id="get_excelUpBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    SELECT NVL(VAL_MSG,'PASS') AS VAL_MSG
+	         , MULTI_MSG      
+	    FROM   MOM_PROC_HCN_MASTER
+	    WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+	    AND    CREATE_BY   = #{userId, jdbcType=VARCHAR}
+  </select> 
+    <delete id="remove_excelUpBtnV1" parameterType="java.util.List">
+	    DELETE FROM MOM_PROC_HCN_MASTER
+	        <where>
+	            <foreach collection="list" item="item" open="" close="" separator="OR">
+	          (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+	             AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+	             AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+	          )
+	            </foreach>
+	        </where>
+    </delete>  
+    <insert id="create_excelUpBtnV1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_HCN_MASTER( COMPANY_CD
+							    , DIVISION_CD
+								, HCN_CD
+                                , ITEM_ID
+                                , MAKER_HEAT_NO
+								, USE_YN
+								, DESCRIPTION
+								, DEL_YN
+								, VAL_MSG
+								, MULTI_MSG
+								, CREATE_BY
+								, CREATE_DATE
+								)
+        VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
+			                    , #{item.divisionCd, jdbcType=VARCHAR}
+			                    , #{item.hcnCd, jdbcType=VARCHAR}
+				                , #{item.itemId, jdbcType=VARCHAR}
+				                , #{item.makerHeatNo, jdbcType=NUMERIC}
+			                    , #{item.useYn, jdbcType=VARCHAR}
+			                    , #{item.description, jdbcType=VARCHAR}
+			                    , 'N'
+			                    , #{item.valMsg, jdbcType=VARCHAR}
+			                    , #{item.multiMsg, jdbcType=VARCHAR}
+			                    , #{item.userId, jdbcType=VARCHAR}
+			                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+		                        )
+        </foreach>
+    </insert>
+    <select id="proc_excelUpBtnV1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_HCN_MASTER( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+		                                               , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+			                                           , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
+			                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>         
+</mapper>

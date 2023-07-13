@@ -78,3 +78,28 @@ $(document).ready(function(event){
 	VIEW.init();
 });
 
+$(document).on('change', '#locationCdDP3', function () {
+   var b = $(this).val();;
+   
+    mom_ajax('R', 'DD.DD00047', {itemId: $('#itemIdDP3').val(),warehouseCd: $('#warehouseCdDP3').val(),zoneCd: $('#zoneCdDP3').val(),locationCd: $('#locationCdDP3').val()}, function (result, data) {
+        if (result == 'SUCCESS') {
+            if(result != 'SUCCESS') {
+               momWidget.splashHide();
+              return;                          
+           }
+           let valueITem = data[0].code;
+          
+
+            let newItems = [];
+            for (var i = 0; i < data.length; i++) {
+                   newItems.push(data[i]);
+            }
+
+           $('#logisticsUnitCdDP3').val(''); 
+           $('#logisticsUnitCdDP3').jqxComboBox('source', newItems);
+           $('#logisticsUnitCdDP3' ).val(valueITem);   
+        }
+    });   
+            
+})
+
