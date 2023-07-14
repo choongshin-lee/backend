@@ -43,7 +43,7 @@ var VIEW= {
 				        return;							     
 			        }
 			        var a = data[0].label;
-                    $('#locationCdDP3' ).val(a);   
+                    //$('#locationCdDP3' ).val(a);   
 	            }
             });
 
@@ -85,19 +85,29 @@ $(document).on('change', '#locationCdDP3', function () {
         if (result == 'SUCCESS') {
             if(result != 'SUCCESS') {
                momWidget.splashHide();
-              return;                          
+               $('#logisticsUnitCdDP3').val(''); 
+              //return;                          
            }
-           let valueITem = data[0].code;
-          
-
-            let newItems = [];
-            for (var i = 0; i < data.length; i++) {
-                   newItems.push(data[i]);
-            }
-
-           $('#logisticsUnitCdDP3').val(''); 
-           $('#logisticsUnitCdDP3').jqxComboBox('source', newItems);
-           $('#logisticsUnitCdDP3' ).val(valueITem);   
+           var valueITem =''
+           var newItems = [];
+           
+           if(data.length == 0 ){
+	           $('#logisticsUnitCdDP3').val(''); 
+           		$('#logisticsUnitCdDP3').jqxComboBox('source', newItems);
+				  
+			}else{
+	           valueITem = data[0].code;
+	          
+	
+	            
+	            for (var i = 0; i < data.length; i++) {
+	                   newItems.push(data[i]);
+	            }
+	
+	           $('#logisticsUnitCdDP3').val(''); 
+	           $('#logisticsUnitCdDP3').jqxComboBox('source', newItems);
+	           $('#logisticsUnitCdDP3' ).val(valueITem); 
+           }  
         }
     });   
             

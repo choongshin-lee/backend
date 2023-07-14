@@ -2099,6 +2099,31 @@ var momWidget = {
         // 동일하게 변경
         AUIGrid.updateRowsById(that.grid[index], items4update);
     },
+    
+    syncDataNew: function (index, item, rowIndex, dataField, refDataField, value) {
+        var that = momWidget;
+        var gridData = AUIGrid.getGridData(that.grid[index]);
+        var gridLen = gridData.length;
+        var rowIdField = AUIGrid.getProp(that.grid[index], "rowIdField");
+        //var rowIdField = AUIGrid.getProp(that.grid[index], "routingId");
+        var items4update = [];
+        var row;
+        var obj;
+
+        for (var i = rowIndex + 1; i < gridLen; i++) {
+            row = gridData[i];
+            if (value == gridData[i].routingId) {
+                obj = {};
+                obj[rowIdField] = row[rowIdField];
+                obj[dataField] = value;
+                items4update.push(obj);
+            } else {
+                break;
+            }
+        }
+        // 동일하게 변경
+        AUIGrid.updateRowsById(that.grid[index], items4update);
+    },
    
 
     setCustomComboBoxSet: function (index, btnId, your) {
@@ -7039,7 +7064,13 @@ var momWidget = {
             } else if (that.columnProperty[index][e.columnIndex]['columnType'] == 'CK') {
                 if (e.dataField == "checkBox") {
                     // 체크박스 클릭 했을 때, 병합된 모든 행의 체크박스를 동기화 시킴.
-                    that.syncData(index, e.item, e.rowIndex, e.dataField, that.columnProperty[index][e.columnIndex]['dataFormat'], e.value);
+                    //that.syncData(index, e.item, e.rowIndex, e.dataField, that.columnProperty[index][e.columnIndex]['dataFormat'], e.value);  -- 20230714. 임시작업중 
+                     if(menuId =="XUMD1090"){ 
+                     that.syncDataNew(index, e.item, e.rowIndex, e.dataField, that.columnProperty[index], e.item.routingId);
+                     }
+                     else{
+	                    that.syncData(index, e.item, e.rowIndex, e.dataField, that.columnProperty[index][e.columnIndex]['dataFormat'], e.value);  
+                     }
                 }
             }
             if (your != undefined && your.cellEditCallBack != undefined) {
