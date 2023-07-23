@@ -2409,7 +2409,8 @@ border-color: #d8dce3 !important;
     height: 38.5rem;
 }
 .searcharea-pop.R7-remark-in {
-    height: 38rem;
+    /*height: 38rem;*/
+    height: 50rem;
 }
 .searcharea-pop.R7-remark-out {
     height: 38rem;
@@ -4830,6 +4831,57 @@ input:focus{
     margin-top: -90vh !important;
     background: white !important; 
     height: 47rem !important;
+    border-radius: 0.5rem;
+    border: 1px solid #bdbdbd !important;
+    
+   
+}
+.defaultPop-C3-R7 {
+    z-index: 1050;
+/* 	display: none ; */
+	float: none !important;
+/* 	background-color: rgba(0, 0, 0, 0.1); */
+	overflow: hidden !important; 
+    width: 58rem !important;
+    position: relative !important;
+    margin-left: 45rem !important;
+    margin-top: -64rem !important;
+    background: white !important; 
+    height: 47.4rem !important;
+    border-radius: 0.5rem;
+    border: 1px solid #bdbdbd !important;
+    
+   
+}
+.defaultPop-C3-R7-remark-in {
+    z-index: 1050;
+/* 	display: none ; */
+	float: none !important;
+/* 	background-color: rgba(0, 0, 0, 0.1); */
+	overflow: hidden !important; 
+    width: 58rem !important;
+    position: relative !important;
+    margin-left: 31vw !important;
+    margin-top: -84vh !important;
+    background: white !important; 
+    height: 59.3rem !important;
+    border-radius: 0.5rem;
+    border: 1px solid #bdbdbd !important;
+    
+   
+}
+.defaultPop-C3-R7-remark-out {
+    z-index: 1050;
+/* 	display: none ; */
+	float: none !important;
+/* 	background-color: rgba(0, 0, 0, 0.1); */
+	overflow: hidden !important; 
+    width: 58rem !important;
+    position: relative !important;
+    margin-left: 30vw !important;
+    margin-top: -90vh !important;
+    background: white !important; 
+    height: 53rem !important;
     border-radius: 0.5rem;
     border: 1px solid #bdbdbd !important;
     

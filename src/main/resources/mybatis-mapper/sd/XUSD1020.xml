@@ -25,6 +25,7 @@
 			     , MSOV.SHIP_TO_NM
 			     , MSOV.SO_DATE
 			     , MSOV.SO_CONFIRM_DATE
+			     , MSOV.CUSTOMER_DUE_DATE
 			     , MSOV.ORDER_QTY
 			     , MSOV.SHIPPING_QTY
 			     , MSOV.CANCEL_QTY
@@ -37,8 +38,8 @@
 			     , MSOV.LOCAL_AMOUNT
 			     , MSOV.TOTAL_AMOUNT
 			     , MSOV.TOTAL_LOCAL_AMOUNT
-			     , MSOV.SO_UNIT
-			     , MSOV.SO_UNIT_NM
+			     , MSOV.SO_UOM 
+                 , MSOV.SO_UOM_NM 
 			     , MSOV.CUSTOMER_PO_NO
 			     , MSOV.CUSTOMER_ITEM_ID
 			     , MSOV.SALES_ITEM_ID
