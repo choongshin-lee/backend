@@ -14,29 +14,31 @@
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM
                  , MI.ITEM_SPEC
                  , MI.UOM
-                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.UOM, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS UOM_NM
+                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
                  , MI.PURCHASE_UOM
-                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.PURCHASE_UOM, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS PURCHASE_UOM_NM
+                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.PURCHASE_UOM) FROM DUAL) AS PURCHASE_UOM_NM
                  , MI.PURCHASE_CONVERSION_RATE 
                  , MI.PROCUREMENT_TYPE
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0004', MI.PROCUREMENT_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS PROCUREMENT_TYPE_NM
                  , MI.MATERIAL_TYPE
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0005', MI.MATERIAL_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS MATERIAL_TYPE_NM
+                 , MI.MATERIAL_PROPERTIES
+                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.MATERIAL_PROPERTIES, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS MATERIAL_PROPERTIES_NM
                  , MI.NET_WEIGHT
                  , MI.NET_WEIGHT_UOM 
-                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.NET_WEIGHT_UOM, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS NET_WEIGHT_UOM_NM
+                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.NET_WEIGHT_UOM) FROM DUAL) AS NET_WEIGHT_UOM_NM
                  , MI.GROSS_WEIGHT
                  , MI.GROSS_WEIGHT_UOM
-                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.GROSS_WEIGHT_UOM, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS GROSS_WEIGHT_UOM_NM
+                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.GROSS_WEIGHT_UOM) FROM DUAL) AS GROSS_WEIGHT_UOM_NM
                  , MI.STORAGE_WAREHOUSE_CD 
                  , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.STORAGE_WAREHOUSE_CD) FROM DUAL) AS STORAGE_WAREHOUSE_NM
                  , MI.ISSUE_TYPE
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0006', MI.ISSUE_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ISSUE_TYPE_NM
                  , MI.SALES_UOM 
-                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.SALES_UOM, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS SALES_UOM_NM
+                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.SALES_UOM) FROM DUAL) AS SALES_UOM_NM
                  , MI.SALES_CONVERSION_RATE 
                  , MI.MFG_UOM  
-                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0003', MI.MFG_UOM, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS MFG_UOM_NM
+                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.MFG_UOM) FROM DUAL) AS MFG_UOM_NM
                  , MI.MFG_CONVERSION_RATE 
                  , MI.IQC_FLAG
                  , MI.OQC_FLAG
@@ -118,6 +120,7 @@
 						  , PURCHASE_CONVERSION_RATE
 						  , PROCUREMENT_TYPE
 						  , MATERIAL_TYPE
+						  , MATERIAL_PROPERTIES
 						  , NET_WEIGHT
 						  , NET_WEIGHT_UOM
 						  , GROSS_WEIGHT
@@ -165,6 +168,7 @@
                           , #{item.purchaseConversionRate, jdbcType=NUMERIC}
                           , #{item.procurementType, jdbcType=VARCHAR}
                           , #{item.materialType, jdbcType=VARCHAR}
+                          , #{item.materialProperties, jdbcType=VARCHAR}
                           , #{item.netWeight, jdbcType=NUMERIC}
                           , #{item.netWeightUom, jdbcType=VARCHAR}
                           , #{item.grossWeight, jdbcType=NUMERIC}
@@ -253,6 +257,7 @@
 						  , PURCHASE_CONVERSION_RATE
 						  , PROCUREMENT_TYPE
 						  , MATERIAL_TYPE
+						  , MATERIAL_PROPERTIES
 						  , NET_WEIGHT
 						  , NET_WEIGHT_UOM
 						  , GROSS_WEIGHT
@@ -300,6 +305,7 @@
                           , #{item.purchaseConversionRate, jdbcType=NUMERIC}
                           , #{item.procurementType, jdbcType=VARCHAR}
                           , #{item.materialType, jdbcType=VARCHAR}
+                          , #{item.materialProperties, jdbcType=VARCHAR}
                           , #{item.netWeight, jdbcType=NUMERIC}
                           , #{item.netWeightUom, jdbcType=VARCHAR}
                           , #{item.grossWeight, jdbcType=NUMERIC}

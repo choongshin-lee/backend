@@ -30,10 +30,16 @@
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_WORK_CENTER_NAME(MB.COMPANY_CD,MB.DIVISION_CD,MB.WORK_CENTER_CD) FROM DUAL) AS WORK_CENTER_NM
 		                 , MB.TACT_TIME
 		                 , MB.TACT_TIME_UOM
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.TACT_TIME_UOM) FROM DUAL) AS TACT_TIME_UOM_NM
 		                 , MB.ADJUST_TACT_TIME
      					 , MB.ADJUST_TACT_TIME_UOM
-		                 , MB.PROCESS_LT_UOM
+     					 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.ADJUST_TACT_TIME_UOM) FROM DUAL) AS ADJUST_TACT_TIME_UOM_NM
+     					 , MB.SETUP_TIME 
+						 , MB.SETUP_TIME_UOM 
+						 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.SETUP_TIME_UOM) FROM DUAL) AS SETUP_TIME_UOM_NM
 		                 , MB.PROCESS_LT
+		                 , MB.PROCESS_LT_UOM
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MB.COMPANY_CD, MB.DIVISION_CD, MB.PROCESS_LT_UOM) FROM DUAL) AS PROCESS_LT_UOM_NM
 		                 , MB.PRIORITY
 		                 , MB.YIELD
 		                 , MB.BOR_ID
@@ -59,9 +65,9 @@
 		            WHERE  MB.COMPANY_CD    = MI.COMPANY_CD
 		            AND    MB.DIVISION_CD   = MI.DIVISION_CD     
 		            AND    MB.ITEM_ID       = MI.ITEM_ID
-		            AND    MB.COMPANY_CD    = MR.COMPANY_CD    (+)                         
-                    AND    MB.DIVISION_CD   = MR.DIVISION_CD   (+)    	                 									
-                    AND    MB.ROUTING_ID    = MR.ROUTING_ID	   (+)                         
+		            AND    MB.COMPANY_CD    = MR.COMPANY_CD(+)                         
+                    AND    MB.DIVISION_CD   = MR.DIVISION_CD(+)    	                 									
+                    AND    MB.ROUTING_ID    = MR.ROUTING_ID(+)                         
 		            AND    MB.COMPANY_CD    = #{companyCd , jdbcType=VARCHAR}
 		            AND    MB.DIVISION_CD   = #{divisionCd , jdbcType=VARCHAR}
 		            <if test="itemIdNm != null and itemIdNm != ''">
@@ -140,6 +146,8 @@
 			                , TACT_TIME_UOM
 			                , ADJUST_TACT_TIME
      					    , ADJUST_TACT_TIME_UOM
+     					    , SETUP_TIME 
+						    , SETUP_TIME_UOM 
 			                , PROCESS_LT
 			                , PROCESS_LT_UOM
 			                , PRIORITY
@@ -162,6 +170,8 @@
 			                , #{item.tactTimeUom, jdbcType=VARCHAR}
 			                , #{item.adjustTactTime, jdbcType=NUMERIC}
 			                , #{item.adjustTactTimeUom, jdbcType=VARCHAR}
+			                , #{item.setupTime, jdbcType=NUMERIC}
+			                , #{item.setupTimeUom, jdbcType=VARCHAR}
 			                , #{item.processLt, jdbcType=NUMERIC}
 			                , #{item.processLtUom, jdbcType=VARCHAR}
 			                , #{item.priority, jdbcType=NUMERIC}
@@ -208,6 +218,8 @@
 			                , TACT_TIME_UOM
 			                , ADJUST_TACT_TIME
      					    , ADJUST_TACT_TIME_UOM
+     					    , SETUP_TIME 
+						    , SETUP_TIME_UOM 
 			                , PROCESS_LT
 			                , PROCESS_LT_UOM
 			                , PRIORITY
@@ -230,6 +242,8 @@
 			                , #{item.tactTimeUom, jdbcType=VARCHAR}
 			                , #{item.adjustTactTime, jdbcType=NUMERIC}
 			                , #{item.adjustTactTimeUom, jdbcType=VARCHAR}
+			                , #{item.setupTime, jdbcType=NUMERIC}
+			                , #{item.setupTimeUom, jdbcType=VARCHAR}
 			                , #{item.processLt, jdbcType=NUMERIC}
 			                , #{item.processLtUom, jdbcType=VARCHAR}
 			                , #{item.priority, jdbcType=NUMERIC}

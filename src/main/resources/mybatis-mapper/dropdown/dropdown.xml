@@ -110,7 +110,13 @@
          , UNIT   ||'('|| UNIT_NM ||')' AS LABEL
     FROM   MOM_UNIT   
     WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+    <if test="unitCategory != null and unitCategory != ''">
+    AND    UNIT_CATEGORY  = #{unitCategory, jdbcType=VARCHAR} 
+    </if>  
+    <if test="unit != null and unit != ''">
+    AND    UNIT  = #{unit, jdbcType=VARCHAR} 
+    </if>  
     AND    USE_YN      = 'Y'
     ORDER BY LABEL
     </select>
@@ -681,5 +687,15 @@
 	      	AND    ML.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}  )
 	ORDER BY SORT_NO
 	       , LOCATION_CD
-	</select>    
+	</select>  
+	<select id="get_DD00056" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
+    SELECT UNIT     AS CODE 
+         , UNIT   ||'('|| UNIT_NM ||')' AS LABEL
+    FROM   MOM_UNIT   
+    WHERE  COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+    AND    DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+    AND    TACT_TIME_YN = 'Y' 
+    AND    USE_YN       = 'Y'
+    ORDER BY LABEL  
+    </select>  
 </mapper>

@@ -33,7 +33,7 @@ var VIEW= {
 	    }  
 	  }
 	  else if(index == 10){			    
-		if(action=='D'&& btnId == 'customBtn11-1'){ 		
+		/*if(action=='D'&& btnId == 'customBtn11-1'){ 		
 		  let checkedItem = [];  
 		  for(var i=0,max=param.length; i<max;i++){
 			if(param[i]['checkBox']=='Y'){
@@ -47,7 +47,12 @@ var VIEW= {
 			param[i]['borId'] = checkItem[0]['borId'];
 			
 	      }
-		}
+		}*/
+		if( btnId == 'customBtn11-1'){
+			for(var i=0,max=param.length; i<max;i++){
+				param[i]['borId'] = checkItem[0]['borId'];
+		    }
+	    }
 	  }
     },	
     	customCallBack: function(index,your,action,btnId,param,result,data) {
@@ -66,7 +71,6 @@ var VIEW= {
 	       }
 	       	   			
 		}
-	
 	},	  
 	cellClickCallBack: function(index,rowIndex,target,e) {
 	  if(index==0){
@@ -94,7 +98,8 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(1,11,1,'XXDG0120', VIEW);
+	/*momWidget.gridPopup.init(1,11,1,'XXDG0120', VIEW);*/
+	momWidget.gridPopup.init(1,11,1,'XUDG0120', VIEW);
 	/*momWidget.gridPopup.init(1,2,'XXDG0120', VIEW);*/
 	VIEW.init();
 });
