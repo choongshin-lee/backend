@@ -6,10 +6,8 @@
         SELECT A.*
 	    FROM   (
 	    </if>
-		        SELECT MCD. COMPANY_CD
-				     , MCD.COMPANY_NM
-				     , MCD.DIVISION_CD
-				     , MCD.DIVISION_NM
+		        SELECT MC.COMPANY_CD
+                     , MC.DIVISION_CD
 				     , TO_CHAR(MC.DATE_ID,'YYYY-MM-DD') AS DATE_ID
 				     , MC.YEAR
 				     , MC.QUARTER
@@ -19,22 +17,25 @@
 				     , TO_CHAR(MC.WEEK_START_DATE,'YYYY-MM-DD') AS WEEK_START_DATE 
 		             , TO_CHAR(MC.WEEK_END_DATE,'YYYY-MM-DD') AS WEEK_END_DATE 
 				     , MC.DAY_OFF_YN
+				     , MC.SHIFT_CD
+                     , MS.SHIFT_NM
 				     , MC.DESCRIPTION
 				     , MC.UPDATE_BY
 				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MC.COMPANY_CD, MC.DIVISION_CD, MC.UPDATE_BY) FROM DUAL ) AS UPDATE_BY_NM
 				     , TO_CHAR(MC.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-				     , TO_CHAR(MC.DATE_ID,'YYYY-MM-DD') AS KEY_ID 
+				     , ROWIDTOCHAR(MC.ROWID) AS KEY_ID 
 				     , COUNT(*) OVER() AS TOTAL_COUNT
 	                 , ROW_NUMBER() OVER(PARTITION BY MC.COMPANY_CD,MC.DIVISION_CD ORDER BY TO_CHAR(MC.DATE_ID,'YYYY-MM-DD')  ) AS ROW_COUNT	
-		        FROM   MOM_COM_DIV_V MCD
-				     , MOM_CALENDAR MC
-			    WHERE  MCD.COMPANY_CD   = MC.COMPANY_CD
-		        AND    MCD.DIVISION_CD  = MC.DIVISION_CD   
+		        FROM   MOM_CALENDAR MC
+				     , MOM_SHIFT MS
+				WHERE  MC.COMPANY_CD    = MS.COMPANY_CD(+)
+				AND    MC.DIVISION_CD   = MS.DIVISION_CD(+)   
+				AND    MC.SHIFT_CD      = MS.SHIFT_CD(+)
 		        AND    MC.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
 			    AND    MC.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  	
 			    AND    MC.DATE_ID <![CDATA[>]]>= TO_DATE(#{startDate, jdbcType=VARCHAR}, 'YYYY-MM-DD')
 			    AND    MC.DATE_ID <![CDATA[<]]> TO_DATE(#{endDate, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999  
-		        ORDER BY MCD.COMPANY_NM, MCD.DIVISION_NM, MC.DATE_ID
+		        ORDER BY MC.DATE_ID
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 	            ) A
 	    WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
@@ -44,6 +45,7 @@
         <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close=";END;">
         UPDATE MOM_CALENDAR
         SET    DAY_OFF_YN  = #{item.dayOffYn, jdbcType=VARCHAR}
+             , SHIFT_CD    = #{item.shiftCd, jdbcType=VARCHAR}
              , DESCRIPTION = #{item.description, jdbcType=VARCHAR}
              , UPDATE_BY   = #{item.userId, jdbcType=VARCHAR}
              , UPDATE_DATE = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
@@ -53,4 +55,13 @@
         AND    DATE_ID     = TO_DATE(#{item.dateId, jdbcType=VARCHAR},'YYYY-MM-DD')
         </foreach>
     </update>  
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+          { CALL MOM_MASTER_INFO_PKG.sp_apply_shift_schedule( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+					                                        , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+					                                        , #{companyCd,javaType=string,  jdbcType=VARCHAR , mode=IN}
+					                                        , #{divisionCd, jdbcType=VARCHAR, mode=IN}
+					                                        , TO_DATE(#{startDate,  jdbcType=VARCHAR, mode=IN},'YYYY-MM-DD')
+					                                        , TO_DATE(#{endDate,    jdbcType=VARCHAR, mode=IN},'YYYY-MM-DD')
+					                                        , #{userId,     jdbcType=VARCHAR, mode=IN} )}    	 
+      </select> 					                                          
 </mapper>

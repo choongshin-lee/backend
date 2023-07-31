@@ -3972,6 +3972,19 @@ border-color: #d8dce3 !important;
     border: 1px solid #bdbdbd !important;
    
 }
+.defaultPop-C2-R1 {
+    z-index: 1050;
+	float: none !important;
+	overflow: hidden !important; 
+    width: 40rem !important;
+    position: relative !important;
+    margin-left: 35vw !important;
+    margin-top: -80vh !important;
+    background: white !important; 
+    height: 19rem !important;
+    border-radius: 0.5rem;
+    border: 1px solid #bdbdbd !important;
+}
 .defaultPop-C2-R2 {
     z-index: 1050;
 	float: none !important;

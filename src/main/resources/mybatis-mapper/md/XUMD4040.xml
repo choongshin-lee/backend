@@ -62,8 +62,16 @@
 			              , CASE WHEN DAY_OFF_YN = 'N' THEN NVL(MT.REST_TIME,0)
 			                     WHEN DAY_OFF_YN = 'Y' THEN 0
 			                ELSE 0
-			                END AS REST_TIME                 
-			              , CASE WHEN DAY_OFF_YN = 'N' THEN NVL(MS.WORK_TIME,0) - NVL(MT.REST_TIME,0)
+			                END AS REST_TIME        
+			              , CASE WHEN DAY_OFF_YN = 'N' THEN NVL(MSS.PALN_SHUTDOWN_TIME,0)
+			                     WHEN DAY_OFF_YN = 'Y' THEN 0
+			                ELSE 0
+			                END AS PALN_SHUTDOWN_TIME       
+			              , CASE WHEN DAY_OFF_YN = 'N' THEN NVL(MSS.UNMANNED_OPERATION_TIME,0)
+			                     WHEN DAY_OFF_YN = 'Y' THEN 0
+			                ELSE 0
+			                END AS UNMANNED_OPERATION_TIME           
+			              , CASE WHEN DAY_OFF_YN = 'N' THEN NVL(MS.WORK_TIME,0) - NVL(MT.REST_TIME,0) - NVL(MSS.PALN_SHUTDOWN_TIME,0) + NVL(MSS.UNMANNED_OPERATION_TIME,0)
 			                     WHEN DAY_OFF_YN = 'Y' THEN 0
 			                ELSE 0
 			                END AS REAL_WORK_TIME
@@ -167,6 +175,8 @@
                 , SHIFT_CD
                 , APPLY_DATE
                 , DAY_OFF_YN
+                , PALN_SHUTDOWN_TIME
+                , UNMANNED_OPERATION_TIME
                 , DESCRIPTION
                 , CREATE_BY
                 , CREATE_DATE
@@ -179,6 +189,8 @@
                 , #{item.shiftCd, jdbcType=VARCHAR}
                 , #{item.applyDate, jdbcType=VARCHAR}
                 , #{item.dayOffYn, jdbcType=VARCHAR}
+                , #{item.palnShutdownTime, jdbcType=NUMERIC}
+                , #{item.unmannedOperationTime, jdbcType=NUMERIC}
                 , #{item.description, jdbcType=VARCHAR}
                 , #{item.userId, jdbcType=VARCHAR}
                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
@@ -196,6 +208,8 @@
                 , SHIFT_CD
                 , APPLY_DATE
                 , DAY_OFF_YN
+                , PALN_SHUTDOWN_TIME
+                , UNMANNED_OPERATION_TIME
                 , DESCRIPTION
                 , CREATE_BY
                 , CREATE_DATE
@@ -208,6 +222,8 @@
                 , #{item.shiftCd, jdbcType=VARCHAR}
                 , #{item.applyDate, jdbcType=VARCHAR}
                 , #{item.dayOffYn, jdbcType=VARCHAR}
+                , #{item.palnShutdownTime, jdbcType=NUMERIC}
+                , #{item.unmannedOperationTime, jdbcType=NUMERIC}
                 , #{item.description, jdbcType=VARCHAR}
                 , #{item.userId, jdbcType=VARCHAR}
                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
@@ -220,7 +236,9 @@
     <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close=";END;">
       UPDATE MOM_SHIFT_SCHEDULE
       SET    SHIFT_CD = #{item.shiftCd, jdbcType=VARCHAR}         
-           , DAY_OFF_YN = #{item.dayOffYn, jdbcType=VARCHAR}
+           , DAY_OFF_YN               = #{item.dayOffYn, jdbcType=VARCHAR}
+           , PALN_SHUTDOWN_TIME	      = #{item.palnShutdownTime, jdbcType=NUMERIC}
+           , UNMANNED_OPERATION_TIME  = #{item.unmannedOperationTime, jdbcType=NUMERIC}
            , DESCRIPTION = #{item.description, jdbcType=VARCHAR}
            , UPDATE_BY = #{item.userId, jdbcType=VARCHAR}
            , UPDATE_DATE = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
