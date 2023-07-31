@@ -4579,7 +4579,8 @@ border-color: #d8dce3 !important;
     float: none !important;
     /* background-color: rgba(0, 0, 0, 0.1); */
     /* overflow-y: auto !important; */
-    width: 100rem !important;
+    overflow: hidden !important; 
+    width: 90rem !important;
     position: relative !important;
     margin-left: 58rem !important;
     margin-top: -100rem !important;
