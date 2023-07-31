@@ -2423,7 +2423,8 @@ border-color: #d8dce3 !important;
     height: 50rem;
 }
 .searcharea-pop.R9-remark-in {
-    height: 54.5rem;
+    /*height: 54.5rem;*/
+    height: 60rem;
 }
 .searcharea-pop.R9-remark-out {
     height: 54.5rem;
@@ -4578,7 +4579,7 @@ border-color: #d8dce3 !important;
     float: none !important;
     /* background-color: rgba(0, 0, 0, 0.1); */
     /* overflow-y: auto !important; */
-    width: 90rem !important;
+    width: 100rem !important;
     position: relative !important;
     margin-left: 58rem !important;
     margin-top: -100rem !important;
@@ -4613,7 +4614,8 @@ border-color: #d8dce3 !important;
     margin-left: 58rem !important;
     margin-top: -100rem !important;
     background: white !important;
-    height: 63.5rem !important;
+    /*height: 63.5rem !important;*/
+    height: 68.5rem !important;
     border-radius: 0.5rem;
     border: 1px solid #bdbdbd !important;
 }

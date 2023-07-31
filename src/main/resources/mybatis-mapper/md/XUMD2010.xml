@@ -53,6 +53,9 @@
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0008', MI.ABC_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ABC_TYPE_NM
                  , MI.DRAWING_NO
                  , MI.HS_CD
+                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0047', MI.HS_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS HS_CD_NM 
+                 , MI.STOCK_TYPE
+                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0048', MI.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS STOCK_TYPE_NM
                  , MI.REORDER_POINT
                  , MI.SAFETY_STOCK_QTY
                  , MI.LOT_MANAGEMENT_YN
@@ -142,6 +145,7 @@
 						  , ABC_TYPE
 						  , DRAWING_NO
 						  , HS_CD
+						  , STOCK_TYPE
 						  , REORDER_POINT
 						  , SAFETY_STOCK_QTY
 						  , LOT_MANAGEMENT_YN
@@ -190,6 +194,7 @@
                           , #{item.abcType, jdbcType=VARCHAR}
                           , #{item.drawingNo, jdbcType=VARCHAR}
                           , #{item.hsCd, jdbcType=VARCHAR}
+                          , #{item.stockType, jdbcType=VARCHAR}
                           , #{item.reorderPoint, jdbcType=NUMERIC}
                           , #{item.safetyStockQty, jdbcType=NUMERIC}
                           , #{item.lotManagementYn, jdbcType=VARCHAR}
@@ -279,6 +284,7 @@
 						  , ABC_TYPE
 						  , DRAWING_NO
 						  , HS_CD
+						  , STOCK_TYPE
 						  , REORDER_POINT
 						  , SAFETY_STOCK_QTY
 						  , LOT_MANAGEMENT_YN
@@ -327,6 +333,7 @@
                           , #{item.abcType, jdbcType=VARCHAR}
                           , #{item.drawingNo, jdbcType=VARCHAR}
                           , #{item.hsCd, jdbcType=VARCHAR}
+                          , #{item.stockType, jdbcType=VARCHAR}
                           , #{item.reorderPoint, jdbcType=NUMERIC}
                           , #{item.safetyStockQty, jdbcType=NUMERIC}
                           , #{item.lotManagementYn, jdbcType=VARCHAR}
