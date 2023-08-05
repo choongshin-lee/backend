@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUPP1080">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	SELECT A.*
+	FROM   (
+	</if>   
+	        <if test="pivot != null and pivot != ''">
+	        SELECT *
+	        FROM   (
+	        </if>
+	                SELECT CPM.COMPANY_CD
+			             , CPM.DIVISION_CD
+			             , CPM.ITEM_ID
+			             , MI.ITEM_NM
+			             , MI.ITEM_TYPE
+			             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM
+			             , CPM.ONHAND_QTY
+			             , CPM.SAFETY_STOCK_QTY
+			             , CPM.LEAD_TIME
+			             , CPM.MOQ
+			             , NVL(CPM.LEAD_TIME, 0) ||'/'|| NVL(CPM.MOQ, 0) AS LT_MOQ
+			             , CPM.SEQ
+			             , CPM.CATEGORY
+			             , CPM.QTY
+			             , TO_CHAR(CPM.PLAN_DATE ,'YYYY-MM-DD')  AS PLAN_DATE      
+			             , CPM.ITEM_ID||'_'|| CPM.SEQ         AS KEY_ID 
+			             , COUNT(*) OVER() AS TOTAL_COUNT
+			             , DENSE_RANK() OVER(PARTITION BY CPM.COMPANY_CD, CPM.DIVISION_CD ORDER BY CPM.ITEM_ID, CPM.SEQ  ) AS ROW_COUNT
+			        FROM   CAL_EXP_PSI_MOM CPM
+			             , MOM_ITEM MI
+			        WHERE  CPM.COMPANY_CD  = MI.COMPANY_CD
+			        AND    CPM.DIVISION_CD = MI.DIVISION_CD
+			        AND    CPM.ITEM_ID     = MI.ITEM_ID 
+			        AND    CPM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+			        AND    CPM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+			        AND    CPM.PLAN_TYPE    = 'PRE'
+			        AND    CPM.SEQ          <![CDATA[<>]]> 1
+			        AND    CPM.PLAN_DATE BETWEEN TO_DATE(#{planDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD') AND TO_DATE(#{planDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD')     
+			        <if test="itemIdNm != null and itemIdNm != ''">
+			        AND    (UPPER(CPM.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
+			        </if>
+			        <if test="shortageYn != null and shortageYn != ''">
+			        AND    CPM.ITEM_ID IN ( SELECT S.ITEM_ID
+		                                    FROM   CAL_EXP_PSI_MOM S
+		                                    WHERE  S.COMPANY_CD = CPM.COMPANY_CD
+		                                    AND    S.DIVISION_CD = CPM.DIVISION_CD
+		                                    AND    S.PLAN_TYPE = CPM.PLAN_TYPE
+		                                    AND    S.seq = 5 )
+		            </if>                        
+	        <if test="pivot != null and pivot != ''">
+            )
+            PIVOT(SUM(QTY) FOR PLAN_DATE IN(${pivot}))
+            </if>       
+	<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	       ) A
+	WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+	</if> 
+    </select>
+</mapper>  	

@@ -698,4 +698,15 @@
     AND    USE_YN       = 'Y'
     ORDER BY LABEL  
     </select>  
+    <select id="get_DD00057" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	SELECT HCN_CD         AS CODE 
+	     , HCN_CD   ||'('|| MAKER_HEAT_NO ||')' AS LABEL
+	FROM   MOM_HCN_MASTER  
+	WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+	<if test="itemId != null and itemId != ''">
+    AND     ITEM_ID = #{itemId, jdbcType=VARCHAR} 
+    </if>
+	ORDER BY HCN_CD   
+	</select>   
 </mapper>

@@ -46,6 +46,8 @@
                  , MI.ITEM_CATEGORY_L
                  , MI.ITEM_CATEGORY_M
                  , MI.ITEM_CATEGORY_S
+                 , MI.MATERIAL_LT
+                 , MI.MOQ
                  , MI.COLOR
                  , MI.MAKER
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0007', MI.MAKER, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS MAKER_NM
@@ -140,6 +142,8 @@
 						  , ITEM_CATEGORY_L
 						  , ITEM_CATEGORY_M
 						  , ITEM_CATEGORY_S
+						  , MATERIAL_LT
+						  , MOQ
 						  , COLOR
 						  , MAKER
 						  , ABC_TYPE
@@ -188,7 +192,9 @@
                           , #{item.rpItemId, jdbcType=VARCHAR}
                           , #{item.itemCategoryL, jdbcType=VARCHAR}
                           , #{item.itemCategoryM, jdbcType=VARCHAR}
-                          , #{item.itemCategoryS, jdbcType=VARCHAR}                          
+                          , #{item.itemCategoryS, jdbcType=VARCHAR}   
+                          , #{item.materialLt, jdbcType=NUMERIC}  
+                          , #{item.moq, jdbcType=NUMERIC}                        
                           , #{item.color, jdbcType=VARCHAR}  
                           , #{item.maker, jdbcType=VARCHAR}
                           , #{item.abcType, jdbcType=VARCHAR}
@@ -279,6 +285,8 @@
 						  , ITEM_CATEGORY_L
 						  , ITEM_CATEGORY_M
 						  , ITEM_CATEGORY_S
+						  , MATERIAL_LT
+						  , MOQ
 						  , COLOR
 						  , MAKER
 						  , ABC_TYPE
@@ -327,7 +335,9 @@
                           , #{item.rpItemId, jdbcType=VARCHAR}
                           , #{item.itemCategoryL, jdbcType=VARCHAR}
                           , #{item.itemCategoryM, jdbcType=VARCHAR}
-                          , #{item.itemCategoryS, jdbcType=VARCHAR}                          
+                          , #{item.itemCategoryS, jdbcType=VARCHAR}        
+                          , #{item.materialLt, jdbcType=NUMERIC}
+                          , #{item.moq, jdbcType=NUMERIC}                         
                           , #{item.color, jdbcType=VARCHAR}  
                           , #{item.maker, jdbcType=VARCHAR}
                           , #{item.abcType, jdbcType=VARCHAR}
