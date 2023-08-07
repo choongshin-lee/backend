@@ -88,6 +88,41 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
-	momWidget.gridPopup.init(1,11,1,'XUDG0210', VIEW); 
+	//momWidget.gridPopup.init(1,11,1,'XUDG0210', VIEW); 
 	VIEW.init();
 });
+
+$(document).on('change', '#workCenterCdDP1', function () {
+   var b = $(this).val();;
+   
+    mom_ajax('R', 'DD.DD00059', {workCenterCd: $('#workCenterCdDP1').val()}, function (result, data) {
+        if (result == 'SUCCESS') {
+            if(result != 'SUCCESS') {
+               momWidget.splashHide();
+               $('#itemIdDP1').val(''); 
+              //return;                          
+           }
+           var valueITem =''
+           var newItems = [];
+           
+           if(data.length == 0 ){
+	           $('#itemIdDP1').val(''); 
+           		$('#itemIdDP1').jqxComboBox('source', newItems);
+				  
+			}else{
+	           valueITem = data[0].code;
+	          
+	
+	            
+	            for (var i = 0; i < data.length; i++) {
+	                   newItems.push(data[i]);
+	            }
+	
+	           $('#itemIdDP1').val(''); 
+	           $('#itemIdDP1').jqxComboBox('source', newItems);
+	           $('#itemIdDP1' ).val(valueITem); 
+           }  
+        }
+    });   
+            
+})

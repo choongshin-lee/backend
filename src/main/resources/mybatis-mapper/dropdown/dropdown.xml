@@ -709,4 +709,37 @@
     </if>
 	ORDER BY HCN_CD   
 	</select>   
+	<select id="get_DD00058" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	SELECT MWC.WORK_CENTER_CD     AS CODE 
+	     , MWC.WORK_CENTER_CD   ||'('|| MWC.WORK_CENTER_NM     ||')' AS LABEL
+	FROM   MOM_WORK_CENTER MWC
+	WHERE  MWC.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND    MWC.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+	AND    MWC.USE_YN      = 'Y' 
+	AND    EXISTS  (SELECT '*'
+	                FROM   MOM_BOR  MB
+	                WHERE  MB.COMPANY_CD     = MWC.COMPANY_CD
+	                AND    MB.DIVISION_CD    = MWC.DIVISION_CD
+	                AND    MB.WORK_CENTER_CD = MWC.WORK_CENTER_CD
+	                AND    MB.USE_YN = 'Y')
+	ORDER BY LABEL 
+	</select>
+	<select id="get_DD00059" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000"> 
+	SELECT MI.ITEM_ID     AS CODE 
+	     , MI.ITEM_ID   ||'('|| MI.ITEM_NM     ||')' AS LABEL
+	FROM   MOM_ITEM MI
+	WHERE  MI.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND    MI.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+	AND    MI.USE_YN      = 'Y' 
+	AND    EXISTS  (SELECT '*'
+	                FROM   MOM_BOR  MB
+	                WHERE  MB.COMPANY_CD     = MI.COMPANY_CD
+	                AND    MB.DIVISION_CD    = MI.DIVISION_CD
+	                AND    MB.ITEM_ID        = MI.ITEM_ID
+	                <if test="workCenterCd != null and workCenterCd != ''">
+	                AND     MB.WORK_CENTER_CD = #{workCenterCd, jdbcType=VARCHAR} 
+	                </if>
+	                AND    MB.USE_YN = 'Y')
+	ORDER BY LABEL 
+	</select>          	
 </mapper>
