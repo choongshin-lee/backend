@@ -86,9 +86,16 @@
 			    <if test="workCenterCdNm != null and workCenterCdNm != ''">
 			    AND    (UPPER(MWO.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MWC.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR})) 
 			    </if>	
-				<if test="woState != null and woState != ''">
-				AND    MWO.WO_STATE IN (${woState})
-				</if>
+				AND    MWO.WO_STATE IN (SELECT MC.CODE
+										FROM   MOM_CODE MC
+										WHERE  MC.COMPANY_CD  = MWO.COMPANY_CD
+										AND    MC.DIVISION_CD = MWO.DIVISION_CD 
+										AND    MC.GROUP_CD    = 'PP0003'
+										<if test="woState != null and woState != ''">
+										AND    MC.CODE IN (${woState})
+										</if>  
+										AND    MC.USE_YN      = 'Y'
+										AND    MC.ATTRIBUTE1  = 'Y' )
 				<if test="outsourcingYn != null and outsourcingYn != ''">
 				AND    MWO.OUTSOURCING_YN = #{outsourcingYn, jdbcType=VARCHAR}
 				</if>	
@@ -181,8 +188,8 @@
                     , MWO.FINAL_OPERATION_YN
                     , MWO.MILESTONE
                     , TO_CHAR(P.WORK_DAY  ,'YYYY-MM-DD')    AS WORK_DAY
-                    , TO_CHAR(P.START_TIME  ,'YYYY-MM-DD')  AS START_DATE
-                    , TO_CHAR(P.END_TIME  ,'YYYY-MM-DD')    AS END_DATE
+                    , TO_CHAR(P.START_TIME  ,'YYYY-MM-DD HH24:MI:SS')  AS START_DATE
+                    , TO_CHAR(P.END_TIME  ,'YYYY-MM-DD HH24:MI:SS')    AS END_DATE
                     , DECODE(P.WO_RESULT_TYPE, 'G', NVL(P.RESULT_QTY,0))  AS GOOD_QTY
                     , DECODE(P.WO_RESULT_TYPE, 'D', NVL(P.RESULT_QTY,0))  AS DEFECT_QTY
                     , P.WO_RESULT_ID

@@ -246,7 +246,6 @@
       AND    COMPANY_CD = #{item.companyCd, jdbcType=VARCHAR}
       AND    DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
       AND    WORK_CENTER_CD = #{item.workCenterCd, jdbcType=VARCHAR}
-      AND    SHIFT_CD = #{item.shiftCd, jdbcType=VARCHAR}
       AND    APPLY_DATE = #{item.applyDate, jdbcType=VARCHAR}
     </foreach>
   </update>
@@ -257,7 +256,6 @@
         (       COMPANY_CD = #{item.companyCd, jdbcType=VARCHAR}
            AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
            AND  WORK_CENTER_CD = #{item.workCenterCd, jdbcType=VARCHAR}
-           AND  SHIFT_CD = #{item.shiftCd, jdbcType=VARCHAR}
            AND  APPLY_DATE = #{item.applyDate, jdbcType=VARCHAR}
         )
        </foreach>

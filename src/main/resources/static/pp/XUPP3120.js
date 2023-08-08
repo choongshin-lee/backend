@@ -73,7 +73,7 @@ var VIEW= {
 	calendarGridSaveCallBack: function(index,rowIndex,columnIndex,dataField,item,nowTime,e){
 		 if(index==1){
 			if(rowIndex==0){
-				  if(dataField =='startDate') {
+				/*  if(dataField =='startDate') {
 							let woStartDate   = new Date(item.woStartDate);
 		                    let woOpStartDate = new Date(nowTime);
 						    if(woOpStartDate<woStartDate){
@@ -83,7 +83,7 @@ var VIEW= {
 						        return;
 						    }
 			   }
-			   else if (dataField =='endDate'){
+			   else*/ if (dataField =='endDate'){
 				         let woOpStartDate = AUIGrid.getCellValue(widget.grid[index],rowIndex, 'startDate');
 				         if(woOpStartDate=='' || woOpStartDate== undefined ){
 					            AUIGrid.setCellValue(widget.grid[index], rowIndex,columnIndex, '');
@@ -105,7 +105,7 @@ var VIEW= {
 			   }
 			}
 			else{
-				  if(dataField =='startDate') {
+				 /* if(dataField =='startDate') {
 							let prevEndDate   = new Date(AUIGrid.getCellValue(widget.grid[index],rowIndex-1, 'endDate'));
 		                    let woOpStartDate = new Date(nowTime);
 						    if(woOpStartDate<prevEndDate){
@@ -115,7 +115,7 @@ var VIEW= {
 						        return;
 						    }
 			   }
-			   else if (dataField =='endDate'){
+			   else*/ if (dataField =='endDate'){
 				         let woOpStartDate = AUIGrid.getCellValue(widget.grid[index],rowIndex, 'startDate');
 				         if(woOpStartDate=='' || woOpStartDate== undefined ){
 					            AUIGrid.setCellValue(widget.grid[index], rowIndex,columnIndex, '');
