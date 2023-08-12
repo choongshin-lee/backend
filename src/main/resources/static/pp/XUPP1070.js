@@ -37,3 +37,14 @@ $(document).ready(function(event){
 	VIEW.init();
 });
 
+function exportTo(type,excelDownOpt) {
+myGridID = AUIGrid.create("#grid1");
+   // 내보내기 실행   
+   switch (type) {
+      case "xlsx":
+
+         AUIGrid.exportToXlsx(myGridID,excelDownOpt);
+         break;
+
+   }
+};

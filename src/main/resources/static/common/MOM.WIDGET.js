@@ -6567,7 +6567,25 @@ var momWidget = {
 
         let menuParamMap = {};
         var queryId = menuId == undefined ? that.pageProperty[index]['menuId'] + '.findBtn' + (index + 1) : menuId + '.findBtn' + (index + 1);
-
+        
+        if(menuId == 'XUPP1070' ||  menuId == 'XUPP1080'){
+	        if (btnId == 'EXCEL_DOWN') {
+	            var fileName1 = that.pageProperty[index]['programId'] + '_' + get_current_date('yyyy-mm-dd');
+	            var excelDownOpt1 = {
+	                fileName: fileName1,
+	                progressBar: true,
+	
+	            };
+	
+	            excelDownOpt1.afterRequestCallback = function () { // 엑셀 만들고 호출되는 콜백함수
+	                $('.aui-grid-export-progress-modal').remove();
+	
+	            }                  
+	
+	             exportTo('xlsx',excelDownOpt1);
+	
+	        }
+        }
         if (Array.isArray(menuParamText) == true) {
             for (let j = 0, max2 = menuParamText.length; j < max2; j++) {
                 menuParamMap[menuParamText[j].split('=')[0]] = menuParamText[j].split('=')[1];
@@ -6653,35 +6671,39 @@ var momWidget = {
                     //AUIGrid.setGridData(that.grid[index], data);
                 }
                 if (btnId == 'EXCEL_DOWN') {
-                    that.excelDownGridData[index] = data;
-                    that.backWork[index] = 'N';
-                    var excelData = that.excelDownGridData[index];
-                    AUIGrid.setGridData(that.excelDownGrid[index], excelData);
-                    var fileName = that.pageProperty[index]['programId'] + '_' + get_current_date('yyyy-mm-dd');
-                    var excelDownOpt = {
-                        fileName: fileName,
-                        progressBar: true,
-                        showRowNumColumn: false,
-                        footers: undefined,
-                        exportWithStyle: true
-                    };
-
-                    excelDownOpt.afterRequestCallback = function () { // 엑셀 만들고 호출되는 콜백함수
-                        $('.aui-grid-export-progress-modal').remove();
-                        // AUIGrid.GridData(that.excelGrid[index]);
-
-                        //$('#excelArea' + (index + 1)).remove();
-                        //AUIGrid.destroy(that.excelDownGrid[index]);
-                        //that.exceldownGrid[index] = undefined;
-                    }
-                    //option.footers = footerProperty;
-                    //that.excelDownGrid[index]
-                    // AUIGrid.exportToXlsx("#excelGrid"+(index+1), excelDownOpt);
-                    AUIGrid.exportToXlsx(that.excelDownGrid[index], excelDownOpt);
-                    $('.aui-grid-export-progress-modal').height('100%');
-                    $('#grid' + (index + 1)).children().append($('.aui-grid-export-progress-modal'));
-                    //that.splashHide();
-                    //AUIGrid.setGridData(that.grid[index], data);
+					if(menuId == 'XUPP1070' ||  menuId == 'XUPP1080'){
+					
+					} else{
+	                    that.excelDownGridData[index] = data;
+	                    that.backWork[index] = 'N';
+	                    var excelData = that.excelDownGridData[index];
+	                    AUIGrid.setGridData(that.excelDownGrid[index], excelData);
+	                    var fileName = that.pageProperty[index]['programId'] + '_' + get_current_date('yyyy-mm-dd');
+	                    var excelDownOpt = {
+	                        fileName: fileName,
+	                        progressBar: true,
+	                        showRowNumColumn: false,
+	                        footers: undefined,
+	                        exportWithStyle: true
+	                    };
+	
+	                    excelDownOpt.afterRequestCallback = function () { // 엑셀 만들고 호출되는 콜백함수
+	                        $('.aui-grid-export-progress-modal').remove();
+	                        // AUIGrid.GridData(that.excelGrid[index]);
+	
+	                        //$('#excelArea' + (index + 1)).remove();
+	                        //AUIGrid.destroy(that.excelDownGrid[index]);
+	                        //that.exceldownGrid[index] = undefined;
+	                    }
+	                    //option.footers = footerProperty;
+	                    //that.excelDownGrid[index]
+	                    // AUIGrid.exportToXlsx("#excelGrid"+(index+1), excelDownOpt);
+	                    AUIGrid.exportToXlsx(that.excelDownGrid[index], excelDownOpt);
+	                    $('.aui-grid-export-progress-modal').height('100%');
+	                    $('#grid' + (index + 1)).children().append($('.aui-grid-export-progress-modal'));
+	                    //that.splashHide();
+	                    //AUIGrid.setGridData(that.grid[index], data);
+                    }  
                 } else if (btnId == 'TOTAL') {
                     that.totalRowCount[index] = data.length == 0 ? 0 : data[0]['totalCount'];
                     //that.splashHide();
@@ -9825,16 +9847,18 @@ var momWidget = {
             if (param.length == 0) {
 	            momWidget.messageBox({type: 'warning', width: '400', height: '145', html: '데이터 미선택!'});
                 return;
-            }
-            param[0].fileName = that.pageProperty[index]['menuId'] + '_' + (index + 1);
+            } else {
+                       for(var i =0; i < param.length; i++){
+            param[i].fileName = that.pageProperty[index]['menuId'] + '_' + (index + 1);
+            param[i].reportFileName = param[i].departureNo; 
             //param[0].fileType = 'xlsx';
-            param[0].fileType = fileType;
+            param[i].fileType = fileType;
             // param = that.checkSearchParam(index,param,your);
             $.ajax({
                 url: mCommon.contextPath() + '/createReport',
                 method: "get",
                 contentType: 'application/json; charset=UTF-8',
-                data: param[0],
+                data: param[i],
                 async: false,
                 timeout: 30000000,
                 beforeSend: function (xhr) {
@@ -9843,7 +9867,7 @@ var momWidget = {
                 success: function (data) {
                     setTimeout(function () {
                         momWidget.splashHide();
-                        window.open('../report-'+fileType+'/'+param[0].fileName+'.'+param[0].fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+                        window.open('../report-'+fileType+'/'+param[i].reportFileName+'.'+fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
                         //history.pushState(null, null, '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType)
                         //location.href = location.href;
                         //location.href  = '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType;
@@ -9857,7 +9881,8 @@ var momWidget = {
                     return;
                 }
             });
-
+            }
+            }
         });
 
         $(document).on('click', '#' + exUpCheckDownBtnId, function () {

@@ -100,7 +100,7 @@
 		                      , #{item.locationCd, jdbcType=VARCHAR}
 		                      , #{item.locationNm, jdbcType=VARCHAR}
 		                      , #{item.warehouseCd, jdbcType=VARCHAR}
-		                      , #{item.logisticUseId, jdbcType=VARCHAR}
+		                      , #{item.logisticUseCd, jdbcType=VARCHAR}
 		                      , #{item.storageType, jdbcType=VARCHAR}
 		                      , #{item.itemId, jdbcType=VARCHAR}
 		                      , #{item.stockControlYn, jdbcType=VARCHAR}
@@ -179,7 +179,7 @@
 		                      , #{item.locationCd, jdbcType=VARCHAR}
 		                      , #{item.locationNm, jdbcType=VARCHAR}
 		                      , #{item.warehouseCd, jdbcType=VARCHAR}
-		                      , #{item.logisticUseId, jdbcType=VARCHAR}
+		                      , #{item.logisticUseCd, jdbcType=VARCHAR}
 		                      , #{item.storageType, jdbcType=VARCHAR}
 		                      , #{item.itemId, jdbcType=VARCHAR}
 		                      , #{item.stockControlYn, jdbcType=VARCHAR}

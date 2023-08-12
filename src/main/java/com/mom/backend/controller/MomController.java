@@ -74,8 +74,9 @@ public class MomController {
 	public Map<String, Object> createReport(@RequestParam Map<String, Object> param) {
 
 		String title = param.get("fileName").toString();
+		String report = param.get("reportFileName").toString();
 		String type = param.get("fileType").toString();
-		return reportUtil.createReport(title, type, param);
+		return reportUtil.createReport(title, report, type, param);
 	}
 
 	@GetMapping(value = "/progressBar")

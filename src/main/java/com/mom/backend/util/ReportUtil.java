@@ -63,7 +63,7 @@ public class ReportUtil {
      
 
   @SuppressWarnings("deprecation")
-public Map<String,Object> createReport(String fileName,String fileType,Map<String,Object> param ){
+public Map<String,Object> createReport(String fileName,String reportFileName,String fileType,Map<String,Object> param ){
         JasperReport jasperReport;  
         JasperPrint jasperPrint;  
            
@@ -118,7 +118,7 @@ public Map<String,Object> createReport(String fileName,String fileType,Map<Strin
             System.out.println("time : " + (System.currentTimeMillis() - start)+ " ms.");  
                
             if(fileType.equals("pdf")) {
-            	 JasperExportManager.exportReportToPdfFile(jasperPrint, rootPath+filePath+fileName+"."+fileType); 
+            	 JasperExportManager.exportReportToPdfFile(jasperPrint, rootPath+filePath+reportFileName+"."+fileType); 
             	 
             }
             else {

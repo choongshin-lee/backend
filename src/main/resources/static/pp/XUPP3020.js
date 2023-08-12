@@ -11,9 +11,20 @@ var VIEW= {
 	event: function(e) {
 	
 	},
+	createCallInit: function(index,your,action,btnId,param,result) {
+		if(index ==0 ){	
+			
+		    if(btnId =='createBtn') {
+			    $('#itemIdDP1').val('');
+			    $('#workCenterCdDP1').val('');	
+			}
+		}
+	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
-		if(index ==0 && btnId =='copyBtn'){	
-			  $('#workOrderIdDP1').val('');
+		if(index ==0 ){	
+		    if( btnId =='copyBtn') {	
+			    $('#workOrderIdDP1').val('');
+			}  
 		}
 		else if(index ==1 && btnId =='copyBtn'){	 
 			  $('#operationSeqDP2').val('');
@@ -125,4 +136,4 @@ $(document).on('change', '#workCenterCdDP1', function () {
         }
     });   
             
-})
+});

@@ -56,7 +56,7 @@
         </foreach>
     </update>  
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-          { CALL MOM_MASTER_INFO_PKG.sp_apply_shift_schedule( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+          { CALL MOM_MASTER_INFO_PKG.SP_APPLY_SHIFT_SCHEDULE( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
 					                                        , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
 					                                        , #{companyCd,javaType=string,  jdbcType=VARCHAR , mode=IN}
 					                                        , #{divisionCd, jdbcType=VARCHAR, mode=IN}

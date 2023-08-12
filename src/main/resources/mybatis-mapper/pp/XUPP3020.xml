@@ -147,6 +147,7 @@
 				                , PRIORITY
 				                , REASON_CD
 				                , MANUAL_YN
+				                , DEL_YN
 				                , DESCRIPTION
 				                , VAL_MSG
 				                , MULTI_MSG
@@ -165,6 +166,7 @@
 				                , #{item.priority, jdbcType=NUMERIC}
 				                , #{item.reasonCd, jdbcType=VARCHAR}
 				                , 'Y'
+				                , #{item.delYn, jdbcType=VARCHAR}
 				                , #{item.description, jdbcType=VARCHAR}
 				                , #{item.valMsg, jdbcType=VARCHAR}
 				                , #{item.multiMsg, jdbcType=VARCHAR}

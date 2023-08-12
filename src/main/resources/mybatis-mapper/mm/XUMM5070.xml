@@ -47,6 +47,8 @@
 					     , MPD.REASON_CD  AS RETURN_REASON_CD  
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MM0018', MPD.REASON_CD,  #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS RETURN_REASON_NM
 					     , ROWIDTOCHAR(MPD.ROWID)  AS KEY_ID
+					     , COUNT(*) OVER() AS TOTAL_COUNT
+                         , ROW_NUMBER() OVER(PARTITION BY MPD.COMPANY_CD,MPD.DIVISION_CD ORDER BY MPD.PURCHASE_INOUT_ID ) AS ROW_COUNT
 					     , MPD.DESCRIPTION   
 					FROM   MOM_PURCHASE_INOUT_MST MPM
 					     , MOM_PURCHASE_INOUT_DTL MPD
@@ -82,7 +84,7 @@
 					AND    MPM.PROCESS_CD = 'TD'
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
-				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+				WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
 		</if>  			
     </select>  
 </mapper>    
