@@ -35,6 +35,17 @@ var VIEW= {
 			widget.findBtnClicked(1, {inoutNo:checkItem[0].inoutNo }, true, 'CELLCLICK', menuId, VIEW);   
 		}
 	},
+	customCallInit: function(index,your,action,btnId,param,result) {
+	    if(index == 1){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
+            let checkItem = widget.getCheckedRowItems(widget.grid[0]);
+            if(btnId == 'customBtn2-1'){ 
+                for(var i=0,max=param.length; i<max;i++){
+                    param[i]['processCd'] = checkItem[0]['processCd'];
+                    param[i]['inoutNo'] = checkItem[0]['inoutNo'];
+                }
+            }
+	    }
+    },
 };
 
 $(document).ready(function(event){	

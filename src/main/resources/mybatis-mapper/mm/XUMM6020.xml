@@ -141,7 +141,7 @@
 					               , #{item.purchaseInoutId, jdbcType=VARCHAR}
 					               , #{item.inspectionResult, jdbcType=VARCHAR}
 					               , #{item.lotManagementYn, jdbcType=VARCHAR}
-					               , #{item.lotId, jdbcType=VARCHAR}
+					               , #{item.hcnCd, jdbcType=VARCHAR}
 					               , #{item.valMsg, jdbcType=VARCHAR}
 					               , #{item.multiMsg, jdbcType=VARCHAR}
 					               , #{item.description, jdbcType=VARCHAR}
@@ -194,7 +194,7 @@
 					               , #{item.purchaseInoutId, jdbcType=VARCHAR}
 					               , #{item.inspectionResult, jdbcType=VARCHAR}
 					               , #{item.lotManagementYn, jdbcType=VARCHAR}
-					               , #{item.lotId, jdbcType=VARCHAR}
+					               , #{item.hcnCd, jdbcType=VARCHAR}
 					               , #{item.valMsg, jdbcType=VARCHAR}
 					               , #{item.multiMsg, jdbcType=VARCHAR}
 					               , #{item.description, jdbcType=VARCHAR}

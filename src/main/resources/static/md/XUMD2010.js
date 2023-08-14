@@ -19,3 +19,4 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, XUMD2010);
 	XUMD2010.init();
 });
+

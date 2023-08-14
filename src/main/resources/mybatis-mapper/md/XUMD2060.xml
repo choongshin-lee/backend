@@ -5,9 +5,14 @@
         SELECT MHM.COMPANY_CD
 		     , MHM.DIVISION_CD
 		     , MHM.HCN_CD
+		     , MHM.HCN_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MHM.COMPANY_CD,MHM.DIVISION_CD, 'MD0049', MHM.HCN_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS HCN_TYPE_NM 
 		     , MHM.ITEM_ID
 		     , MI.ITEM_NM
 		     , MHM.MAKER_HEAT_NO
+ 		     , MHM.MILL_MAKER_CD 
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MHM.COMPANY_CD,MHM.DIVISION_CD, 'MD0050', MHM.MILL_MAKER_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS MILL_MAKER_NM 
+             , MHM.MILL_TEST_REPORT
 		     , MHM.USE_YN
 		     , MHM.DESCRIPTION
 		     , MI.ITEM_SPEC
@@ -51,9 +56,12 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_HCN_MASTER( COMPANY_CD
 							    , DIVISION_CD
+							    , HCN_TYPE
 								, HCN_CD
                                 , ITEM_ID
                                 , MAKER_HEAT_NO
+                                , MILL_MAKER_CD
+                                , MILL_TEST_REPORT
 								, USE_YN
 								, DESCRIPTION
 								, DEL_YN
@@ -64,9 +72,12 @@
 								)
         VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
 			                    , #{item.divisionCd, jdbcType=VARCHAR}
+			                    , #{item.hcnType, jdbcType=VARCHAR}
 			                    , #{item.hcnCd, jdbcType=VARCHAR}
 				                , #{item.itemId, jdbcType=VARCHAR}
-				                , #{item.makerHeatNo, jdbcType=NUMERIC}
+				                , #{item.makerHeatNo, jdbcType=VARCHAR}
+				                , #{item.millMakerCd, jdbcType=VARCHAR}
+				                , #{item.millTestReport, jdbcType=VARCHAR}
 			                    , #{item.useYn, jdbcType=VARCHAR}
 			                    , #{item.description, jdbcType=VARCHAR}
 			                    , #{item.delYn, jdbcType=VARCHAR}
@@ -78,7 +89,7 @@
         </foreach>
     </insert>
         <select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_DEMAND_ITEM_MAP( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_HCN_MASTER( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 		                                                    , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 			                                                , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 			                                                , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
@@ -108,9 +119,12 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_HCN_MASTER( COMPANY_CD
 							    , DIVISION_CD
+							    , HCN_TYPE
 								, HCN_CD
                                 , ITEM_ID
                                 , MAKER_HEAT_NO
+                                , MILL_MAKER_CD
+                                , MILL_TEST_REPORT
 								, USE_YN
 								, DESCRIPTION
 								, DEL_YN
@@ -123,7 +137,9 @@
 			                    , #{item.divisionCd, jdbcType=VARCHAR}
 			                    , #{item.hcnCd, jdbcType=VARCHAR}
 				                , #{item.itemId, jdbcType=VARCHAR}
-				                , #{item.makerHeatNo, jdbcType=NUMERIC}
+				                , #{item.makerHeatNo, jdbcType=VARCHAR}
+				                , #{item.millMakerCd, jdbcType=VARCHAR}
+				                , #{item.millTestReport, jdbcType=VARCHAR}
 			                    , #{item.useYn, jdbcType=VARCHAR}
 			                    , #{item.description, jdbcType=VARCHAR}
 			                    , 'N'
