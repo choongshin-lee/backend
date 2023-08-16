@@ -43,8 +43,10 @@ var VIEW= {
                     return;
                 }
                 $('#issueWarehouseCdSP21').val(checkItem[0]['receiptWarehouseCd']);
+                $('#requestWarehouseCdSP21').val(checkItem[0]['requestWarehouseCd']);
                 $('#drNoSP21').val('');
                 $('#issueWarehouseCdSP21').jqxComboBox({disabled: true});
+                $('#requestWarehouseCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 20){         

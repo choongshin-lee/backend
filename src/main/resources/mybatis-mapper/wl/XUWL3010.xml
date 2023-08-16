@@ -12,6 +12,8 @@
 					     , MWM.RECEIPT_NM
 					     , MWM.WAREHOUSE_CD       AS RECEIPT_WAREHOUSE_CD
 					     , MW.WAREHOUSE_NM        AS RECEIPT_WAREHOUSE_NM
+					     , MWM.TO_WAREHOUSE_CD    AS REQUEST_WAREHOUSE_CD
+                         , MWT.WAREHOUSE_NM       AS REQUEST_WAREHOUSE_NM
 					     , MWM.WAREHOUSE_USER_NO  AS RECEIPT_USER_NO
 					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.WAREHOUSE_USER_NO) FROM DUAL ) AS RECEIPT_USER_NM
 					     , MWM.IO_RECEIPT_TYPE  AS OUTPUT_RECEIPT_TYPE
@@ -28,9 +30,13 @@
 					     , ROW_NUMBER() OVER(PARTITION BY MWM.COMPANY_CD,MWM.DIVISION_CD ORDER BY MWM.RECEIPT_ID) AS ROW_CNT
 					FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
 					     , MOM_WAREHOUSE MW
-					WHERE  MWM.COMPANY_CD      = MW.COMPANY_CD(+)
-					AND    MWM.DIVISION_CD     = MW.DIVISION_CD(+)
-					AND    MWM.WAREHOUSE_CD    = MW.WAREHOUSE_CD(+)
+					     , MOM_WAREHOUSE MWT
+					WHERE  MWM.COMPANY_CD      = MW.COMPANY_CD
+					AND    MWM.DIVISION_CD     = MW.DIVISION_CD
+					AND    MWM.WAREHOUSE_CD    = MW.WAREHOUSE_CD
+					AND    MWM.COMPANY_CD      = MWT.COMPANY_CD
+					AND    MWM.DIVISION_CD     = MWT.DIVISION_CD
+					AND    MWM.TO_WAREHOUSE_CD = MWT.WAREHOUSE_CD
 					AND    MWM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 					AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
@@ -39,6 +45,13 @@
 					<if test="receiptWarehouseCdNm != null and receiptWarehouseCdNm != ''">
 					AND    (UPPER(MWM.WAREHOUSE_CD) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MW.WAREHOUSE_NM) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
+					AND    MWM.WAREHOUSE_CD IN (SELECT MUM.WAREHOUSE_CD
+												FROM   MOM_USER_WH_IO_RECEIPT_MAP  MUM
+												WHERE  MUM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+					                            AND    MUM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
+					  							AND    MUM.USER_NO         = #{userId, jdbcType=VARCHAR}	
+												AND    MUM.IO_RECEIPT_TYPE =  'WMO'
+												AND    MUM.USE_YN 		   = 'Y')
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
@@ -122,6 +135,7 @@
                                            , RECEIPT_NM
                                            , WAREHOUSE_CD
                                            , WAREHOUSE_USER_NO
+                                           , TO_WAREHOUSE_CD
                                            , IO_RECEIPT_TYPE
                                            , DESCRIPTION
                                            , DEL_YN
@@ -136,6 +150,7 @@
                                           , #{item.receiptNm, jdbcType=VARCHAR}
                                           , #{item.receiptWarehouseCd, jdbcType=VARCHAR}
                                           , #{item.userId, jdbcType=VARCHAR}
+                                          , #{item.requestWarehouseCd, jdbcType=VARCHAR}
                                           , 'WMO'
                                           , #{item.description, jdbcType=VARCHAR}
                                           , #{item.delYn, jdbcType=VARCHAR}

@@ -45,8 +45,8 @@
 												   AND    MIM.DIVISION_CD     = MDM.DIVISION_CD
 												   AND    MIM.IO_RECEIPT_TYPE = 'WMO'
 												   AND    MIM.USE_YN          = 'Y')									
-		        AND    MDM.ISSUE_WAREHOUSE_CD  = #{issueWarehouseCd, jdbcType=VARCHAR} 
-		        AND    MDM.ISSUE_WH_USE_YN     = 'Y'
+		        AND    MDM.ISSUE_WAREHOUSE_CD   = #{issueWarehouseCd, jdbcType=VARCHAR} 
+		        AND    MDM.REQUEST_WAREHOUSE_CD = #{requestWarehouseCd, jdbcType=VARCHAR}
 		        <if test="drNo != null and drNo != ''">
 				AND    UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{drNo, jdbcType=VARCHAR}) || '%'
 				</if>

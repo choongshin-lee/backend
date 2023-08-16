@@ -13,7 +13,9 @@
 					     , MWD.SEQ
 					     , MWD.RECEIPT_DETAIL_ID 
 					     , MWM.WAREHOUSE_CD       AS RECEIPT_WAREHOUSE_CD
-					     , MWH.WAREHOUSE_NM	      AS RECEIPT_WAREHOUSE_NM		
+					     , MWH.WAREHOUSE_NM	      AS RECEIPT_WAREHOUSE_NM	
+					     , MWM.TO_WAREHOUSE_CD    AS REQUEST_WAREHOUSE_CD
+                         , MWT.WAREHOUSE_NM       AS REQUEST_WAREHOUSE_NM	
 					     , MWM.STATE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, 'WM0002', MWM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 					     , MWD.ITEM_ID
@@ -48,6 +50,7 @@
 					FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
 					     , MOM_WAREHOUSE_RECEIPT_DTL MWD
 					     , MOM_WAREHOUSE MWH
+					     , MOM_WAREHOUSE MWT
 					     , MOM_ITEM MI
 					WHERE  MWM.COMPANY_CD      = MWD.COMPANY_CD
 					AND    MWM.DIVISION_CD     = MWD.DIVISION_CD
@@ -55,6 +58,9 @@
 					AND    MWM.COMPANY_CD      = MWH.COMPANY_CD
 					AND    MWM.DIVISION_CD     = MWH.DIVISION_CD
 					AND    MWM.WAREHOUSE_CD    = MWH.WAREHOUSE_CD
+					AND    MWM.COMPANY_CD      = MWT.COMPANY_CD
+					AND    MWM.DIVISION_CD     = MWT.DIVISION_CD
+					AND    MWM.TO_WAREHOUSE_CD = MWT.WAREHOUSE_CD
 					AND    MWD.COMPANY_CD      = MI.COMPANY_CD
 					AND    MWD.DIVISION_CD     = MI.DIVISION_CD
 					AND    MWD.ITEM_ID         = MI.ITEM_ID
@@ -68,6 +74,13 @@
 					<if test="receiptWarehouseCdNm != null and receiptWarehouseCdNm != ''">
 					AND    (UPPER(MWM.WAREHOUSE_CD) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
+					AND    MWM.WAREHOUSE_CD IN (SELECT MUM.WAREHOUSE_CD
+												FROM   MOM_USER_WH_IO_RECEIPT_MAP  MUM
+												WHERE  MUM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+					                            AND    MUM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
+					  							AND    MUM.USER_NO         = #{userId, jdbcType=VARCHAR}	
+												AND    MUM.IO_RECEIPT_TYPE =  'WMO'
+												AND    MUM.USE_YN 		   = 'Y')
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}

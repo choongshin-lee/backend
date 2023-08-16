@@ -1,4 +1,4 @@
-var menuId = 'T_XUWL3050';
+var menuId = 'XUWL3050';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -30,7 +30,14 @@ var VIEW= {
 			widget.findBtnClicked(1, {receiptId:e.item['receiptId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {receiptId:e.item['receiptId'],referenceNo:e.item['deliveryRequestNo']}, true, 'CELLCLICK',menuId,VIEW);
+			if(e.item.completedYn != 'N' ) {
+			    AUIGrid.clearGridData(widget.grid[2]);   
+			    //widget.messageBox({type: 'warning', width: '400', height: '145', html: '기처리 완료된 건입니다.! '});
+			    return false;	
+			}
+			else {
+			    widget.findBtnClicked(2, {receiptWarehouseCd:e.item['receiptWarehouseCd'],itemId:e.item['itemId'],receiptDetailId:e.item['receiptDetailId']}, true, 'CELLCLICK',menuId,VIEW);
+			}
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
