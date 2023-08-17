@@ -183,7 +183,7 @@
 	        <foreach collection="list" item="item" open="" close="" separator="OR">
 	        (       COMPANY_CD       = #{item.companyCd, jdbcType=VARCHAR}
 	           AND  DIVISION_CD      = #{item.divisionCd, jdbcType=VARCHAR}
-	           AND  IO_RECEIPT_TYPE  = 'WMO'
+	           AND  IO_RECEIPT_TYPE  = 'WMI'
 	           AND  CREATE_BY        = #{item.userId, jdbcType=VARCHAR}
 	        )
 	        </foreach>
@@ -195,17 +195,7 @@
 									   , DIVISION_CD
 									   , IO_RECEIPT_TYPE
 									   , WAREHOUSE_CD
-									   , ITEM_ID
-									   , LOT_ID
-									   , LOCATION_CD
-									   , LOGISTICS_UNIT_CD
-									   , MOVE_QTY
-									   , UOM
-									   , RECEIPT_ID
-									   , RECEIPT_DETAIL_ID
-									   , WAREHOUSE_USE_YN
-									   , IO_TYPE
-    							 	   , DESCRIPTION
+									   , DESCRIPTION
 									   , VAL_MSG
 									   , MULTI_MSG
 									   , CREATE_BY
@@ -213,19 +203,9 @@
 									   )
            VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}  
 				                       , #{item.divisionCd, jdbcType=VARCHAR} 
-				                       , 'WMO'
+				                       , 'WMI'
 				                       , #{item.receiptWarehouseCd, jdbcType=VARCHAR}
-				                       , #{item.itemId, jdbcType=VARCHAR}
-				                       , #{item.lotId, jdbcType=VARCHAR}
-				                       , #{item.locationCd, jdbcType=VARCHAR}
-				                       , #{item.logisticsUnitCd, jdbcType=VARCHAR}
-				                       , #{item.issueQty, jdbcType=NUMERIC}
-				                       , #{item.uom, jdbcType=VARCHAR}
-				                       , #{item.receiptId, jdbcType=VARCHAR}
-				                       , #{item.receiptDetailId, jdbcType=VARCHAR}
-				                       , #{item.issueWhUseYn, jdbcType=VARCHAR}
-				                       , #{item.ioType, jdbcType=VARCHAR}
-						               , #{item.description, jdbcType=VARCHAR}
+				                       , #{item.description, jdbcType=VARCHAR}
 						               , #{item.valMsg, jdbcType=VARCHAR}
 						               , #{item.multiMsg, jdbcType=VARCHAR}
 						               , #{item.userId, jdbcType=VARCHAR}
@@ -234,11 +214,11 @@
         </foreach>
     </insert>
     <select id="proc_customBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WMS_PKG.SP_WAREHOUSE_MOVE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-                                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-                                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-                                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
-                                            , 'WMO' 
-                                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}      
+        { CALL MOM_WMS_PKG.SP_WAREHOUSE_MOVE_IN( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                               , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                               , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                               , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
+                                               , 'WMI' 
+                                               , #{userId,      jdbcType=VARCHAR, mode=IN} )}      
     </select>   	
 </mapper>    
