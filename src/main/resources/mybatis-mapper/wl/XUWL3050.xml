@@ -42,8 +42,8 @@
 			                        WHERE  MWD.COMPANY_CD   = MWM.COMPANY_CD
 			                        AND    MWD.DIVISION_CD  = MWM.DIVISION_CD
 			                        AND    MWD.RECEIPT_ID   = MWM.RECEIPT_ID )        
-					<if test="receiptWarehouseCdNm != null and receiptWarehouseCdNm != ''">
-					AND    (UPPER(MWM.WAREHOUSE_CD) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MW.WAREHOUSE_NM) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
+					<if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
+					AND    MWM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}    
 					</if> 
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
@@ -145,7 +145,7 @@
 		AND     MIS.ITEM_ID       = #{itemId, jdbcType=VARCHAR}
 		AND     MIS.WAREHOUSE_CD  = #{receiptWarehouseCd, jdbcType=VARCHAR}
 		AND     MIS.ALLOCATE_QTY  > 0              
-		AND     C.ISSUE_WH_USE_YN = 'Y'
+		AND     C.ISSUE_WH_USE_YN = 'N'
 		UNION ALL
 		SELECT MLIS.COMPANY_CD
 		     , MLIS.DIVISION_CD 
@@ -178,7 +178,7 @@
 		AND    MLIS.WAREHOUSE_CD  = #{receiptWarehouseCd, jdbcType=VARCHAR}
 		AND    MLIS.ALLOCATE_QTY  > 0
 		AND    ML.LOGISTIC_USE_CD = 'SS'
-		AND     C.ISSUE_WH_USE_YN = 'N'
+		AND     C.ISSUE_WH_USE_YN = 'Y'
 	</select>  
     <delete id="remove_customBtn3-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_WAREHOUSE_MOVE

@@ -42,8 +42,8 @@
 					AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					AND    MWM.STATE           = 'WRG'
 					AND    MWM.IO_RECEIPT_TYPE = 'WMO'
-					<if test="receiptWarehouseCdNm != null and receiptWarehouseCdNm != ''">
-					AND    (UPPER(MWM.WAREHOUSE_CD) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MW.WAREHOUSE_NM) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
+					<if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
+					AND    MWM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}        
 					</if> 
 					AND    MWM.WAREHOUSE_CD IN (SELECT MUM.WAREHOUSE_CD
 												FROM   MOM_USER_WH_IO_RECEIPT_MAP  MUM

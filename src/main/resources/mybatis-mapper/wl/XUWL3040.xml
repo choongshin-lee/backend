@@ -71,9 +71,9 @@
 					<if test="receiptId != null and receiptId != ''">
 					AND    (UPPER(MWM.RECEIPT_ID) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%')   
 					</if>
-					<if test="receiptWarehouseCdNm != null and receiptWarehouseCdNm != ''">
-					AND    (UPPER(MWM.WAREHOUSE_CD) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
-					</if> 
+					<if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
+					AND    MWM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}        
+					</if>
 					AND    MWM.WAREHOUSE_CD IN (SELECT MUM.WAREHOUSE_CD
 												FROM   MOM_USER_WH_IO_RECEIPT_MAP  MUM
 												WHERE  MUM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
