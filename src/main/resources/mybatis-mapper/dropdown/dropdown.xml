@@ -447,6 +447,9 @@
 	<if test="warehouseCd != null and warehouseCd != ''">
 	AND    MLM.WAREHOUSE_CD = #{warehouseCd, jdbcType=VARCHAR} 
 	</if>
+	<if test="userId != null and userId != ''">
+	AND    MLM.USER_NO      = #{userId, jdbcType=VARCHAR}
+	</if>
 	GROUP BY MLM.WAREHOUSE_CD
 	       , ML.WAREHOUSE_NM
 	ORDER BY ML.WAREHOUSE_NM 

@@ -9844,46 +9844,58 @@ var momWidget = {
             that.splashShow();
             let param = that.getCheckedRowItems(that.grid[index]);
             let fileType = 'pdf';
+            let reportFile = " "
+            var today = new Date();
+			var year = today.getFullYear();
+			var month = ('0' + (today.getMonth() + 1)).slice(-2);
+			var day = ('0' + today.getDate()).slice(-2);
+			var hours = ('0' + today.getHours()).slice(-2); 
+			var minutes = ('0' + today.getMinutes()).slice(-2);
+			var seconds = ('0' + today.getSeconds()).slice(-2); 			
+			var dateTimeString = year + month  + day+ hours + minutes  + seconds;
+            
             if (param.length == 0) {
 	            momWidget.messageBox({type: 'warning', width: '400', height: '145', html: '데이터 미선택!'});
                 return;
-            } else {
-                       for(var i =0; i < param.length; i++){
-            param[i].fileName = that.pageProperty[index]['menuId'] + '_' + (index + 1);
-            param[i].reportFileName = param[i].departureNo; 
-            //param[0].fileType = 'xlsx';
-            param[i].fileType = fileType;
-            // param = that.checkSearchParam(index,param,your);
-            $.ajax({
-                url: mCommon.contextPath() + '/createReport',
-                method: "get",
-                contentType: 'application/json; charset=UTF-8',
-                data: param[i],
-                async: false,
-                timeout: 30000000,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('token'));
-                },
-                success: function (data) {
-                    setTimeout(function () {
-                        momWidget.splashHide();
-                        window.open('../report-'+fileType+'/'+param[i].reportFileName+'.'+fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
-                        //history.pushState(null, null, '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType)
-                        //location.href = location.href;
-                        //location.href  = '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType;
-
-                       // location.href = '../report-pdf/' + param[0].fileName + '.' + param[0].fileType;
-                    }, 5000);
-                    
-                },
-                error: function (e) {
-                    momWidget.splashHide();
-                    return;
-                }
-            });
-            }
-            }
-        });
+            }else{
+            for(var i =0; i < param.length; i++){
+	            param[i].fileName = that.pageProperty[index]['menuId'] + '_' + (index + 1);
+	            //param[0].fileType = 'xlsx';
+	            param[i].fileType = fileType;
+	            param[i].reportFile = param[i].departureNo ;
+	            reportFile = param[i].departureNo ;
+	            // param = that.checkSearchParam(index,param,your);
+	
+	            $.ajax({
+	                url: mCommon.contextPath() + '/createReport',
+	                method: "get",
+	                contentType: 'application/json; charset=UTF-8',
+	                data: param[i],
+	                async: false,
+	                timeout: 30000000,
+	                beforeSend: function (xhr) {
+	                    xhr.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('token'));
+	                },
+	                success: function (data) {
+	                    setTimeout(function () {
+	                        momWidget.splashHide();
+	                        window.open('../report-'+fileType+'/'+reportFile+'.'+fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+	                        //history.pushState(null, null, '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType)
+	                        //location.href = location.href;
+	                        //location.href  = '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType;
+	
+	                       // location.href = '../report-pdf/' + param[0].fileName + '.' + param[0].fileType;
+	                    }, 5000);
+	                    
+	                },
+	                error: function (e) {
+	                    momWidget.splashHide();
+	                    return;
+	                }
+	            });
+				}
+				};
+	        });
 
         $(document).on('click', '#' + exUpCheckDownBtnId, function () {
             mom_ajax('R', momWidget.pageProperty[0]['programId'] + '.excelUpBtn' + (index + 1), [], function (result1, data1) {

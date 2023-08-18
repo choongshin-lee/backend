@@ -73,10 +73,11 @@ public class MomController {
 	@GetMapping(value = "/createReport") // 리포트 생성
 	public Map<String, Object> createReport(@RequestParam Map<String, Object> param) {
 
-		String title = param.get("fileName").toString();
-		String report = param.get("reportFileName").toString();
-		String type = param.get("fileType").toString();
-		return reportUtil.createReport(title, report, type, param);
+		String jasperFile = param.get("fileName").toString();
+		String fileType = param.get("fileType").toString();
+		String report = param.get("reportFile").toString();
+        System.out.println("jasper "+jasperFile+" "+" type "+fileType+ " report "+report);  
+		return reportUtil.createReport(jasperFile, fileType, report, param);
 	}
 
 	@GetMapping(value = "/progressBar")

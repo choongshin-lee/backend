@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+    <fontFamily name="JAS-HY고딕">
+        <normal><![CDATA[static/font/korean.h2gtrm.ttf]]></normal>
+        <bold><![CDATA[static/font/korean.h2gtrm.ttf]]></bold>
+        <pdfEncoding>Identity-H</pdfEncoding>
+        <pdfEmbedded>true</pdfEmbedded>
+    </fontFamily>
+    <fontFamily name="JAS-HY견고딕">
+        <normal><![CDATA[static/font/HY견고딕.TTF]]></normal>
+        <bold><![CDATA[static/font/HY견고딕.TTF]]></bold>
+        <pdfEncoding>Identity-H</pdfEncoding>
+        <pdfEmbedded>true</pdfEmbedded>
+    </fontFamily>
+    <fontFamily name="JAS-HYGTRE">
+        <normal><![CDATA[static/font/HYGTRE.TTF]]></normal>
+        <bold><![CDATA[static/font/HYGTRE.TTF]]></bold>
+        <pdfEncoding>Identity-H</pdfEncoding>
+        <pdfEmbedded>true</pdfEmbedded>
+    </fontFamily>
+    <fontFamily name="JAS-H2GTRE">
+        <normal><![CDATA[static/font/H2GTRE.TTF]]></normal>
+        <bold><![CDATA[static/font/H2GTRE.TTF]]></bold>
+        <pdfEncoding>Identity-H</pdfEncoding>
+        <pdfEmbedded>true</pdfEmbedded>
+    </fontFamily>
+</fontFamilies>
