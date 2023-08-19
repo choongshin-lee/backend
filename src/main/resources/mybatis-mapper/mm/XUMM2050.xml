@@ -55,6 +55,8 @@
 					     , MPM.DO_INVOICE_YN
 					     , MPM.TAX_TYPE
                          , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'SM0029', MPM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+                         , COUNT(*) OVER()         AS TOTAL_COUNT
+                         , ROW_NUMBER() OVER(PARTITION BY MPD.COMPANY_CD,MPD.DIVISION_CD ORDER BY MPD.PURCHASE_ORDER_ID ) AS ROW_CNT
 					FROM   MOM_PO_MST MPM
 				         , MOM_PO_DTL MPD
 				         , MOM_PARTNER MP
