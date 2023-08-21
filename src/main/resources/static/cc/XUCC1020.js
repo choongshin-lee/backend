@@ -9,6 +9,30 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
+		dateSelect();
+		//codeSelect();
+        $(document).on('change','#partnerCdDP1', function(e) {
+	    mom_ajax('R', 'XUMD1030.findBtn1', {partnerCd:$('#partnerCdDP1').val(),useYn:'Y'}, function(result1, data1) { 
+	        if(result1 != 'SUCCESS' || data1.length == 0) {
+	            momWidget.splashHide();
+	            return;                  
+	         }     
+	         var taxType =  data1[0]['taxType'];
+	         var taxRate   =  data1[0]['taxRate'];
+	         $('#taxTypeDP1').val(taxType);
+	         $('#taxRateDP1').val(taxRate);
+	          }, undefined, undefined, this, false);
+	    });
+	    $(document).on('change','#taxTypeDP1', function(e) {
+	      mom_ajax('R', 'DD.DD00061', {taxType:$('#taxTypeDP1').val(),useYn:'Y'}, function(result1, data1) { 
+	            if(result1 != 'SUCCESS' || data1.length == 0) {
+	            momWidget.splashHide();
+	            return;                  
+	          }     
+	         var taxRate   =  data1[0]['taxRate'];
+	         $('#taxRateDP1').val(taxRate);
+	          }, undefined, undefined, this, false);
+	    });
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
 		if(index ==0 && btnId =='copyBtn'){	
@@ -62,3 +86,26 @@ $(document).ready(function(event){
 	momWidget.gridPopup.init(2,21,1,'XUDG0360', VIEW);	
 	VIEW.init();
 });
+
+function dateSelect(){
+   mom_ajax('R', 'XUCC1020.dropdownlistContentcloseYearMonthSP1-select1', {}, function(result, data) {
+      if(result == 'SUCCESS') {
+
+         var a = data[0].code;
+         $('#closeYearMonthSP1' ).val(a);   
+      return;
+      }
+   }, undefined, undefined, this, false,'Y');
+      
+};
+
+function codeSelect(){
+   mom_ajax('R', 'XUCC1020.dropdownlistContenttaxTypeSP1-select1', {}, function(result, data) {
+      if(result == 'SUCCESS') {
+      var a = data[0].code;
+      $('#taxTypeSP1' ).val(a);
+      return;
+      }
+   }, undefined, undefined, this, false,'Y');
+
+};

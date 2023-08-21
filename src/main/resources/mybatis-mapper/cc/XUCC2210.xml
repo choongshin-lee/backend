@@ -7,102 +7,116 @@
         FROM   (
     </if>
                 SELECT A.COMPANY_CD
-				     , A.DIVISION_CD
-				     , A.ITEM_TYPE
-				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'MD0002', A.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-				     , A.ITEM_ID
-				     , A.ITEM_NM
-				     , A.ITEM_SPEC
-				     , A.UOM
-				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UOM) FROM DUAL) AS UOM_NM
-				     , A.IN_QTY
-				     , A.OUT_QTY
-				     , TO_CHAR(TO_DATE(#{ioDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD'), 'YYYY-MM-DD')  AS IO_DATE_SD
-				     , TO_CHAR(TO_DATE(#{ioDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD'), 'YYYY-MM-DD')  AS IO_DATE_ED
-				     , A.ITEM_ID||'_'||A.UOM            AS KEY_ID
-				     , COUNT(*) OVER()   AS TOTAL_COUNT
-				     , ROW_NUMBER() OVER(PARTITION BY A.COMPANY_CD,A.DIVISION_CD ORDER BY A.ITEM_TYPE,A.ITEM_ID,A.UOM) AS ROW_CNT
-				FROM   (SELECT MII.COMPANY_CD
-				             , MII.DIVISION_CD
-				             , MI.ITEM_TYPE
-				             , MII.ITEM_ID
-				             , MIN(MI.ITEM_NM)    AS ITEM_NM
-				             , MIN(MI.ITEM_SPEC)  AS ITEM_SPEC
-				             , MII.UOM
-				             , SUM(CASE IO_CATEGORY WHEN 'I' THEN MII.QTY ELSE 0 END) AS IN_QTY
-				             , SUM(CASE IO_CATEGORY WHEN 'O' THEN MII.QTY ELSE 0 END) AS OUT_QTY
-				        FROM   MOM_ITEM_INOUT MII
-				             , MOM_ITEM MI 
-				        WHERE  MII.COMPANY_CD    = MI.COMPANY_CD 
-				        AND    MII.DIVISION_CD   = MI.DIVISION_CD 
-				        AND    MII.ITEM_ID       = MI.ITEM_ID 
-				        AND    MII.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
-				        AND    MII.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  
-				        AND    MII.IO_DATE BETWEEN TO_DATE(#{ioDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{ioDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-				        <if test="itemIdNm != null and itemIdNm != ''">
-				        AND    (UPPER(MII.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
-				        </if>
-				        <if test="itemType != null and itemType != ''">
-				        AND    MI.ITEM_TYPE  = #{itemType, jdbcType=VARCHAR} 	  
-				        </if>
-				        AND    MII.WAREHOUSE_CD IN (SELECT MWM.WAREHOUSE_CD
-							                        FROM   MOM_WAREHOUSE_MANAGER  MWM
-								                    WHERE  MWM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
-								                    AND    MWM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
-								                    AND    MWM.USER_NO      = #{userId, jdbcType=VARCHAR}  
-								                    AND    MWM.USE_YN       = 'Y')
-				        GROUP BY MII.COMPANY_CD
-				               , MII.DIVISION_CD
-				               , MI.ITEM_TYPE
-				               , MII.ITEM_ID
-				               , MII.UOM      ) A 
+		             , A.DIVISION_CD
+		             , A.ITEM_TYPE
+		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'MD0002', A.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+		             , A.ITEM_ID
+		             , A.ITEM_NM
+		             , A.ITEM_SPEC
+		             , A.UOM
+		             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UOM) FROM DUAL) AS UOM_NM
+		             , TO_CHAR(A.IO_DATE ,'YYYY-MM-DD')  AS IO_DATE
+		             , A.BEGIN_QTY
+		             , A.PRE_IN_QTY
+		             , A.DAY_IN_QTY
+		             , A.PRE_OUT_QTY
+		             , A.DAY_OUT_QTY
+		             , A.END_QTY
+		             , A.PRE_END_QTY
+		             , TO_CHAR(TO_DATE(#{ioDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD'), 'YYYY-MM-DD')  AS IO_DATE_SD
+		             , TO_CHAR(TO_DATE(#{ioDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD'), 'YYYY-MM-DD')  AS IO_DATE_ED
+		             , A.ITEM_ID||'_'||A.UOM            AS KEY_ID
+		             , COUNT(*) OVER()   AS TOTAL_COUNT
+		             , ROW_NUMBER() OVER(PARTITION BY A.COMPANY_CD,A.DIVISION_CD ORDER BY A.ITEM_TYPE,A.ITEM_ID,A.UOM) AS ROW_CNT
+		        FROM   (SELECT MCIV.COMPANY_CD
+			                 , MCIV.DIVISION_CD
+			                 , MIN(MI.ITEM_TYPE)        AS ITEM_TYPE
+			                 , MCIV.ITEM_ID
+			                 , MIN(MI.ITEM_NM)          AS ITEM_NM
+			                 , MIN(MI.ITEM_SPEC)        AS ITEM_SPEC
+			                 , MCIV.UOM
+			                 , MIN(MCIV.IO_DATE)        AS  IO_DATE
+			                 , SUM(MCIV.BEGIN_QTY)      AS  BEGIN_QTY     
+			                 , SUM(MCIV.PRE_IN_QTY)     AS  PRE_IN_QTY 
+			                 , SUM(MCIV.DAY_IN_QTY)     AS  DAY_IN_QTY 
+			                 , SUM(MCIV.PRE_OUT_QTY)    AS  PRE_OUT_QTY 
+			                 , SUM(MCIV.DAY_OUT_QTY)    AS  DAY_OUT_QTY 
+			                 , SUM(MCIV.END_QTY)        AS  END_QTY 
+			                 , SUM(MCIV.PRE_END_QTY)    AS  PRE_END_QTY  
+			            FROM   MOM_CURRENT_INV_V MCIV  
+			                 , MOM_ITEM MI
+			            WHERE  MCIV.COMPANY_CD  = MI.COMPANY_CD 
+			            AND    MCIV.DIVISION_CD = MI.DIVISION_CD 
+			            AND    MCIV.ITEM_ID     = MI.ITEM_ID
+			            AND    MCIV.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+			            AND    MCIV.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}   
+			            <if test="itemIdNm != null and itemIdNm != ''">
+			            AND    (UPPER(MCIV.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')   
+			            </if>
+			            <if test="itemType != null and itemType != ''">
+			            AND    MI.ITEM_TYPE  = #{itemType, jdbcType=VARCHAR}    
+			            </if>
+		                AND    MCIV.WAREHOUSE_CD IN (SELECT MWM.WAREHOUSE_CD
+		                                             FROM   MOM_WAREHOUSE_MANAGER  MWM
+				                                     WHERE  MWM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+				                                     AND    MWM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
+				                                     AND    MWM.USER_NO      = #{userId, jdbcType=VARCHAR}  
+				                                     AND    MWM.USE_YN       = 'Y')
+				        GROUP BY MCIV.COMPANY_CD
+				               , MCIV.DIVISION_CD
+				               , MCIV.ITEM_ID  
+		                       , MCIV.UOM ) A 
     <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
                ) A
         WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
     </if>               
     </select>   
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-        SELECT MII.COMPANY_CD
-		     , MII.DIVISION_CD
-		     , MI.ITEM_TYPE
-		     , MII.ITEM_ID
-		     , MII.IO_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
-		     , TO_CHAR(MII.IO_DATE ,'YYYY-MM-DD')  AS IO_DATE
-		     , MII.WAREHOUSE_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
-		     , MII.UOM
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.UOM) FROM DUAL) AS UOM_NM
-		     , NVL(MII.LOT_ID,' ') AS LOT_ID
-		     , CASE MII.IO_CATEGORY WHEN 'I' THEN MII.QTY ELSE 0 END AS IN_QTY
-		     , CASE MII.IO_CATEGORY WHEN 'O' THEN MII.QTY ELSE 0 END AS OUT_QTY
-		     , MII.ITEM_INOUT_ID  
-		     , MII.ITEM_STOCK_ID
-		     , MII.IO_CATEGORY
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MII.COMPANY_CD, MII.DIVISION_CD, 'IC0001', MII.IO_CATEGORY, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS IO_CATEGORY_NM
-		     , MII.REFERENCE_NO
-		     , MII.REFERENCE_SEQ
-		     , MII.REFERENCE_DTL_NO
-		     , MII.WORK_ORDER_ID
-		     , MII.WO_RESULT_ID
-		     , MII.CREATE_BY      AS CREATE_USER_NO
-		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
-		     , TO_CHAR(MII.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE
-		     , ROWIDTOCHAR(MII.ROWID)            AS KEY_ID
-		FROM   MOM_ITEM_INOUT MII
-		     , MOM_ITEM MI 
-		WHERE  MII.COMPANY_CD    = MI.COMPANY_CD 
-		AND    MII.DIVISION_CD   = MI.DIVISION_CD 
-		AND    MII.ITEM_ID       = MI.ITEM_ID 
-		AND    MII.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
-		AND    MII.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  
-		AND    MII.IO_DATE BETWEEN TO_DATE(#{ioDateSd, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{ioDateEd, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-		AND    MII.ITEM_ID       = #{item_id, jdbcType=VARCHAR}  
-		AND    MII.UOM           = #{uom, jdbcType=VARCHAR}
-		ORDER BY MI.ITEM_TYPE ASC
-		       , MII.ITEM_ID ASC 
-		       , MII.WAREHOUSE_CD ASC
-		       , MII.LOT_ID ASC
-		       , MII.IO_DATE ASC       
+        SELECT INV.COMPANY_CD
+	         , INV.DIVISION_CD
+	         , INV.DOCUMENT_NO
+	         , MI.ITEM_TYPE
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(INV.COMPANY_CD, INV.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+	         , INV.ITEM_ID
+	         , INV.UOM
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(INV.COMPANY_CD, INV.DIVISION_CD, INV.UOM) FROM DUAL) AS UOM_NM
+	         , INV.WAREHOUSE_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(INV.COMPANY_CD, INV.DIVISION_CD, INV.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
+	         , TO_CHAR(INV.IO_DATE ,'YYYY-MM-DD')  AS IO_DATE
+	         , INV.BEGIN_QTY
+	         , INV.PRE_IN_QTY
+	         , INV.DAY_IN_QTY
+	         , INV.PRE_OUT_QTY
+	         , INV.DAY_OUT_QTY
+	         , INV.END_QTY
+	         , INV.PRE_END_QTY 
+	         , INV.ITEM_ID||'_'||INV.UOM||'_'||INV.WAREHOUSE_CD           AS KEY_ID
+	    FROM   ( SELECT COMPANY_CD, DIVISION_CD, DOCUMENT_NO, ITEM_ID, UOM, WAREHOUSE_CD, IO_DATE, BEGIN_QTY, PRE_IN_QTY, DAY_IN_QTY, PRE_OUT_QTY, DAY_OUT_QTY, END_QTY, PRE_END_QTY
+	             FROM ( SELECT COMPANY_CD, DIVISION_CD, '기초' AS DOCUMENT_NO, ITEM_ID, UOM, WAREHOUSE_CD, IO_DATE, BEGIN_QTY, 0 AS PRE_IN_QTY, IN_QTY AS DAY_IN_QTY, 0 AS PRE_OUT_QTY, OUT_QTY AS DAY_OUT_QTY ,END_QTY, END_QTY AS PRE_END_QTY
+	                    FROM   MOM_DAILY_INOUT_V
+	                    UNION ALL
+	                    SELECT COMPANY_CD, DIVISION_CD, DOCUMENT_NO, ITEM_ID, UOM, STORAGE_WAREHOUSE_CD AS WAREHOUSE_CD, TRUNC(SYSDATE) AS IO_DATE, 0 AS BEGIN_QTY, INV_QTY AS PRE_IN_QTY, 0 AS DAY_IN_QTY, 0 AS PRE_OUT_QTY, 0 AS DAY_OUT_QTY, 0 AS END_QTY, INV_QTY AS PRE_END_QTY
+	                    FROM MOM_PO_PUR_ITEM_V
+	                    UNION ALL
+	                    SELECT COMPANY_CD, DIVISION_CD, DOCUMENT_NO, ITEM_ID, UOM, STORAGE_WAREHOUSE_CD AS WAREHOUSE_CD, TRUNC(SYSDATE) AS IO_DATE, 0 AS BEGIN_QTY
+	                         , (CASE WHEN STATUS = '입고전' THEN INV_QTY ELSE 0 END) AS PRE_IN_QTY, 0 AS DAY_IN_QTY
+	                         , (CASE WHEN STATUS = '출고전' THEN INV_QTY ELSE 0 END) AS PRE_OUT_QTY, 0 AS DAY_OUT_QTY, 0 AS END_QTY
+	                         , (CASE WHEN STATUS = '출고전' THEN INV_QTY*-1  ELSE INV_QTY END) AS PRE_END_QTY
+	                    FROM MOM_DO_ITEM_V
+	                    UNION ALL
+	                    SELECT COMPANY_CD, DIVISION_CD, DOCUMENT_NO, ITEM_ID, UOM, GOOD_WAREHOUSE_CD AS WAREHOUSE_CD, TRUNC(SYSDATE) AS IO_DATE, 0 AS BEGIN_QTY
+	                         , (CASE WHEN STATUS = '생산예정' THEN INV_QTY ELSE 0 END) AS PRE_IN_QTY,0 AS DAY_IN_QTY
+	                         , (CASE WHEN STATUS = '소진예정' THEN INV_QTY ELSE 0 END) AS PRE_OUT_QTY,0 AS DAY_OUT_QTY,0 AS END_QTY
+	                         , (CASE WHEN STATUS = '소진예정' THEN INV_QTY*-1  ELSE INV_QTY END) AS PRE_END_QTY
+	                    FROM MOM_PROD_ITEM_V ) ) INV
+	        ,  MOM_ITEM MI
+	    WHERE  1=1
+	    AND    INV.COMPANY_CD   = MI.COMPANY_CD 
+	    AND    INV.DIVISION_CD  = MI.DIVISION_CD 
+	    AND    INV.ITEM_ID      = MI.ITEM_ID 
+	    AND    INV.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+	    AND    INV.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}  
+	    AND    INV.ITEM_ID      = #{item_id, jdbcType=VARCHAR}  
+	    AND    INV.UOM          = #{uom, jdbcType=VARCHAR}
     </select> 
 </mapper>     

@@ -1,54 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUDG0360">
+<mapper namespace="com.mom.backend.XUDG0520">
     <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
-	    SELECT MDOM.COMPANY_CD
-		     , MDOM.DIVISION_CD
-		     , MDOM.DO_NO
-		     , MDOD.DELIVERY_ORDER_ID
-		     , MDOD.REFERENCE_NO          	AS SO_NO
-		     , MDOD.REFERENCE_DTL_NO		AS SO_DETAIL_NO
-		     , TO_CHAR(MDOD.SHIP_DATE ,'YYYY-MM-DD')  AS SHIP_DATE
-		     , MDOD.ITEM_ID
+	    SELECT MPIM.COMPANY_CD 
+		     , MPIM.DIVISION_CD
+		     , MPID.INOUT_NO
+		     , MPID.PURCHASE_INOUT_ID
+		     , MPID.REFERENCE_NO          AS PO_NO
+		     , MPID.REFERENCE_DTL_NO	  AS PO_DETAIL_NO
+		     , TO_CHAR(MPID.RECEIPT_DATE ,'YYYY-MM-DD')     AS RECEIPT_DATE
+		     , MPID.ITEM_ID         
 		     , MI.ITEM_NM
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		     , MDOD.SHIP_QTY
-		     , MDOD.DO_UNIT   AS SHIP_UOM
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, MDOD.DO_UNIT) FROM DUAL) AS SHIP_UOM_NM
-		     , MDOD.CONVERSION_QTY
-			 , MDOD.CONVERSION_UNIT  AS CONVERSION_UOM
-			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, MDOD.CONVERSION_UNIT) FROM DUAL) AS CONVERSION_UOM_NM
+		     , MPID.RECEIPT_QTY    
+		     , MPID.INOUT_UOM     AS RECEIPT_UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.INOUT_UOM) FROM DUAL) AS RECEIPT_UOM_NM
+		     , MPID.CONVERSION_QTY
+		     , MPID.CONVERSION_UOM 
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
 		     , MPIM.CURRENCY_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDOD.COMPANY_CD, MDOD.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
 		     , MPIM.EXCHANGE_RATE
-		     , MDOD.UNIT_PRICE
-		     , MDOD.AMOUNT
-		     , MDOD.LOCAL_AMOUNT
-		     , MDOM.TAX_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDOM.COMPANY_CD, MDOM.DIVISION_CD, 'SM0029', MDOM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
-			 , TRUNC(ROUND(MDOD.LOCAL_AMOUNT * (MOM_COMMON_PKG.FN_GET_TAX_RATE(MDOM.COMPANY_CD , MDOM.DIVISION_CD , MDOM.TAX_TYPE)) ,0),-1) AS TAX_AMOUNT
-		FROM   MOM_DELIVERY_ORDER_DTL  MDOD
-		     , MOM_DELIVERY_ORDER_MST  MDOM 
-		     , MOM_ITEM                MI 
-		     , MOM_TAX_INVOICE_DTL     MTID          
-		WHERE  MDOD.COMPANY_CD        = MDOM.COMPANY_CD 
-		AND    MDOD.DIVISION_CD       = MDOM.DIVISION_CD 
-		AND    MDOD.DO_NO             = MDOM.DO_NO
-		AND    MDOD.COMPANY_CD        = MI.COMPANY_CD
-		AND    MDOD.DIVISION_CD       = MI.DIVISION_CD
-		AND    MDOD.ITEM_ID           = MI.ITEM_ID  
-		AND    MDOD.COMPANY_CD        = MTID.COMPANY_CD(+) 
-		AND    MDOD.DIVISION_CD       = MTID.DIVISION_CD(+) 
-		AND    MDOD.DELIVERY_ORDER_ID = MTID.REFERENCE_DTL_NO(+) 
-		AND    MDOD.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
-		AND    MDOD.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
-		AND    MDOM.PARTNER_CD        = #{partnerCd, jdbcType=VARCHAR}
-		AND    (MDOD.SHIP_DATE         &lt; #{invoiceDate, jdbcType=VARCHAR} OR  MDOD.SHIP_DATE = #{invoiceDate, jdbcType=VARCHAR}) 
-		AND    MDOM.TAX_TYPE          = #{taxType, jdbcType=VARCHAR}
-		AND    MDOD.CLOSING_YN        = 'N'
+		     , MPID.UNIT_PRICE
+		     , MPID.AMOUNT
+		     , MPID.LOCAL_AMOUNT
+		     , MPIM.TAX_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+		     , TRUNC(ROUND(MPID.LOCAL_AMOUNT * (MOM_COMMON_PKG.FN_GET_TAX_RATE(MPIM.COMPANY_CD , MPIM.DIVISION_CD , MPIM.TAX_TYPE)) ,0),-1) AS TAX_AMOUNT
+		FROM   MOM_PURCHASE_INOUT_DTL MPID
+		     , MOM_PURCHASE_INOUT_MST MPIM
+		     , MOM_ITEM MI 
+		     , MOM_TAX_INVOICE_DTL    MTID
+		WHERE  MPID.COMPANY_CD        = MPIM.COMPANY_CD 
+		AND    MPID.DIVISION_CD       = MPIM.DIVISION_CD 
+		AND    MPID.INOUT_NO          = MPIM.INOUT_NO
+		AND    MPID.COMPANY_CD        = MI.COMPANY_CD
+		AND    MPID.DIVISION_CD       = MI.DIVISION_CD
+		AND    MPID.ITEM_ID           = MI.ITEM_ID   
+		AND    MPID.COMPANY_CD        = MTID.COMPANY_CD(+)
+		AND    MPID.DIVISION_CD       = MTID.DIVISION_CD(+) 
+		AND    MPID.PURCHASE_INOUT_ID = MTID.REFERENCE_DTL_NO(+) 
+		AND    MPID.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
+		AND    MPID.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
+		AND    MPIM.VENDOR_CD         = #{partnerCd, jdbcType=VARCHAR}
+		AND    (MPID.RECEIPT_DATE    &lt; #{invoiceDate, jdbcType=VARCHAR}  OR  MPID.RECEIPT_DATE = #{invoiceDate, jdbcType=VARCHAR}) 
+		AND    MPIM.TAX_TYPE          = #{taxType, jdbcType=VARCHAR}
+		AND    MPID.CLOSING_YN        = 'N'
 		AND    MTID.REFERENCE_DTL_NO IS NULL
+		AND    EXISTS ( SELECT '*'
+                        FROM   MOM_IO_CATEGORY MIC
+	                    WHERE  MIC.COMPANY_CD        = MPID.COMPANY_CD
+	                    AND    MIC.DIVISION_CD       = MPID.DIVISION_CD
+	                    AND    MIC.USE_YN            = 'Y'
+	                    AND    MIC.OUTSIDE_CLOSED_YN = 'Y')
     </select>
     <delete id="remove_customBtn21-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_TAX_INVOICE_DTL 
@@ -56,7 +62,7 @@
               <foreach collection="list" item="item" open="" close="" separator="OR">
             (       COMPANY_CD     = #{item.companyCd, jdbcType=VARCHAR}
                AND  DIVISION_CD    = #{item.divisionCd, jdbcType=VARCHAR}
-               AND  PUR_SAL_TYPE = 'S'
+               AND  PUR_SAL_TYPE = 'O'
                AND  CREATE_BY      = #{item.userId, jdbcType=VARCHAR}
             )
               </foreach>
@@ -88,7 +94,7 @@
 	                                 )
         VALUES                       ( #{item.companyCd, jdbcType=VARCHAR}
 					                 , #{item.divisionCd, jdbcType=VARCHAR}
-					                 , 'S'
+					                 , 'O'
 					                 , #{item.partnerCd, jdbcType=VARCHAR}
 					                 , TO_DATE(#{item.invoiceDate, jdbcType=VARCHAR},'YYYY-MM-DD')
 					                 , #{item.taxType, jdbcType=VARCHAR}
@@ -96,7 +102,7 @@
 					                 , #{item.referenceDtlNo, jdbcType=VARCHAR}
 					                 , #{item.itemId, jdbcType=VARCHAR}
 					                 , TO_DATE(#{item.receiptDate, jdbcType=VARCHAR},'YYYY-MM-DD') 
-					                 , #{item.doQty, jdbcType=NUMERIC}
+					                 , #{item.receiptQty, jdbcType=NUMERIC}
 					                 , #{item.localAmount, jdbcType=NUMERIC}
 					                 , #{item.taxRate, jdbcType=NUMERIC}
 					                 , #{item.taxAmount, jdbcType=NUMERIC}
@@ -115,7 +121,7 @@
 			                                           , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 			                                           , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 			                                           , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
-			                                           , 'S'											  
+			                                           , 'O'											  
 			                                           , #{userId,      jdbcType=VARCHAR, mode=IN} )}                   
     </select>    
 </mapper>

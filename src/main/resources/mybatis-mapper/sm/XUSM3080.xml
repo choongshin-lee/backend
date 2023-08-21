@@ -22,6 +22,8 @@
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MOC.COMPANY_CD, MOC.DIVISION_CD, 'SM0026', MOC.SHIPPING_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS SHIPPING_YN_NM
 	         , MOC.EX_SHIPPING_YN
 	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MOC.COMPANY_CD, MOC.DIVISION_CD, 'SM0026', MOC.EX_SHIPPING_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EX_SHIPPING_YN_NM
+	         , MOC.PURCHASE_CLOSED_YN 
+             , MOC.OUTSIDE_CLOSED_YN 
 	    FROM   MOM_COM_DIV_V MCD
 	  	     , MOM_IO_CATEGORY MOC
 	    WHERE  MCD.COMPANY_CD   = MOC.COMPANY_CD
@@ -50,6 +52,8 @@
 		                    , PUR_RETURN_YN 
 		                    , SHIPPING_YN
 		                    , EX_SHIPPING_YN
+		                    , PURCHASE_CLOSED_YN
+		                    , OUTSIDE_CLOSED_YN
 		                    , USE_YN
 		                    , DESCRIPTION
 		                    , CREATE_BY
@@ -57,7 +61,7 @@
 		                    , UPDATE_BY
 		                    , UPDATE_DATE )
         VALUES 
-                            (   #{item.companyCd, jdbcType=VARCHAR}
+                            ( #{item.companyCd, jdbcType=VARCHAR}
 			                , #{item.divisionCd, jdbcType=VARCHAR}
 			                , #{item.ioType, jdbcType=VARCHAR}
 			                , #{item.ioTypeNm, jdbcType=VARCHAR}
@@ -66,6 +70,8 @@
 			                , #{item.purReturnYn, jdbcType=VARCHAR}
 			                , #{item.shippingYn, jdbcType=VARCHAR}
 			                , #{item.exShippingYn, jdbcType=VARCHAR}
+			                , #{item.purchaseClosedYn, jdbcType=VARCHAR}
+			                , #{item.outsideClosedYn, jdbcType=VARCHAR}
 			                , #{item.useYn, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.userId, jdbcType=VARCHAR}
@@ -78,20 +84,22 @@
     <update id="modify_editBtn1" parameterType="java.util.List">
         <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close=";END;">
         UPDATE MOM_IO_CATEGORY
-        SET    IO_TYPE_NM = #{item.ioTypeNm, jdbcType=VARCHAR}
-             , IL_TYPE = #{item.ilType, jdbcType=VARCHAR}
-             , PUR_RECEIVE_YN = #{item.purReceiveYn, jdbcType=VARCHAR}
-             , PUR_RETURN_YN  = #{item.purReturnYn, jdbcType=VARCHAR}
-             , SHIPPING_YN    = #{item.shippingYn, jdbcType=VARCHAR}
-             , EX_SHIPPING_YN = #{item.exShippingYn, jdbcType=VARCHAR}
-             , USE_YN = #{item.useYn, jdbcType=VARCHAR}
-             , DESCRIPTION = #{item.description, jdbcType=VARCHAR}
-             , UPDATE_BY = #{item.userId, jdbcType=VARCHAR}
-             , UPDATE_DATE = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+        SET    IO_TYPE_NM         = #{item.ioTypeNm, jdbcType=VARCHAR}
+             , IL_TYPE 	          = #{item.ilType, jdbcType=VARCHAR}
+             , PUR_RECEIVE_YN     = #{item.purReceiveYn, jdbcType=VARCHAR}
+             , PUR_RETURN_YN      = #{item.purReturnYn, jdbcType=VARCHAR}
+             , SHIPPING_YN        = #{item.shippingYn, jdbcType=VARCHAR}
+             , EX_SHIPPING_YN     = #{item.exShippingYn, jdbcType=VARCHAR}
+             , PURCHASE_CLOSED_YN = #{item.purchaseClosedYn, jdbcType=VARCHAR}
+             , OUTSIDE_CLOSED_YN  = #{item.outsideClosedYn, jdbcType=VARCHAR}
+             , USE_YN             = #{item.useYn, jdbcType=VARCHAR}
+             , DESCRIPTION        = #{item.description, jdbcType=VARCHAR}
+             , UPDATE_BY          = #{item.userId, jdbcType=VARCHAR}
+             , UPDATE_DATE        = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
         WHERE  1=1
-        AND    COMPANY_CD = #{item.companyCd, jdbcType=VARCHAR}
+        AND    COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
         AND    DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-        AND    IO_TYPE = #{item.ioType, jdbcType=VARCHAR}
+        AND    IO_TYPE     = #{item.ioType, jdbcType=VARCHAR}
         </foreach>
     </update>
     <delete id="remove_delBtn1" parameterType="java.util.List">

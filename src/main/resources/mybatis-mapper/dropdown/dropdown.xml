@@ -186,7 +186,10 @@
          , PARTNER_CD ||'('|| PARTNER_NM   ||')' AS LABEL
     FROM   MOM_PARTNER   
     WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+    <if test="partnerType != null and partnerType != ''">
+    AND    PARTNER_TYPE = #{partnerType, jdbcType=VARCHAR} 
+    </if> 
     AND    USE_YN      = 'Y'
     <if test="searchKey != null and searchKey != ''">
     AND    (TRIM(UPPER(PARTNER_CD)) LIKE '%' || TRIM(UPPER(#{searchKey, jdbcType=VARCHAR})) || '%' OR TRIM(UPPER(PARTNER_NM)) LIKE '%' || TRIM(UPPER(#{searchKey, jdbcType=VARCHAR})) || '%')
@@ -758,5 +761,24 @@
     AND     ATTRIBUTE1 = #{attribute1, jdbcType=VARCHAR} 
     </if>
     ORDER BY LABEL
-	</select>           	
+	</select>      
+	<select id="get_DD00061" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	SELECT  CODE
+         ,  NVL((SELECT MOM_COMMON_PKG.FN_GET_MULTI_LANGUAGE(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR},#{langCd, jdbcType=VARCHAR},'CODE',#{groupCd, jdbcType=VARCHAR}|| '_' ||CODE)
+	             FROM   DUAL ),CODE ||'('|| CODE_NM ||')') AS LABEL
+	     ,  NVL(TO_NUMBER(ATTRIBUTE1), 0) AS TAX_RATE        
+	FROM    MOM_CODE
+	WHERE   DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+	AND     COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	AND     GROUP_CD    = 'SM0029'
+	<if test="taxType != null and taxType != ''">
+    AND     CODE = #{taxType, jdbcType=VARCHAR} 
+    </if>
+	AND     USE_YN      = 'Y'
+	<if test="attribute1 != null and attribute1 != ''">
+    AND     ATTRIBUTE1 = #{attribute1, jdbcType=VARCHAR} 
+    </if>
+    ORDER BY LABEL
+	</select> 
+	     	
 </mapper>

@@ -10,6 +10,11 @@ var VIEW= {
   event: function(e) {
   
   },
+  copyCallInit: function(index,your,action,btnId,param,result) {
+      if(index ==0 && btnId =='copyBtn'){	
+	      $('#hcnCdDP1').val('');
+	  }
+  },
     
 };
 

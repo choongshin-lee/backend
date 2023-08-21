@@ -1,4 +1,4 @@
-var menuId = 'XUCC1010';
+var menuId = 'XUCC1030';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -10,7 +10,7 @@ var VIEW= {
 	},
 	event: function(e) {
 		dateSelect();
-				//codeSelect();
+		//codeSelect();
 		$(document).on('change','#partnerCdDP1', function(e) {
 			mom_ajax('R', 'XUMD1030.findBtn1', {partnerCd:$('#partnerCdDP1').val(),useYn:'Y'}, function(result1, data1) { 
 		        if(result1 != 'SUCCESS' || data1.length == 0) {
@@ -83,12 +83,12 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0350', VIEW);	
+	momWidget.gridPopup.init(2,21,1,'XUDG0520', VIEW);	
 	VIEW.init();
 });
 
 function dateSelect(){
-   mom_ajax('R', 'XUCC1010.dropdownlistContentcloseYearMonthSP1-select1', {}, function(result, data) {
+   mom_ajax('R', 'XUCC1030.dropdownlistContentcloseYearMonthSP1-select1', {}, function(result, data) {
       if(result == 'SUCCESS') {
 
          var a = data[0].code;
@@ -100,7 +100,7 @@ function dateSelect(){
 };
 
 function codeSelect(){
-   mom_ajax('R', 'XUCC1010.dropdownlistContenttaxTypeSP1-select1', {}, function(result, data) {
+   mom_ajax('R', 'XUCC1030.dropdownlistContenttaxTypeSP1-select1', {}, function(result, data) {
       if(result == 'SUCCESS') {
       var a = data[0].code;
       $('#taxTypeSP1' ).val(a);

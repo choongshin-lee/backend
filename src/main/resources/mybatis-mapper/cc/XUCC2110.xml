@@ -46,7 +46,7 @@
 		</if>
     </select>
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-    { CALL MOM_CLOSED_PKG.SP_CREATE_ITEM_INOUT_MOMTHLY_SUMMARY( #{p_err_code,     jdbcType=VARCHAR, mode=OUT}
+    { CALL MOM_CLOSED_PKG.SP_CREATE_ITEM_INOUT_M_SUMMARY( #{p_err_code,     jdbcType=VARCHAR, mode=OUT}
 					                                          , #{p_err_msg,      jdbcType=VARCHAR, mode=OUT}
 					                                          , #{companyCd,      jdbcType=VARCHAR, mode=IN}
 					                                          , #{divisionCd,     jdbcType=VARCHAR, mode=IN}
