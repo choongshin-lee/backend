@@ -74,7 +74,7 @@
 		            AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
 		            </if>
 		            <if test="workCenterCd != null and workCenterCd != ''">
-		            AND    MB.WORK_CENTER_CD = #{workCenterCd , jdbcType=VARCHAR}
+		            AND    MB.WORK_CENTER_CD IN (${workCenterCd})
 		            </if>
 		            <if test="routingId != null and routingId != ''">
 		            AND    MB.ROUTING_ID = #{routingId , jdbcType=VARCHAR}

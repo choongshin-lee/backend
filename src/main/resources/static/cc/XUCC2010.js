@@ -10,6 +10,11 @@ var VIEW= {
 	},
 	event: function(e) {
 	},
+	customCallInit: function(index,your,action,btnId,param,result) {
+		if(index==0 && btnId == 'customBtn1-1'){	                                             
+		    result.param = {closedDate:$('#closedDateSP1').val()};    
+        }   
+	},	
 };
 
 $(document).ready(function(event){	

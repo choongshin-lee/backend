@@ -9,8 +9,8 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
-		dateSelect();
-				//codeSelect();
+		//dateSelect();
+		//codeSelect();
 		$(document).on('change','#partnerCdDP1', function(e) {
 			mom_ajax('R', 'XUMD1030.findBtn1', {partnerCd:$('#partnerCdDP1').val(),useYn:'Y'}, function(result1, data1) { 
 		        if(result1 != 'SUCCESS' || data1.length == 0) {

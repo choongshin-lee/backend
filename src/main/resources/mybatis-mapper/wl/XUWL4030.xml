@@ -195,6 +195,7 @@
 									   , DIVISION_CD
 									   , IO_RECEIPT_TYPE
 									   , WAREHOUSE_CD
+									   , RECEIPT_ID
 									   , DESCRIPTION
 									   , VAL_MSG
 									   , MULTI_MSG
@@ -205,6 +206,7 @@
 				                       , #{item.divisionCd, jdbcType=VARCHAR} 
 				                       , 'WMI'
 				                       , #{item.receiptWarehouseCd, jdbcType=VARCHAR}
+				                       , #{item.receiptId, jdbcType=VARCHAR}
 				                       , #{item.description, jdbcType=VARCHAR}
 						               , #{item.valMsg, jdbcType=VARCHAR}
 						               , #{item.multiMsg, jdbcType=VARCHAR}

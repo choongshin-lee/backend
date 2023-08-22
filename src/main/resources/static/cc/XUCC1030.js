@@ -9,8 +9,6 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
-		dateSelect();
-		//codeSelect();
 		$(document).on('change','#partnerCdDP1', function(e) {
 			mom_ajax('R', 'XUMD1030.findBtn1', {partnerCd:$('#partnerCdDP1').val(),useYn:'Y'}, function(result1, data1) { 
 		        if(result1 != 'SUCCESS' || data1.length == 0) {
@@ -87,25 +85,3 @@ $(document).ready(function(event){
 	VIEW.init();
 });
 
-function dateSelect(){
-   mom_ajax('R', 'XUCC1030.dropdownlistContentcloseYearMonthSP1-select1', {}, function(result, data) {
-      if(result == 'SUCCESS') {
-
-         var a = data[0].code;
-         $('#closeYearMonthSP1' ).val(a);   
-      return;
-      }
-   }, undefined, undefined, this, false,'Y');
-      
-};
-
-function codeSelect(){
-   mom_ajax('R', 'XUCC1030.dropdownlistContenttaxTypeSP1-select1', {}, function(result, data) {
-      if(result == 'SUCCESS') {
-      var a = data[0].code;
-      $('#taxTypeSP1' ).val(a);
-      return;
-      }
-   }, undefined, undefined, this, false,'Y');
-
-};
