@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUCC2230">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+        SELECT A.*
+        FROM   (
+    </if>
+                SELECT A.COMPANY_CD
+				     , A.DIVISION_CD
+				     , A.ITEM_ID
+				     , MIN(A.ITEM_TYPE)  AS ITEM_TYPE
+				     , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'MD0002', A.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_TYPE_NM
+				     , MIN(A.ITEM_NM)    AS ITEM_NM
+				     , MIN(A.ITEM_SPEC)  AS ITEM_SPEC
+				     , A.UOM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UOM) FROM DUAL) AS UOM_NM
+				     , SUM(BEGIN_QTY) AS BEGIN_QTY
+				     , SUM(IN_QTY)    AS IN_QTY
+				     , SUM(OUT_QTY)   AS OUT_QTY
+				     , SUM(BEGIN_QTY) + SUM(IN_QTY) - SUM(OUT_QTY) AS END_QTY
+				     , A.ITEM_ID||'_'||A.UOM            AS KEY_ID
+				     , #{startMonth, jdbcType=VARCHAR}  AS START_MONTH
+                     , #{endMonth, jdbcType=VARCHAR}    AS END_MONTH
+				     , COUNT(*) OVER()   AS TOTAL_COUNT
+				     , ROW_NUMBER() OVER(PARTITION BY A.COMPANY_CD,A.DIVISION_CD ORDER BY A.ITEM_ID,A.UOM) AS ROW_CNT
+				FROM ( SELECT MIS.COMPANY_CD
+				            , MIS.DIVISION_CD
+				            , MIS.ITEM_ID
+				            , MI.ITEM_NM
+				            , MI.ITEM_TYPE
+				            , MI.ITEM_SPEC
+				            , MIS.UOM
+				            , MIS.WAREHOUSE_CD
+				            , MIS.CLOSE_YEAR_MONTH   
+				            , (CASE WHEN MIS.CLOSE_YEAR_MONTH = #{startMonth, jdbcType=VARCHAR} THEN NVL(MIS.BEGIN_QTY,0) ELSE 0 END) AS BEGIN_QTY
+				            , NVL(MIS.IN_QTY,0) AS IN_QTY
+				            , NVL(MIS.OUT_QTY,0) AS OUT_QTY
+				       FROM   MOM_ITEM_INOUT_MONTHLY_SUMMARY MIS
+				            , MOM_ITEM  MI
+				       WHERE  MIS.COMPANY_CD    = MI.COMPANY_CD
+				       AND    MIS.DIVISION_CD   = MI.DIVISION_CD
+				       AND    MIS.ITEM_ID       = MI.ITEM_ID
+				       AND    MIS.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+				       AND    MIS.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  
+				       AND    MIS.CLOSE_YEAR_MONTH  BETWEEN  #{startMonth, jdbcType=VARCHAR} AND #{endMonth, jdbcType=VARCHAR} 
+				       <if test="itemType != null and itemType != ''">
+				       AND    MI.ITEM_TYPE  = #{itemType, jdbcType=VARCHAR} 
+				       </if>
+				       <if test="itemIdNm != null and itemIdNm != ''">
+				       AND (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
+				       </if>
+				     ) A
+				GROUP BY A.COMPANY_CD 
+				      ,  A.DIVISION_CD
+				      ,  A.ITEM_ID
+				      ,  A.UOM 
+    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+               ) A
+        WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+    </if>               
+    </select>   
+    <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        SELECT COMPANY_CD
+		     , DIVISION_CD
+		     , ITEM_ID
+		     , UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UOM) FROM DUAL) AS UOM_NM
+		     , WAREHOUSE_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(A.COMPANY_CD, A.DIVISION_CD,A.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
+		     , SUM(BEGIN_QTY) AS BEGIN_QTY
+		     , SUM(IN_QTY)    AS IN_QTY
+		     , SUM(OUT_QTY)   AS OUT_QTY
+		     , SUM(BEGIN_QTY) + SUM(IN_QTY) - SUM(OUT_QTY)          AS END_QTY
+		     , A.ITEM_ID||'_'||A.UOM||'_'||A.WAREHOUSE_CD           AS KEY_ID
+		FROM ( SELECT COMPANY_CD
+		            , DIVISION_CD
+		            , ITEM_ID
+		            , UOM
+		            , WAREHOUSE_CD
+		            , CLOSE_YEAR_MONTH
+		            , (CASE WHEN CLOSE_YEAR_MONTH = #{startMonth, jdbcType=VARCHAR} THEN NVL(BEGIN_QTY,0) ELSE 0 END) AS BEGIN_QTY
+		            , NVL(IN_QTY,0) AS IN_QTY
+		            , NVL(OUT_QTY,0) AS OUT_QTY
+		       FROM   MOM_ITEM_INOUT_MONTHLY_SUMMARY
+		       WHERE  COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+			   AND    DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  
+		       AND    CLOSE_YEAR_MONTH  BETWEEN  #{startMonth, jdbcType=VARCHAR} AND #{endMonth, jdbcType=VARCHAR} 
+		       AND    ITEM_ID       = #{itemId, jdbcType=VARCHAR}
+		       AND    UOM           = #{uom, jdbcType=VARCHAR}
+		     ) A
+		GROUP BY COMPANY_CD , DIVISION_CD, ITEM_ID, UOM , WAREHOUSE_CD 
+		ORDER BY COMPANY_CD ASC , DIVISION_CD ASC, WAREHOUSE_CD ASC, ITEM_ID ASC, UOM ASC
+    </select> 
+    <select id="get_dropdownlistContentstartMonthSP1-select1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    SELECT TO_CHAR(TRUNC(MAX(MC.DATE_ID), 'MONTH'), 'YYYYMM')  AS CODE
+    FROM   MOM_CALENDAR MC
+    WHERE  1 = 1 
+    AND   MC.DATE_ID = TRUNC(MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{companyCd, jdbcType=VARCHAR},#{divisionCd, jdbcType=VARCHAR}))  
+    </select> 
+</mapper>     

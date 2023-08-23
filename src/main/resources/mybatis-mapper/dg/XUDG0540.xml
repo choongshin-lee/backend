@@ -91,6 +91,7 @@
 		                    , IO_TYPE
 		                    , REFERENCE_NO
 		                    , REFERENCE_DTL_NO
+		                    , LOT_ID
 		                    , DESCRIPTION
 		                    , DEL_YN
 		                    , VAL_MSG
@@ -111,6 +112,7 @@
 		                   , #{item.ioType, jdbcType=VARCHAR}
 		                   , #{item.referenceNo, jdbcType=VARCHAR}
 		                   , #{item.referenceDtlNo, jdbcType=VARCHAR}
+		                   , #{item.lotId, jdbcType=VARCHAR}
 		                   , #{item.description, jdbcType=VARCHAR}
 		                   , #{item.delYn, jdbcType=VARCHAR}
 		                   , #{item.valMsg, jdbcType=VARCHAR}

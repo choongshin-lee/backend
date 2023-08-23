@@ -44,11 +44,23 @@
 		        AND    MDM.STATE               = 'DRG'
 		        AND    MDM.PROCESS_CD          = 'MI'
 		        AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+		        AND    EXISTS ( SELECT '*'
+                                FROM   MOM_DO_DTL MDD
+                                WHERE  MDD.COMPANY_CD   = MDM.COMPANY_CD
+                                AND    MDD.DIVISION_CD  = MDM.DIVISION_CD
+                                AND    MDD.DO_NO        = MDM.DO_NO )  
+                AND    EXISTS ( SELECT '*'
+				                FROM   MOM_WAREHOUSE_MANAGER MLM
+				                WHERE  MLM.COMPANY_CD    = MDM.COMPANY_CD
+				                AND    MLM.DIVISION_CD   = MDM.DIVISION_CD
+				                AND    MLM.WAREHOUSE_CD  = MDM.REQUEST_WAREHOUSE_CD 
+				                AND    MLM.USE_YN       = 'Y'
+				                AND    MLM.USER_NO      = #{userId, jdbcType=VARCHAR}  )                   
 		        <if test="issueRequestNo != null and issueRequestNo != ''">
 		        AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{issueRequestNo, jdbcType=VARCHAR}) || '%')   
 		        </if>
-		        <if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
-		        AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWR.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
+		        <if test="requestWarehouseCd != null and requestWarehouseCd != ''">
+		        AND    MDM.REQUEST_WAREHOUSE_CD  = #{requestWarehouseCd, jdbcType=VARCHAR}   
 		        </if> 
 		        <if test="issueWarehouseCdNm != null and issueWarehouseCdNm != ''">
 		        AND    (UPPER(MDM.ISSUE_WAREHOUSE_CD) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWI.WAREHOUSE_NM) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%')   

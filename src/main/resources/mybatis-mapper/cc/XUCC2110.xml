@@ -38,9 +38,6 @@
 		<if test="itemType != null and itemType != ''">
 		AND     MI.ITEM_TYPE    IN (${itemType}) 
 		</if>
-		<if test="plantCd != null and plantCd != ''">
-		AND   MWH.PLANT_CD      = #{plantCd, jdbcType=VARCHAR}
-		</if>
 		<if test="itemIdNm != null and itemIdNm != ''">
 		AND (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
 		</if>
