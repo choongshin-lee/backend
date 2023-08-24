@@ -147,7 +147,7 @@
                             , #{item.issueRequestNo, jdbcType=VARCHAR}
                             , #{item.issueRequestNm, jdbcType=VARCHAR}
                             , #{item.issueWarehouseCd, jdbcType=VARCHAR}
-                            , #{item.customerCd, jdbcType=VARCHAR}
+                            , #{item.partnerCd, jdbcType=VARCHAR}
                             , #{item.issueDueDate, jdbcType=VARCHAR}
                             , #{item.currencyCd, jdbcType=VARCHAR}
                             , #{item.exchangeRate, jdbcType=NUMERIC}

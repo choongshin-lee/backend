@@ -32,7 +32,7 @@ var VIEW= {
 		    if(btnId == 'customGridPopBtn2-3'){ // 커스텀 버튼 실행시 1 삭제(D) 2 TMP삽입(C) 3 프로시저실행(P) actionType 으로 시점 제어가능  		
 			    if(checkItem.length==0){
 				    //$('#' +'gridPop-'+btnId).modal('hide');
-				    result.msg = '상단에서 자재반납요청 선택필수!';
+				    result.msg = '상단에서 외주재고반납요청 선택필수!';
 				    result.result = 'WARN';
 				    return;
 			    }
@@ -58,5 +58,36 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
 	VIEW.init();
-	momWidget.gridPopup.init(2,21,1,'XUDG0540', VIEW);
+	momWidget.gridPopup.init(2,21,1,'XUDG0550', VIEW);
 });
+
+
+$(document).on('change', '#partnerCdDP1', function () {
+   var b = $(this).val();;
+   
+   mom_ajax('R', 'DD.DD00018', {partnerCd: $('#partnerCdDP1').val()}, function (result, data) {
+       if (result == 'SUCCESS') {
+           if(result != 'SUCCESS') {
+               momWidget.splashHide();
+               $('#requestWarehouseCdDP1').val(''); 
+                   
+           }
+           var valueITem =''
+           var newItems = [];
+           if(data.length == 0 ){
+               $('#requestWarehouseCdDP1').val(''); 
+       	       $('#requestWarehouseCdDP1').jqxComboBox('source', newItems);
+		   }
+		   else {
+                valueITem = data[0].code;
+                for (var i = 0; i < data.length; i++) {
+                    newItems.push(data[i]);
+                }
+                $('#requestWarehouseCdDP1').val(''); 
+                $('#requestWarehouseCdDP1').jqxComboBox('source', newItems);
+                $('#requestWarehouseCdDP1' ).val(valueITem); 
+           }  
+       }
+   });   
+
+})

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUIC3110">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+        SELECT A.*
+        FROM   (
+    </if>
+                SELECT MDM.COMPANY_CD 
+				     , MDM.DIVISION_CD
+				     , MDM.DO_NO                    AS RETURN_REQUEST_NO
+				     , MDM.DO_NM                    AS RETURN_REQUEST_NM
+				     , MDD.SEQ
+				     , MDD.DELIVERY_ORDER_ID
+				     , MDM.PARTNER_CD                       
+		             , MP.PARTNER_NM   
+				     , MDM.REQUEST_WAREHOUSE_CD    AS RETURN_WAREHOUSE_CD   
+				     , MWR.WAREHOUSE_NM            AS RETURN_WAREHOUSE_NM
+				     , MDM.ISSUE_WAREHOUSE_CD      AS REQUEST_WAREHOUSE_CD
+				     , MWI.WAREHOUSE_NM            AS REQUEST_WAREHOUSE_NM
+				     , MDD.ITEM_ID
+				     , MI.ITEM_NM
+				     , MI.ITEM_SPEC
+				     , MI.ITEM_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+				     , MDD.QTY                       AS RETURN_REQUEST_QTY
+				     , MDD.DO_UOM                    AS RETURN_UOM 
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS RETURN_UOM_NM
+				     , MDD.CONVERSION_UOM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
+				     , TO_CHAR(MDM.ISSUE_DUE_DATE ,'YYYY-MM-DD')      AS RETURN_DUE_DATE
+				     , MDM.STATE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'IC0002', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+				     , TO_CHAR(MDM.CREATE_DATE , 'YYYY-MM-DD HH24:MI:SS')      AS CREATE_DATE
+				     , TO_CHAR(MDM.CONFIRM_DATE ,'YYYY-MM-DD')      AS CONFIRM_DATE
+				     , MDM.CONFIRM_USER_NO
+				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
+				     , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
+				     , COUNT(*) OVER()   AS TOTAL_COUNT
+				     , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD, MDM.DIVISION_CD ORDER BY MDD.DO_NO) AS ROW_CNT
+				     , MDD.LOT_ID 
+				     , MDD.REFERENCE_NO
+				     , MDD.REFERENCE_DTL_NO
+				     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WH_STOCK_LOT_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.REQUEST_WAREHOUSE_CD, MDD.LOT_ID) FROM DUAL)  AS AVAILABLE_QTY
+				     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_AVAILABLE_LOT_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.REQUEST_WAREHOUSE_CD, MDD.LOT_ID) FROM DUAL) AS CURRENT_STOCK_QTY
+				     , MDM.DESCRIPTION
+				FROM   MOM_DO_MST MDM
+				     , MOM_DO_DTL MDD
+				     , MOM_PARTNER MP
+				     , MOM_WAREHOUSE MWR
+				     , MOM_WAREHOUSE MWI
+				     , MOM_ITEM     MI
+				WHERE  MDM.COMPANY_CD           = MDD.COMPANY_CD
+				AND    MDM.DIVISION_CD          = MDD.DIVISION_CD
+				AND    MDM.DO_NO                = MDD.DO_NO   
+				AND    MDM.COMPANY_CD           = MP.COMPANY_CD
+		        AND    MDM.DIVISION_CD          = MP.DIVISION_CD
+		        AND    MDM.PARTNER_CD           = MP.PARTNER_CD 
+				AND    MDM.COMPANY_CD           = MWR.COMPANY_CD
+				AND    MDM.DIVISION_CD          = MWR.DIVISION_CD
+				AND    MDM.REQUEST_WAREHOUSE_CD = MWR.WAREHOUSE_CD
+				AND    MDM.COMPANY_CD           = MWI.COMPANY_CD
+				AND    MDM.DIVISION_CD          = MWI.DIVISION_CD
+				AND    MDM.ISSUE_WAREHOUSE_CD   = MWI.WAREHOUSE_CD
+				AND    MDD.COMPANY_CD           = MI.COMPANY_CD
+				AND    MDD.DIVISION_CD          = MI.DIVISION_CD
+				AND    MDD.ITEM_ID              = MI.ITEM_ID     
+				AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
+				AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
+				AND    MDM.PROCESS_CD          = 'NIR'
+				AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+				AND    EXISTS ( SELECT '*'
+				                FROM   MOM_WAREHOUSE_MANAGER MLM
+				                WHERE  MLM.COMPANY_CD    = MDM.COMPANY_CD
+				                AND    MLM.DIVISION_CD   = MDM.DIVISION_CD
+				                AND    MLM.WAREHOUSE_CD  = MDM.REQUEST_WAREHOUSE_CD 
+				                AND    MLM.USE_YN       = 'Y'
+				                AND    MLM.USER_NO      = #{userId, jdbcType=VARCHAR}  )
+				<if test="returnRequestNo != null and returnRequestNo != ''">
+				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{returnRequestNo, jdbcType=VARCHAR}) || '%')   
+				</if>
+				<if test="partnerCdNm != null and partnerCdNm != ''">
+		        AND    (UPPER(MDM.PARTNER_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')
+		        </if> 
+				<if test="returnWarehouseCd != null and returnWarehouseCd != ''">
+	            AND    MDM.REQUEST_WAREHOUSE_CD = #{returnWarehouseCd, jdbcType=VARCHAR}   
+	            </if> 
+	            <if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
+	            AND    (UPPER(MDM.ISSUE_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWI.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
+	            </if> 
+				<if test="state != null and state != ''">
+				AND    MDM.STATE   IN (${state}) 
+				</if>   
+    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+               ) A
+        WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+    </if>               
+    </select>   
+</mapper>     

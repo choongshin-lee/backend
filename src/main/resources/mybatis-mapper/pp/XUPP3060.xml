@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUPP3060">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+        SELECT A.*
+	    FROM   (
+	    </if>
+		        SELECT MWO.COMPANY_CD
+				     , MWO.DIVISION_CD
+				     , MWO.WORK_ORDER_ID
+				     , MWO.WO_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'PP0002', MWO.WO_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_TYPE_NM
+				     , MWO.WO_STATE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'PP0003', MWO.WO_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_STATE_NM
+				     , MWO.ITEM_ID
+				     , MI.ITEM_NM
+				     , MI.ITEM_SPEC
+				     , MI.ITEM_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+				     , MWO.WO_QTY
+				     , MWO.WORK_CENTER_CD
+				     , MWC.WORK_CENTER_NM
+				     , TO_CHAR(MWO.CONFIRM_DATE  ,'YYYY-MM-DD')    AS CONFIRM_DATE
+				     , MDM.DO_NO                                   AS REQUEST_DO_NO
+				     , MDM.DO_NM
+				     , MDM.PROCESS_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL) AS PROCESS_NM
+				     , MDM.STATE   AS REQUEST_STATE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'IC0002', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS REQUEST_STATE_NM
+				     , MDM.REQUEST_WAREHOUSE_CD  AS TO_WAREHOUSE_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.REQUEST_WAREHOUSE_CD) FROM DUAL) AS TO_WAREHOUSE_NM
+				     , MDM.ISSUE_WAREHOUSE_CD  AS FROM_WAREHOUSE_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL) AS FROM_WAREHOUSE_NM
+				     , MDM.PARTNER_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME (MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PARTNER_CD) FROM DUAL) AS PARTNER_NM
+				     , MDD.SEQ          
+				     , MDD.DELIVERY_ORDER_ID
+				     , MDD.ITEM_ID       AS  REQUEST_ITEM_ID
+				     , MDI.ITEM_NM       AS  REQUEST_ITEM_NM
+				     , MDD.DO_UOM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS ISSUE_UOM_NM
+				     , MDD.QTY             AS  DO_QTY
+				     , MDD.CONVERSION_QTY
+				     , MDD.CONVERSION_UOM
+				     , MWO.DESCRIPTION     
+				     , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
+				     , COUNT(*) OVER() AS TOTAL_COUNT
+				     , ROW_NUMBER() OVER(PARTITION BY MWO.COMPANY_CD,MWO.DIVISION_CD ORDER BY MDD.DELIVERY_ORDER_ID  ) AS ROW_COUNT   
+				FROM   MOM_WORK_ORDER MWO 
+				     , MOM_ITEM       MI
+				     , MOM_WORK_CENTER MWC
+				     , MOM_DO_DTL     MDD
+				     , MOM_DO_MST     MDM
+				     , MOM_ITEM       MDI
+				WHERE  MWO.COMPANY_CD      = MI.COMPANY_CD
+				AND    MWO.DIVISION_CD     = MI.DIVISION_CD
+				AND    MWO.ITEM_ID         = MI.ITEM_ID
+				AND    MWO.COMPANY_CD      = MWC.COMPANY_CD
+				AND    MWO.DIVISION_CD     = MWC.DIVISION_CD
+				AND    MWO.WORK_CENTER_CD  = MWC.WORK_CENTER_CD 
+				AND    MWO.COMPANY_CD      = MDD.COMPANY_CD
+				AND    MWO.DIVISION_CD     = MDD.DIVISION_CD
+				AND    MWO.WORK_ORDER_ID   = MDD.REFERENCE_NO
+				AND    MDD.COMPANY_CD      = MDM.COMPANY_CD
+				AND    MDD.DIVISION_CD     = MDM.DIVISION_CD
+				AND    MDD.DO_NO           = MDM.DO_NO
+				AND    MDD.COMPANY_CD      = MDI.COMPANY_CD
+				AND    MDD.DIVISION_CD     = MDI.DIVISION_CD
+				AND    MDD.ITEM_ID         = MDI.ITEM_ID
+				AND    MWO.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+				AND    MWO.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+				AND    MWO.CONFIRM_DATE BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+				<if test="itemIdNm != null and itemIdNm != ''">
+				AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm , jdbcType=VARCHAR}))
+				</if>   
+				<if test="workOrderId != null and workOrderId != ''">
+				AND    (UPPER(MWO.WORK_ORDER_ID ) LIKE '%' || UPPER(#{workOrderId, jdbcType=VARCHAR}) || '%')   
+				</if>   
+				<if test="workCenterCdNm != null and workCenterCdNm != ''">
+				AND    (UPPER(MWO.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MWC.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR})) 
+				</if>	
+				<if test="requestItemIdNm != null and requestItemIdNm != ''">
+				AND    (UPPER(MDD.ITEM_ID) LIKE '%' || UPPER(#{requestItemIdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MDI.ITEM_NM) LIKE '%' || UPPER(#{requestItemIdNm , jdbcType=VARCHAR}))
+				</if>   
+                 <if test="processCd != null and processCd != ''">
+		        AND    MDM.PROCESS_CD  = #{processCd, jdbcType=VARCHAR}   
+		        </if> 
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	           ) A
+	    WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+	    </if> 
+	</select>
+</mapper>
