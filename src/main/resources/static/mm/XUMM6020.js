@@ -17,7 +17,14 @@ var VIEW= {
 		} 
 	},
     cellClickCallInit: function(index,rowIndex,e,) {
-	    if(index == 1){
+
+	},	
+    cellClickCallBack: function(index,rowIndex,target,e) {				
+		if(index==0){
+			let checkItem = widget.getCheckedRowItems(widget.grid[0]);                                                
+			widget.findBtnClicked(1, {inoutNo:checkItem[0].inoutNo }, true, 'CELLCLICK', menuId, VIEW);   
+		}
+		if(index == 1){
 		    var item = e.item;	
 		    setTimeout(function(){
 		        mom_ajax('R', 'DD.DD00057', {itemId:item['itemId']}, function(result, data) {
@@ -25,14 +32,13 @@ var VIEW= {
 		                momWidget.splashHide();
 			            return;							     
 		            }	
+		            for(var i=0;i<widget.columnProperty[1].length;i++){
+			            if(widget.columnProperty[1][i]['columnId'] =='hcnCd'){
+				            widget.columnDropdown[1][widget.columnProperty[1][i]['columnId']]=data;
+			            }
+			        }
 	            }, undefined, undefined, this, false);	
 		    }, 200);
-		}
-	},	
-    cellClickCallBack: function(index,rowIndex,target,e) {				
-		if(index==0){
-			let checkItem = widget.getCheckedRowItems(widget.grid[0]);                                                
-			widget.findBtnClicked(1, {inoutNo:checkItem[0].inoutNo }, true, 'CELLCLICK', menuId, VIEW);   
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {

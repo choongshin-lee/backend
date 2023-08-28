@@ -783,4 +783,43 @@
     </if>
     ORDER BY LABEL
 	</select> 
+	<select id="get_DD00062" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	SELECT CODE
+	     , LABEL
+	FROM   (SELECT  MP.PARTNER_CD   AS CODE 
+	             ,  MP.PARTNER_CD ||'('|| MP.PARTNER_NM   ||')' AS LABEL
+	        FROM    MOM_PARTNER MP
+	        WHERE   MP.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+	        AND     MP.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+	        AND     MP.USE_YN       = 'Y'
+	        AND     'N' = ( SELECT  MG.OUT_SOURCING_FLAG
+	                        FROM    MOM_USER MU
+	                             ,  MOM_AUTH_GROUP MG
+	                        WHERE   MU.COMPANY_CD    = MG.COMPANY_CD
+	                        AND     MU.DIVISION_CD   = MG.DIVISION_CD
+	                        AND     MU.AUTH_GROUP_CD = MG.AUTH_GROUP_CD
+	                        AND     MU.COMPANY_CD    = MP.COMPANY_CD
+	                        AND     MU.DIVISION_CD   = MP.DIVISION_CD
+	                        AND     MU.USER_NO       = #{userId, jdbcType=VARCHAR}
+	                        AND     MG.OUT_SOURCING_FLAG = 'N' 
+	                        AND     MU.USE_YN            = 'Y')
+	        UNION 
+	        SELECT  MP.PARTNER_CD   AS CODE 
+	             ,  MP.PARTNER_CD ||'('|| MP.PARTNER_NM   ||')' AS LABEL
+	        FROM    MOM_USER MU
+	             ,  MOM_AUTH_GROUP MG
+	             ,  MOM_PARTNER MP
+	        WHERE   MU.COMPANY_CD    = MG.COMPANY_CD
+	        AND     MU.DIVISION_CD   = MG.DIVISION_CD
+	        AND     MU.AUTH_GROUP_CD = MG.AUTH_GROUP_CD
+	        AND     MU.COMPANY_CD    = MP.COMPANY_CD
+	        AND     MU.DIVISION_CD   = MP.DIVISION_CD
+	        AND     MU.VENDOR_CD     = MP.PARTNER_CD
+	        AND     MU.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+	        AND     MU.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+	        AND     MU.USER_NO       = #{userId, jdbcType=VARCHAR}
+	        AND     MG.OUT_SOURCING_FLAG = 'Y'
+	        AND     MU.USE_YN            = 'Y' )
+	ORDER BY LABEL         
+	</select> 
 </mapper>

@@ -375,7 +375,7 @@ var momWidget = {
 					labelField = '<select maxlength="256" id=' + that.popupProperty[index][i]['popupId'] + 'DP' + (index + 1) + '  class="popGrid' + (index + 1) + ' popupSelectField"></select>';
 				 }
                  else if (that.popupProperty[index][i]['popupType'] == 'FA') {
-                    labelField = '<input id=' + that.popupProperty[index][i]['popupId'] + 'DP' + (index + 1) + ' type="file" class="file-input" accept=".xls, .xlsx, .csv, .jasper,.jpg,.png" ></input>';
+                    labelField = '<input id=' + that.popupProperty[index][i]['popupId'] + 'DP' + (index + 1) + ' type="file" class="file-input" accept=".xls, .xlsx, .csv, .jasper,.jpg,.png,.pdf" ></input>';
                 } else {
                     labelField = '<input maxlength="256" id=' + that.popupProperty[index][i]['popupId'] + 'DP' + (index + 1) + ' type="text" type="text" class="w-input popupInputField" date-format="date"></input>';
                 }
@@ -5677,7 +5677,7 @@ var momWidget = {
                 '<div class="file-up-pop-header" style="height:2.5rem;margin-top: -1rem;margin-left: -0.2rem;">' +
  			     '<label type="text" for="fileBlobFP1" class="file-label" style="cursor: pointer">파일첨부</label>' +
 		         '<label type="text" id="fileBlobFP1-name" class="filePop-label-name">파일명:</label>'+
-		         '<input id="fileBlobFP1" type="file" class="file-input" accept=".xls, .xlsx, .csv, .jasper,.jpg,.png" >'+
+		         '<input id="fileBlobFP1" type="file" class="file-input" accept=".xls, .xlsx, .csv, .jasper,.jpg,.png,.pdf" >'+
                 '</div>' +
                 '<div id="fileUpGrid1" class="file-up-grid"></div>'+
                  '<div class="modal-footer file-up-grid-footer" style="">' +
@@ -9858,34 +9858,34 @@ var momWidget = {
 	            momWidget.messageBox({type: 'warning', width: '400', height: '145', html: '데이터 미선택!'});
                 return;
             }else{
-            for(var i =0; i < param.length; i++){
-	            param[i].fileName = that.pageProperty[index]['menuId'] + '_' + (index + 1);
+            for(var i2 =0; i2 < param.length; i2++){
+	            param[i2].fileName = that.pageProperty[index]['menuId'] + '_' + (index + 1);
 	            //param[0].fileType = 'xlsx';
-	            param[i].fileType = fileType;
-	            param[i].reportFile = param[i].departureNo ;
-	            reportFile = param[i].departureNo ;
+	            param[i2].fileType = fileType;
+	            param[i2].reportFile = param[i2].departureNo ;
+	            reportFile = param[i2].departureNo ;
 	            // param = that.checkSearchParam(index,param,your);
 	
 	            $.ajax({
 	                url: mCommon.contextPath() + '/createReport',
 	                method: "get",
 	                contentType: 'application/json; charset=UTF-8',
-	                data: param[i],
+	                data: param[i2],
 	                async: false,
 	                timeout: 30000000,
 	                beforeSend: function (xhr) {
 	                    xhr.setRequestHeader("Authorization", "Bearer " + localStorage.getItem('token'));
 	                },
 	                success: function (data) {
-	                    setTimeout(function () {
+	                    //setTimeout(function () {
 	                        momWidget.splashHide();
-	                        window.open('../report-'+fileType+'/'+reportFile+'.'+fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+	                        window.open('../report-'+param[i2].fileType+'/'+param[i2].reportFile+'.'+param[i2].fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
 	                        //history.pushState(null, null, '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType)
 	                        //location.href = location.href;
 	                        //location.href  = '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType;
 	
 	                       // location.href = '../report-pdf/' + param[0].fileName + '.' + param[0].fileType;
-	                    }, 5000);
+	                   // }, 5000);
 	                    
 	                },
 	                error: function (e) {
