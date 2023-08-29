@@ -820,6 +820,6 @@
 	        AND     MU.USER_NO       = #{userId, jdbcType=VARCHAR}
 	        AND     MG.OUT_SOURCING_FLAG = 'Y'
 	        AND     MU.USE_YN            = 'Y' )
-	ORDER BY LABEL         
+	ORDER BY LABEL   
 	</select> 
 </mapper>

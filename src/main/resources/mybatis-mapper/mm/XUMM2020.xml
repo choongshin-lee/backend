@@ -96,8 +96,8 @@
 		     , MPD.REFERENCE_DTL_NO        AS PURCHASE_REQUEST_ID
 		     , MPD.PURCHASE_ORDER_ID
 		     , MPD.PURCHASE_ORDER_ID      AS KEY_ID
-		     , MI.STOCK_TYPE
-             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0048', MI.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STOCK_TYPE_NM
+		     , MPD.STOCK_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0048', MPD.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STOCK_TYPE_NM
              , MPD.DESCRIPTION
 		FROM   MOM_PO_DTL MPD
 		     , MOM_ITEM MI
@@ -179,7 +179,7 @@
 					                            , '20'          									  
 					                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>  
-    <delete id="remove_createBtn2" parameterType="java.util.List">
+    <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_PO_DTL
         <where>
         <foreach collection="list" item="item" open="" close="" separator="OR">
@@ -191,7 +191,7 @@
         </foreach>
         </where>
     </delete>  
-    <insert id="create_createBtn2" parameterType="java.util.List">
+    <insert id="create_customBtn2-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_PO_DTL( COMPANY_CD
 			                , DIVISION_CD
@@ -238,7 +238,7 @@
 			                )
         </foreach>
     </insert>
-    <select id="proc_createBtn2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
         { CALL MOM_MATERIAL_PKG.SP_UPSERT_PO_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 					                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 					                            , #{companyCd,   jdbcType=VARCHAR, mode=IN}

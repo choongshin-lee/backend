@@ -10,6 +10,15 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
+	    dateSelect();	
+	    //$("#partnerCdSP1").attr('disabled', true);
+	    $('#partnerCdSP1').jqxComboBox({disabled: true});
+	},
+	createCallInit: function(index,your,action,btnId,param,result) { //등록버튼 팝업띄우기 전에 호출되는 함수 
+		if(index ==0 && btnId =='createBtn'){	
+		    param.partnerCd = $('#partnerCdSP1').val();
+		    $('#partnerCdDP1' ).val(param.partnerCd); 
+		}
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) { // 복사팝업 뜨기전에 호출
 		if(index ==0 && btnId =='copyBtn'){	
@@ -81,3 +90,15 @@ $(document).ready(function(event){
 	momWidget.gridPopup.init(2,21,1,'XUDG0410', VIEW);
 	VIEW.init();
 });
+
+function dateSelect(){
+   mom_ajax('R', 'XUMM3010.dropdownlistContentpartnerCdSP1-select1', {}, function(result, data) {
+      if(result == 'SUCCESS') {
+
+         var a = data[0].code;
+         $('#partnerCdSP1' ).val(a);   
+      return;
+      }
+   }, undefined, undefined, this, false,'Y');
+      
+};

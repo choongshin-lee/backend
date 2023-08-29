@@ -9,7 +9,8 @@ var VIEW= {
 		that.event();
 	},
 	event: function(e) {
-	
+	    dateSelect();	
+	    $('#partnerCdSP1').jqxComboBox({disabled: true});	
 	},
     searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         if(index==0 ){	                                               //20221027 LCS 추가 
@@ -29,3 +30,15 @@ $(document).ready(function(event){
 	momWidget.init(2, menuId, VIEW,'GRID');	
 	VIEW.init();
 });
+
+function dateSelect(){
+   mom_ajax('R', 'XUMM3010.dropdownlistContentpartnerCdSP1-select1', {}, function(result, data) {
+      if(result == 'SUCCESS') {
+
+         var a = data[0].code;
+         $('#partnerCdSP1' ).val(a);   
+      return;
+      }
+   }, undefined, undefined, this, false,'Y');
+      
+};

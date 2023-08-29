@@ -66,7 +66,7 @@
 						             , #{item.faxNo,          	 jdbcType=VARCHAR}
 						             , #{item.deptCd,    		 jdbcType=VARCHAR}
 						             , #{item.authGroupCd, 	     jdbcType=VARCHAR}
-						             , #{item.vendorCd,          jdbcType=VARCHAR}
+						             , #{item.partnerCd,          jdbcType=VARCHAR}
 						             , #{item.defaultLanguuage,  jdbcType=VARCHAR}
 						             , #{item.mapAddress,    	 jdbcType=VARCHAR}
 						             , #{item.ipAddress, 		 jdbcType=VARCHAR}
@@ -120,7 +120,7 @@
             , #{item.faxNo,          	 jdbcType=VARCHAR}
             , #{item.deptCd,    		 jdbcType=VARCHAR}
             , #{item.authGroupCd, 	     jdbcType=VARCHAR}
-            , #{item.vendorCd,          jdbcType=VARCHAR}
+            , #{item.partnerCd,          jdbcType=VARCHAR}
             , #{item.defaultLanguuage,  jdbcType=VARCHAR}
             , #{item.mapAddress,    	 jdbcType=VARCHAR}
             , #{item.ipAddress, 		 jdbcType=VARCHAR}
@@ -148,7 +148,7 @@
 			 , EMAIL                  = #{item.email,               jdbcType=VARCHAR}
 			 , MAP_ADDRESS            = #{item.mapAddress,          jdbcType=VARCHAR}
 			 , IP_ADDRESS             = #{item.ipAddress,           jdbcType=VARCHAR}
-			 , VENDOR_CD              = #{item.vendorCd,            jdbcType=VARCHAR}
+			 , VENDOR_CD              = #{item.partnerCd,            jdbcType=VARCHAR}
 			 , USE_YN                 = #{item.useYn,               jdbcType=VARCHAR}
 			 , DESCRIPTION            = #{item.description,         jdbcType=VARCHAR}
 		     , UPDATE_BY              = #{item.userId,              jdbcType=VARCHAR}
@@ -187,7 +187,7 @@
                             #{faxNo, jdbcType=VARCHAR} as faxNo,
                             #{deptCd, jdbcType=VARCHAR} as deptCd,
                             #{authGroupCd, jdbcType=VARCHAR} as authGroupCd,
-                            #{vendorCd, jdbcType=VARCHAR} as vendorCd,
+                            #{partnerCd, jdbcType=VARCHAR} as partnerCd,
                             #{defaultLanguage, jdbcType=VARCHAR} as defaultLanguage,
                             #{mapAddress, jdbcType=VARCHAR} as mapAddress,
                             #{ipAddress, jdbcType=VARCHAR} as ipAddress,
@@ -213,7 +213,7 @@
                           , FAX_NO = PARAM.faxNo
                           , DEPT_CD = PARAM.deptCd
                           , AUTH_GROUP_CD = PARAM.authGroupCd
-                          , VENDOR_CD = PARAM.vendorCd
+                          , VENDOR_CD = PARAM.partnerCd
                           , DEFAULT_LANGUAGE = PARAM.defaultLanguage
                           , MAP_ADDRESS = PARAM.mapAddress
                           , IP_ADDRESS = PARAM.ipAddress
@@ -259,7 +259,7 @@
                             , PARAM.faxNo
                             , PARAM.deptCd
                             , PARAM.authGroupCd
-                            , PARAM.vendorCd
+                            , PARAM.partnerCd
                             , PARAM.defaultLanguage
                             , PARAM.mapAddress
                             , PARAM.ipAddress

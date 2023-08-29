@@ -47,6 +47,7 @@ var VIEW= {
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
+	    let checkItem = widget.getCheckedRowItems(widget.grid[0]);
 	    if(index == 0){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
 	        let checkedItem = AUIGrid.getCheckedRowItems(widget.grid[index]);
 	        if(btnId == 'partnerCdDP1'){   
@@ -54,6 +55,30 @@ var VIEW= {
 	             $('#partnerCdNmSP11').val('');  
 	        }
 	    }
+	    else if(index == 1){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
+	        let checkItem = widget.getCheckedRowItems(widget.grid[0]);
+	        if(btnId == 'customGridPopBtn2-3'){  
+		        if(checkItem.length==0){
+				    //$('#' +'gridPop-'+btnId).modal('hide');
+				    result.msg = '상단에서 발주서 선택필수!';
+				    result.result = 'WARN';
+				    return;
+			    } 
+	            $('#partnerCdSP21').val(checkItem[0]['partnerCd']);
+	            $('#currencyCdSP21').val(checkItem[0]['currencyCd']);
+	            $('#itemIdSP21').val('');  
+	            $('#partnerCdSP21').jqxComboBox({disabled: true});
+	            $('#currencyCdSP21').jqxComboBox({disabled: true});
+	        }
+	    }
+	    else if(index == 20){			    
+		    if(action='C'&& btnId == 'customBtn21-1'){ 
+			    for(var i=0,max=param.length; i<max;i++){
+				   param[i]['poNo'] = checkItem[0]['poNo'];
+					
+			    }
+            }			        
+		}
         /*else if(index == 10){       
 	        if(btnId == 'customBtn11-1'){// 팝업에서 커스텀버튼(선택) 눌렀을떄 호출
 	            let checkItem = widget.getCheckedRowItems(widget.grid[index]);
@@ -97,5 +122,6 @@ $(document).ready(function(event){
 	momWidget.init(2, menuId, VIEW);	
     //momWidget.gridPopup.init(1,11,1,'XUDG0220', VIEW); 
     //momWidget.gridPopup.init(2,21,1,'XUDG0230', VIEW);
+    momWidget.gridPopup.init(2,21,1,'XUDG0230', VIEW);
 	VIEW.init();
 });

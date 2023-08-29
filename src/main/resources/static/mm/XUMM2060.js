@@ -9,6 +9,8 @@ var VIEW= {
 		that.event();
 	},
     event: function(e) {
+	    dateSelect();	
+	    $('#partnerCdSP1').jqxComboBox({disabled: true});
 	},
 	searchCallBack: function(index,your,action,btnId,param,result,data) {
 	    if(index==0){
@@ -51,3 +53,15 @@ $(document).ready(function(event){
 	momWidget.init(2, menuId, VIEW);
 	VIEW.init();
 });
+
+function dateSelect(){
+   mom_ajax('R', 'XUMM3010.dropdownlistContentpartnerCdSP1-select1', {}, function(result, data) {
+      if(result == 'SUCCESS') {
+
+         var a = data[0].code;
+         $('#partnerCdSP1' ).val(a);   
+      return;
+      }
+   }, undefined, undefined, this, false,'Y');
+      
+};

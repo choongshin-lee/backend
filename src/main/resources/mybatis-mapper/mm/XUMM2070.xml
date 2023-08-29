@@ -50,6 +50,8 @@
 					     , MPD.IQC_FLAG
 					     , MI.MAKER
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0007', MI.MAKER, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS MAKER_NM
+					     , MPD.STOCK_TYPE
+                         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, 'MD0048', MPD.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STOCK_TYPE_NM
 					     , MP.PARTNER_CD
                          , MP.PARTNER_NM
 					     , MPD.PURCHASE_ORDER_ID
@@ -94,7 +96,40 @@
 					</if>
 					<if test="poUserCd != null and poUserCd != ''">
 					AND MPM.CREATE_BY = #{poUserCd, jdbcType=VARCHAR}
-		</if>	
+		            </if>	
+	           		AND    MPM.VENDOR_CD IN ( SELECT A.PARTNER_CD
+											  FROM   ( SELECT  MP.PARTNER_CD   
+											           FROM    MOM_PARTNER MP
+												       WHERE   MP.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+												       AND     MP.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
+												       AND     MP.USE_YN       = 'Y'
+												       AND     'N' = ( SELECT  MG.OUT_SOURCING_FLAG
+												                       FROM    MOM_USER MU
+												                            ,  MOM_AUTH_GROUP MG
+												                       WHERE   MU.COMPANY_CD    = MG.COMPANY_CD
+												                       AND     MU.DIVISION_CD   = MG.DIVISION_CD
+												                       AND     MU.AUTH_GROUP_CD = MG.AUTH_GROUP_CD
+												                       AND     MU.COMPANY_CD    = MP.COMPANY_CD
+												                       AND     MU.DIVISION_CD   = MP.DIVISION_CD
+												                       AND     MU.USER_NO       = #{userId, jdbcType=VARCHAR}
+												                       AND     MG.OUT_SOURCING_FLAG = 'N' 
+												                       AND     MU.USE_YN            = 'Y')
+												       UNION 
+												       SELECT  MP.PARTNER_CD   
+												       FROM    MOM_USER MU
+												            ,  MOM_AUTH_GROUP MG
+												            ,  MOM_PARTNER MP
+												       WHERE   MU.COMPANY_CD    = MG.COMPANY_CD
+												       AND     MU.DIVISION_CD   = MG.DIVISION_CD
+												       AND     MU.AUTH_GROUP_CD = MG.AUTH_GROUP_CD
+												       AND     MU.COMPANY_CD    = MP.COMPANY_CD
+												       AND     MU.DIVISION_CD   = MP.DIVISION_CD
+												       AND     MU.VENDOR_CD     = MP.PARTNER_CD
+												       AND     MU.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+												       AND     MU.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+												       AND     MU.USER_NO       = #{userId, jdbcType=VARCHAR}
+												       AND     MG.OUT_SOURCING_FLAG = 'Y'
+												       AND     MU.USE_YN            = 'Y' ) A )
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
