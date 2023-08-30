@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUMM4050">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    SELECT MPIM.COMPANY_CD
+		     , MPIM.DIVISION_CD
+		     , MPIM.INOUT_NO            AS RECEIPT_NO
+		     , ROWIDTOCHAR(MPIM.ROWID)  AS KEY_ID   
+		     , MPIM.PROCESS_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM    
+		     , MPIM.TITLE               AS RECEIPT_TITLE
+		     , MP.PARTNER_CD
+             , MP.PARTNER_NM
+		     , MPIM.DEPARTURE_VENDOR_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
+		     , MPIM.WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
+		     , MPIM.IQC_FLAG
+		     , MPIM.CURRENCY_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+		     , MPIM.EXCHANGE_RATE
+		     , MPIM.AMOUNT           AS RECEIPT_AMOUNT
+		     , TO_CHAR(MPIM.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE
+		     , MPIM.VENDOR_INVOICE
+		     , MPIM.FREE_YN
+		     , MPIM.TAX_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+             , MPIM.IQC_FLAG
+             , MPIM.IQC_FINAL_RESULT
+             , TO_CHAR(MPIM.IQC_FINAL_DATE ,'YYYY-MM-DD')     AS IQC_FINAL_DATE
+		     , MPIM.DESCRIPTION
+		     , MPIM.CREATE_BY   AS CREATE_USER_NO
+		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
+		     , TO_CHAR(MPIM.CREATE_DATE ,'YYYY-MM-DD')     AS CREATE_DATE
+	    FROM   MOM_PURCHASE_INOUT_MST MPIM
+	         , MOM_PARTNER MP
+	    WHERE  MPIM.COMPANY_CD   = MP.COMPANY_CD
+        AND    MPIM.DIVISION_CD  = MP.DIVISION_CD
+        AND    MPIM.VENDOR_CD    = MP.PARTNER_CD
+        AND    MPIM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+	    AND    MPIM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR} 
+	    AND    MPIM.IQC_FINAL_DATE BETWEEN TO_DATE(#{iqcFinalDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{iqcFinalDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+	    AND    MPIM.IQC_FLAG     = 'Y'
+	    AND    MPIM.IQC_FINAL_RESULT = 'F'
+        AND    MPIM.PI_REISSUE_YN = 'N'  
+        <if test="processCd != null and processCd != ''">
+	    AND    MPIM.PROCESS_CD   =  #{processCd, jdbcType=VARCHAR}
+	    </if>
+	    <if test="receiptNo != null and receiptNo != ''">
+	    AND    UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{receiptNo, jdbcType=VARCHAR}) || '%'
+	    </if>
+	    <if test="partnerCdNm != null and partnerCdNm != ''">
+		AND    (UPPER(MPIM.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
+		</if>	
+	    <if test="receiptTitle != null and receiptTitle != ''">
+	    AND    UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{receiptTitle, jdbcType=VARCHAR}) || '%'
+	    </if>
+	    ORDER BY MPIM.INOUT_NO
+    </select>
+    <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    SELECT MPID.COMPANY_CD
+	         , MPID.DIVISION_CD
+	         , MPID.INOUT_NO          AS RECEIPT_NO
+	         , MPID.SEQ
+	         , MPID.REFERENCE_NO  
+	         , MPID.REFERENCE_DTL_NO 
+	         , MPID.ITEM_ID
+	         , MI.ITEM_NM
+	         , MI.ITEM_SPEC 
+	         , MI.ITEM_TYPE
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+	         , MPID.INOUT_UOM   AS PURCHASE_UOM
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.INOUT_UOM) FROM DUAL) AS PURCHASE_UOM_NM
+	         , MI.UOM        
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
+	         , MPID.INOUT_QTY        
+	         , NVL(MPID.REISSUE_QTY,MPID.INOUT_QTY ) AS  REISSUE_QTY
+	         , MPID.UNIT_PRICE
+	         , MPID.AMOUNT
+	         , MPID.LOCAL_AMOUNT
+	         , MPID.PO_OVER_RECEIPT_RATE
+	         , MPID.STOCK_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0048', MPID.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STOCK_TYPE_NM
+	         , MPID.DESCRIPTION
+	         , MPID.PURCHASE_INOUT_ID
+	         , ROWIDTOCHAR(MPID.ROWID)  AS KEY_ID   
+	    FROM   MOM_PURCHASE_INOUT_DTL MPID
+	         , MOM_ITEM MI
+	    WHERE  MPID.COMPANY_CD = MI.COMPANY_CD
+	    AND    MPID.DIVISION_CD = MI.DIVISION_CD
+	    AND    MPID.ITEM_ID     = MI.ITEM_ID
+	    AND    MPID.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
+	    AND    MPID.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+	    AND    MPID.INOUT_NO    = #{receiptNo, jdbcType=VARCHAR}
+	    AND    NVL(MPID.REISSUE_DEL_YN, 'N') = 'N'
+	    ORDER BY MPID.INOUT_NO 
+	           , MPID.SEQ
+    </select>
+    <delete id="remove_customBtn1-1" parameterType="java.util.List">
+    DELETE FROM MOM_PROC_PI_REISSUE
+        <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (    COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+            AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+            AND  BUTTON_TYPE = 'R'
+            AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+        </where>
+    </delete>  
+    <insert id="create_customBtn1-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_PI_REISSUE( COMPANY_CD
+	                            , DIVISION_CD
+	                            , BUTTON_TYPE
+	                            , INOUT_NO
+	                            , PURCHASE_INOUT_ID
+	                            , REISSUE_QTY
+	                            , VAL_MSG
+	                            , MULTI_MSG
+	                            , DESCRIPTION
+	                            , CREATE_BY
+	                            , CREATE_DATE )
+        VALUES                 ( #{item.companyCd, jdbcType=VARCHAR}
+			                   , #{item.divisionCd, jdbcType=VARCHAR}
+			                   , 'R'
+			                   , #{item.receiptNo, jdbcType=VARCHAR}
+			                   , #{item.purchaseInoutId, jdbcType=VARCHAR}
+			                   , #{item.reissueQty, jdbcType=NUMERIC}
+			                   , #{item.valMsg, jdbcType=VARCHAR}
+			                   , #{item.multiMsg, jdbcType=VARCHAR}
+			                   , #{item.description, jdbcType=VARCHAR}
+			                   , #{item.userId, jdbcType=VARCHAR}
+			                   , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                               )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_MATERIAL_PKG.SP_UPSERT_PI_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                            , #{companyCd,   jdbcType=VARCHAR , mode=IN}
+                                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}   
+                                            , 'R'                   
+                                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>  
+    <delete id="remove_customBtn2-1" parameterType="java.util.List">
+    DELETE FROM MOM_PROC_PI_REISSUE
+        <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (    COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+            AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+            AND  BUTTON_TYPE = 'S'
+            AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+        </where>
+    </delete>  
+    <insert id="create_customBtn2-1" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_PI_REISSUE( COMPANY_CD
+	                            , DIVISION_CD
+	                            , BUTTON_TYPE
+	                            , INOUT_NO
+	                            , PURCHASE_INOUT_ID
+	                            , REISSUE_QTY
+	                            , VAL_MSG
+	                            , MULTI_MSG
+	                            , DESCRIPTION
+	                            , CREATE_BY
+	                            , CREATE_DATE )
+        VALUES                 ( #{item.companyCd, jdbcType=VARCHAR}
+			                   , #{item.divisionCd, jdbcType=VARCHAR}
+			                   , 'S'
+			                   , #{item.receiptNo, jdbcType=VARCHAR}
+			                   , #{item.purchaseInoutId, jdbcType=VARCHAR}
+			                   , #{item.reissueQty, jdbcType=NUMERIC}
+			                   , #{item.valMsg, jdbcType=VARCHAR}
+			                   , #{item.multiMsg, jdbcType=VARCHAR}
+			                   , #{item.description, jdbcType=VARCHAR}
+			                   , #{item.userId, jdbcType=VARCHAR}
+			                   , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                               )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn2-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_MATERIAL_PKG.SP_UPSERT_PI_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                            , #{companyCd,   jdbcType=VARCHAR , mode=IN}
+                                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}   
+                                            , 'S'                   
+                                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>  
+    <delete id="remove_customBtn2-2" parameterType="java.util.List">
+    DELETE FROM MOM_PROC_PI_REISSUE
+        <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (    COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+            AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+            AND  BUTTON_TYPE = 'D'
+            AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+        </where>
+    </delete>  
+    <insert id="create_customBtn2-2" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_PI_REISSUE( COMPANY_CD
+	                            , DIVISION_CD
+	                            , BUTTON_TYPE
+	                            , INOUT_NO
+	                            , PURCHASE_INOUT_ID
+	                            , REISSUE_QTY
+	                            , VAL_MSG
+	                            , MULTI_MSG
+	                            , DESCRIPTION
+	                            , CREATE_BY
+	                            , CREATE_DATE )
+        VALUES                 ( #{item.companyCd, jdbcType=VARCHAR}
+			                   , #{item.divisionCd, jdbcType=VARCHAR}
+			                   , 'D'
+			                   , #{item.receiptNo, jdbcType=VARCHAR}
+			                   , #{item.purchaseInoutId, jdbcType=VARCHAR}
+			                   , #{item.reissueQty, jdbcType=NUMERIC}
+			                   , #{item.valMsg, jdbcType=VARCHAR}
+			                   , #{item.multiMsg, jdbcType=VARCHAR}
+			                   , #{item.description, jdbcType=VARCHAR}
+			                   , #{item.userId, jdbcType=VARCHAR}
+			                   , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                               )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn2-2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_MATERIAL_PKG.SP_UPSERT_PI_MST( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                            , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                            , #{companyCd,   jdbcType=VARCHAR , mode=IN}
+                                            , #{divisionCd,  jdbcType=VARCHAR, mode=IN}   
+                                            , 'D'                   
+                                            , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>  
+</mapper>
