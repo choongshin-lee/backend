@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUMM3040">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+		    SELECT A.*
+		    FROM   (
+		</if> 		
+				    SELECT MPI.COMPANY_CD
+					     , MPI.DIVISION_CD
+					     , MPI.PROCESS_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
+					     , MPI.INOUT_NO    AS DEPARTURE_NO
+					     , MPI.SEQ  
+					     , MPI.PURCHASE_INOUT_ID  AS DEPARTURE_INOUT_ID
+					     , MPI.ITEM_ID
+					     , MI.ITEM_NM
+					     , MI.ITEM_SPEC
+					     , MI.ITEM_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+					     , MPI.STOCK_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MD0048', MPI.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS STOCK_TYPE_NM
+					     , MPI.STATE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MM0013', MPI.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS STATE_NM
+					     , MPI.IQC_RESULT
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MM0014', MPI.IQC_RESULT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS IQC_RESULT_NM
+					     , MPI.INOUT_QTY   AS DEPARTURE_QTY
+					     , MPI.INOUT_UOM   AS DEPARTURE_UOM	 
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.INOUT_UOM) FROM DUAL) AS DEPARTURE_UOM_NM
+					     , MPI.CONVERSION_QTY
+					     , MPI.CONVERSION_UOM
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
+					     , MPI.UNIT_PRICE
+					     , MPI.AMOUNT
+					     , MPI.LOCAL_AMOUNT
+					     , MPI.CURRENCY_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'SM0017', MPI.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+					     , MPI.PENALTY_AMOUNT
+                         , MPI.PENALTY_LOCAL_AMOUNT
+					     , MPI.WAREHOUSE_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPI.COMPANY_CD,MPI.DIVISION_CD,MPI.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
+					     , MPI.VENDOR_CD   AS PARTNER_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.VENDOR_CD) FROM DUAL ) AS PARTNER_NM
+					     , MPI.REFERENCE_NO
+                         , MPI.REFERENCE_DTL_NO
+					     , DECODE(MPI.ITEM_INOUT_ID, '', '',  MPI.IO_TYPE) AS IO_TYPE
+					     , CASE WHEN MPI.ITEM_INOUT_ID IS NOT NULL THEN
+					           (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.IO_TYPE) FROM DUAL) 
+					       ELSE ''
+					       END    AS IO_TYPE_NM
+					     , TO_CHAR(MPI.RECEIPT_DATE ,'YYYY-MM-DD')   AS RECEIPT_DATE
+					     , TO_CHAR(MPI.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE
+					     , MPI.IQC_FLAG
+					     , MPI.RECEIPT_QTY
+					     , TO_CHAR(MPI.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS')     AS CREATE_DATE
+						 , MPI.CREATE_BY                                         AS CREATE_USER_NO
+						 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
+					     , MPI.DESCRIPTION
+					     , ROWIDTOCHAR(MPI.ROWID)  AS KEY_ID 
+					     , COUNT(*) OVER()         AS TOTAL_COUNT
+					     , ROW_NUMBER() OVER(PARTITION BY MPI.COMPANY_CD,MPI.DIVISION_CD ORDER BY MPI.PURCHASE_INOUT_ID ) AS ROW_COUNT
+					FROM   MOM_PURCHASE_INOUT_V MPI
+					     , MOM_ITEM MI
+					WHERE  MPI.COMPANY_CD   = MI.COMPANY_CD
+					AND    MPI.DIVISION_CD  = MI.DIVISION_CD
+					AND    MPI.ITEM_ID      = MI.ITEM_ID    
+					AND    MPI.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+					AND    MPI.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
+					AND    MPI.CREATE_DATE BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					<if test="departureNo != null and departureNo != ''">
+					AND    UPPER(MPI.INOUT_NO) LIKE '%' || UPPER(#{departureNo, jdbcType=VARCHAR}) || '%'
+					</if>
+					<if test="itemIdNm != null and itemIdNm != ''">
+					AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
+					</if>
+					<if test="departureTitle != null and departureTitle != ''">
+					AND    UPPER(MPI.TITLE) LIKE '%' || UPPER(#{departureTitle, jdbcType=VARCHAR}) || '%'
+					</if>
+					<if test="iqcFlag != null and iqcFlag != ''">
+					AND    MPI.IQC_FLAG = #{iqcFlag, jdbcType=VARCHAR}
+					</if>	
+					AND    MPI.PROCESS_CD = 'DD' 
+					<if test="state != null and state != ''">
+					AND    MPI.STATE = #{state, jdbcType=VARCHAR}
+					</if>	
+					AND    MPI.VENDOR_CD IN ( SELECT MU.VENDOR_CD
+				                              FROM   MOM_USER MU
+				                                   , MOM_AUTH_GROUP MG
+				                              WHERE  MU.COMPANY_CD        = MG.COMPANY_CD
+				                              AND    MU.DIVISION_CD       = MG.DIVISION_CD
+				                              AND    MU.AUTH_GROUP_CD     = MG.AUTH_GROUP_CD
+				                              AND    MU.COMPANY_CD        = MPI.COMPANY_CD
+				                              AND    MU.DIVISION_CD       = MPI.DIVISION_CD
+				                              AND    MU.USER_NO           = #{userId, jdbcType=VARCHAR}
+				                              AND    MU.USE_YN            = 'Y' )  
+		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+				       ) A
+				WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+		</if>  	
+	</select>
+</mapper>
