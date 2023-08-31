@@ -38,29 +38,21 @@
 	AND    MPIM.CREATE_DATE BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999  
 	AND    MPIM.STATE     = 'PIG'  -- 등록 
 	AND    MPIM.PROCESS_CD = 'DD'   -- 납품서-내자거래
+	AND    MPIM.VENDOR_CD = #{partnerCd, jdbcType=VARCHAR}
 	<if test="departureNo != null and departureNo != ''">
 	AND    UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{departureNo, jdbcType=VARCHAR}) || '%'
 	</if>
-	<if test="partnerCd != null and partnerCd != ''">
-	AND    MPIM.VENDOR_CD = #{partnerCd, jdbcType=VARCHAR}    
-	</if>
-    <if test="departureTitle != null and departureTitle != ''">
+	<if test="departureTitle != null and departureTitle != ''">
 	AND    UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{departureTitle, jdbcType=VARCHAR}) || '%'
 	</if>
 	<if test="iqcFlag != null and iqcFlag != ''">
 	AND    MPIM.IQC_FLAG = #{iqcFlag, jdbcType=VARCHAR}
 	</if>	
-	AND    MPIM.VENDOR_CD IN (SELECT MU.VENDOR_CD
-                              FROM   MOM_USER MU
-                                  ,  MOM_AUTH_GROUP MG
-                              WHERE  MU.COMPANY_CD        = MG.COMPANY_CD
-                              AND    MU.DIVISION_CD       = MG.DIVISION_CD
-                              AND    MU.AUTH_GROUP_CD     = MG.AUTH_GROUP_CD
-                              AND    MU.COMPANY_CD        = MPIM.COMPANY_CD
-                              AND    MU.DIVISION_CD       = MPIM.DIVISION_CD
-                              AND    MU.USER_NO           = #{userId, jdbcType=VARCHAR}
-                              AND    MU.USE_YN            = 'Y' )    
-    ORDER BY MPIM.INOUT_NO
+	AND    EXISTS ( SELECT '*'
+                    FROM   MOM_PURCHASE_INOUT_DTL MPID
+                    WHERE  MPID.COMPANY_CD   = MPIM.COMPANY_CD
+                    AND    MPID.DIVISION_CD  = MPIM.DIVISION_CD
+                    AND    MPID.INOUT_NO     = MPIM.INOUT_NO )     
 	</select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
     SELECT MPID.COMPANY_CD

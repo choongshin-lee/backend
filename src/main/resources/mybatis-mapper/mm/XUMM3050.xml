@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUMM4050">
+<mapper namespace="com.mom.backend.XUMM3050">
     <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MPIM.COMPANY_CD
 		     , MPIM.DIVISION_CD
-		     , MPIM.INOUT_NO            AS RECEIPT_NO
+		     , MPIM.INOUT_NO            AS DEPARTURE_NO
 		     , ROWIDTOCHAR(MPIM.ROWID)  AS KEY_ID   
 		     , MPIM.PROCESS_CD
              , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM    
-		     , MPIM.TITLE               AS RECEIPT_TITLE
+		     , MPIM.TITLE               AS DEPARTURE_TITLE
 		     , MP.PARTNER_CD
              , MP.PARTNER_NM
 		     , MPIM.DEPARTURE_VENDOR_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
-		     , MPIM.WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
-             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
+		     , MPIM.WAREHOUSE_CD  AS DEPARTURE_WAREHOUSE_CD
+             , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS DEPARTURE_WAREHOUSE_NM
 		     , MPIM.IQC_FLAG
 		     , MPIM.CURRENCY_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
@@ -46,21 +46,19 @@
         <if test="processCd != null and processCd != ''">
 	    AND    MPIM.PROCESS_CD   =  #{processCd, jdbcType=VARCHAR}
 	    </if>
-	    <if test="receiptNo != null and receiptNo != ''">
-	    AND    UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{receiptNo, jdbcType=VARCHAR}) || '%'
+	    <if test="departureNo != null and departureNo != ''">
+	    AND    UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{departureNo, jdbcType=VARCHAR}) || '%'
 	    </if>
-	    <if test="partnerCdNm != null and partnerCdNm != ''">
-		AND    (UPPER(MPIM.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
-		</if>	
-	    <if test="receiptTitle != null and receiptTitle != ''">
-	    AND    UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{receiptTitle, jdbcType=VARCHAR}) || '%'
+	    AND    MPIM.VENDOR_CD = #{partnerCd, jdbcType=VARCHAR}    
+        <if test="departureTitle != null and departureTitle != ''">
+	    AND    UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{departureTitle, jdbcType=VARCHAR}) || '%'
 	    </if>
 	    ORDER BY MPIM.INOUT_NO
     </select>
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MPID.COMPANY_CD
 	         , MPID.DIVISION_CD
-	         , MPID.INOUT_NO          AS RECEIPT_NO
+	         , MPID.INOUT_NO          AS DEPARTURE_NO
 	         , MPID.SEQ
 	         , MPID.REFERENCE_NO  
 	         , MPID.REFERENCE_DTL_NO 
@@ -73,7 +71,7 @@
 	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.INOUT_UOM) FROM DUAL) AS PURCHASE_UOM_NM
 	         , MI.UOM        
 	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
-	         , MPID.INOUT_QTY        
+	         , MPID.INOUT_QTY                        AS DEPARTURE_QTY  
 	         , NVL(MPID.REISSUE_QTY,MPID.INOUT_QTY ) AS  REISSUE_QTY
 	         , MPID.UNIT_PRICE
 	         , MPID.AMOUNT
@@ -91,7 +89,7 @@
 	    AND    MPID.ITEM_ID     = MI.ITEM_ID
 	    AND    MPID.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 	    AND    MPID.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
-	    AND    MPID.INOUT_NO    = #{receiptNo, jdbcType=VARCHAR}
+	    AND    MPID.INOUT_NO    = #{departureNo, jdbcType=VARCHAR}
 	    AND    NVL(MPID.REISSUE_DEL_YN, 'N') = 'N'
 	    ORDER BY MPID.INOUT_NO 
 	           , MPID.SEQ
@@ -126,7 +124,7 @@
         VALUES                 ( #{item.companyCd, jdbcType=VARCHAR}
 			                   , #{item.divisionCd, jdbcType=VARCHAR}
 			                   , 'R'
-			                   , #{item.receiptNo, jdbcType=VARCHAR}
+			                   , #{item.departureNo, jdbcType=VARCHAR}
 			                   , #{item.purchaseInoutId, jdbcType=VARCHAR}
 			                   , #{item.referenceNo, jdbcType=VARCHAR}
 			                   , #{item.referenceDtlNo, jdbcType=VARCHAR}
@@ -177,7 +175,7 @@
         VALUES                 ( #{item.companyCd, jdbcType=VARCHAR}
 			                   , #{item.divisionCd, jdbcType=VARCHAR}
 			                   , 'S'
-			                   , #{item.receiptNo, jdbcType=VARCHAR}
+			                   , #{item.departureNo, jdbcType=VARCHAR}
 			                   , #{item.purchaseInoutId, jdbcType=VARCHAR}
 			                   , #{item.referenceNo, jdbcType=VARCHAR}
 			                   , #{item.referenceDtlNo, jdbcType=VARCHAR}
@@ -228,7 +226,7 @@
         VALUES                 ( #{item.companyCd, jdbcType=VARCHAR}
 			                   , #{item.divisionCd, jdbcType=VARCHAR}
 			                   , 'D'
-			                   , #{item.receiptNo, jdbcType=VARCHAR}
+			                   , #{item.departureNo, jdbcType=VARCHAR}
 			                   , #{item.purchaseInoutId, jdbcType=VARCHAR}
 			                   , #{item.referenceNo, jdbcType=VARCHAR}
 			                   , #{item.referenceDtlNo, jdbcType=VARCHAR}

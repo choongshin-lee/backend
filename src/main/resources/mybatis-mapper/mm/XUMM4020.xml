@@ -51,7 +51,11 @@
 	    <if test="iqcFlag != null and iqcFlag != ''">
 	    AND    MPIM.IQC_FLAG = #{iqcFlag, jdbcType=VARCHAR}
 	    </if> 
-	    ORDER BY MPIM.INOUT_NO
+    	AND    EXISTS ( SELECT '*'
+	                    FROM   MOM_PURCHASE_INOUT_DTL MPID
+	                    WHERE  MPID.COMPANY_CD   = MPIM.COMPANY_CD
+	                    AND    MPID.DIVISION_CD  = MPIM.DIVISION_CD
+	                    AND    MPID.INOUT_NO     = MPIM.INOUT_NO )     
     </select>
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MPID.COMPANY_CD
