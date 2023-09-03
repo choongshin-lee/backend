@@ -2,47 +2,56 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mom.backend.XUMD4020">
    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-       SELECT MCD.COMPANY_CD
-     , MCD.COMPANY_NM
-     , MCD.DIVISION_CD
-     , MCD.DIVISION_NM
-     , MS.SHIFT_CD 
-     , MS.SHIFT_NM 
-     , MS.START_TIME
-     , MS.END_TIME
-     , MS.WORK_TIME 
-     , MS.WORK_TIME - NVL((SELECT SUM(B.REST_TIME)
-       FROM MOM_MASTER.MOM_SHIFT_REST_TIME_MAP A
-       ,    MOM_MASTER.MOM_SHIFT_REST_TIME B
-       WHERE A.COMPANY_CD  = B.COMPANY_CD
-       AND   A.DIVISION_CD = B.DIVISION_CD
-       AND   A.REST_TIME_CD = B.REST_TIME_CD
-       AND   A.COMPANY_CD  = MCD.COMPANY_CD
-       AND   A.DIVISION_CD = MCD.DIVISION_CD
-       AND   A.SHIFT_CD    = MS.SHIFT_CD),0) AS PURE_WORK_TIME
-     , MS.MAIN_SHIFT_YN
-     , MS.USE_YN
-     , MS.DESCRIPTION
-     , MS.UPDATE_BY
-     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MS.COMPANY_CD, MS.DIVISION_CD, MS.UPDATE_BY) FROM DUAL ) AS UPDATE_BY_NM
-     , TO_CHAR(MS.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-     , MS.SHIFT_CD AS KEY_ID
-	  FROM   MOM_COM_DIV_V MCD
-		   , MOM_SHIFT  MS
-	  WHERE  MCD.COMPANY_CD    = MS.COMPANY_CD
-	  AND    MCD.DIVISION_CD   = MS.DIVISION_CD   
-	  AND    MCD.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
-	  AND    MCD.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}	  
-    <if test="shiftCd != null and shiftCd != ''">
-	  AND MS.SHIFT_CD  IN (${shiftCd})
-	</if>
-	<if test="shiftCd2 != null and shiftCd2 != ''">
-	  AND MS.SHIFT_CD = #{shiftCd2, jdbcType=VARCHAR}
-	</if>
-	<if test="useYn != null and useYn != ''">
-	  AND MS.USE_YN = #{useYn, jdbcType=VARCHAR}
-	</if>   
-      ORDER BY MCD.COMPANY_NM, MCD.DIVISION_NM, MS.SHIFT_NM 
+       SELECT A.COMPANY_CD
+		     , A.COMPANY_NM
+		     , A.DIVISION_CD
+		     , A.DIVISION_NM
+		     , A.SHIFT_CD 
+		     , A.SHIFT_NM 
+		     , A.START_TIME
+		     , A.END_TIME
+		     , A.WORK_TIME
+		     , A.REST_TIME
+		     , A.WORK_TIME - NVL(A.REST_TIME,0) AS  PURE_WORK_TIME
+		     , A.MAIN_SHIFT_YN
+		     , A.USE_YN
+		     , A.DESCRIPTION
+		     , A.UPDATE_BY
+		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UPDATE_BY) FROM DUAL ) AS UPDATE_BY_NM
+		     , A.UPDATE_DATE
+		     , A.KEY_ID
+		FROM   (SELECT MCD.COMPANY_CD
+		             , MCD.COMPANY_NM
+		             , MCD.DIVISION_CD
+		             , MCD.DIVISION_NM
+		             , MS.SHIFT_CD 
+		             , MS.SHIFT_NM 
+		             , MS.START_TIME
+		             , MS.END_TIME
+		             , (SELECT MOM_COMMON_PKG.FN_GET_SHIFT_WORK_TIME(MS.COMPANY_CD, MS.DIVISION_CD, MS.SHIFT_CD) FROM DUAL) AS WORK_TIME
+		             , (SELECT MOM_COMMON_PKG.FN_GET_SHIFT_REST_TIME(MS.COMPANY_CD, MS.DIVISION_CD, MS.SHIFT_CD) FROM DUAL) AS REST_TIME
+		             , MS.MAIN_SHIFT_YN
+		             , MS.USE_YN
+		             , MS.DESCRIPTION
+		             , MS.UPDATE_BY
+		             ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MS.COMPANY_CD, MS.DIVISION_CD, MS.UPDATE_BY) FROM DUAL ) AS UPDATE_BY_NM
+		             , TO_CHAR(MS.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+		             , MS.SHIFT_CD AS KEY_ID
+		        FROM   MOM_COM_DIV_V MCD
+		             , MOM_SHIFT  MS
+		        WHERE  MCD.COMPANY_CD    = MS.COMPANY_CD
+		        AND    MCD.DIVISION_CD   = MS.DIVISION_CD   
+		        AND    MCD.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+		        AND    MCD.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}    
+		        <if test="shiftCd != null and shiftCd != ''">
+		        AND    MS.SHIFT_CD  IN (${shiftCd})
+		        </if>
+		        <if test="shiftCd2 != null and shiftCd2 != ''">
+		        AND    MS.SHIFT_CD = #{shiftCd2, jdbcType=VARCHAR}
+		        </if>
+		        <if test="useYn != null and useYn != ''">
+		        AND    MS.USE_YN = #{useYn, jdbcType=VARCHAR}
+		        </if>   ) A
   </select>
   <select id="get_findBtn2" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
       SELECT MCD.COMPANY_CD

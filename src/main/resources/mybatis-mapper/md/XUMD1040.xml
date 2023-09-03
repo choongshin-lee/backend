@@ -10,6 +10,8 @@
 				     , MWG.DIVISION_CD
 				     , MWG.WORK_GROUP_CD
 				     , MWG.WORK_GROUP_NM
+				     , MWG.WORK_GROUP_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWG.COMPANY_CD,MWG.DIVISION_CD, 'MM0021', MWG.WORK_GROUP_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS WORK_GROUP_TYPE_NM 
 				     , MWG.USE_YN
 				     , MWG.DESCRIPTION
 				     , MWG.CREATE_BY     AS CREATE_USER_NO
@@ -44,6 +46,7 @@
 	                              ,  DIVISION_CD
 	                              ,  WORK_GROUP_CD
 	                              ,  WORK_GROUP_NM
+	                              ,  WORK_GROUP_TYPE
 	                              ,  USE_YN
 	                              ,  DESCRIPTION
 	                              ,  CREATE_BY
@@ -56,6 +59,7 @@
             ,   #{item.divisionCd, jdbcType=VARCHAR}
             ,   #{item.workGroupCd, jdbcType=VARCHAR}
             ,   #{item.workGroupNm, jdbcType=VARCHAR}
+            ,   #{item.workGroupType, jdbcType=VARCHAR}
             ,   #{item.useYn, jdbcType=VARCHAR}
             ,   #{item.description, jdbcType=VARCHAR}
             ,   #{item.userId, jdbcType=VARCHAR}
@@ -68,14 +72,15 @@
     <update id="modify_editBtn1" parameterType="java.util.List">
         <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close=";END;">
         UPDATE MOM_WORK_GROUP
-        SET    WORK_GROUP_NM = #{item.workGroupNm,   jdbcType=VARCHAR}
-             , USE_YN        = #{item.useYn,         jdbcType=VARCHAR}
-             , DESCRIPTION   = #{item.description,   jdbcType=VARCHAR}
-             , UPDATE_BY     = #{item.userId,        jdbcType=VARCHAR}
-             , UPDATE_DATE   = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-        WHERE  COMPANY_CD    = TRIM(#{item.companyCd,   jdbcType=VARCHAR})
-        AND    DIVISION_CD   = TRIM(#{item.divisionCd,  jdbcType=VARCHAR}) 
-        AND    WORK_GROUP_CD = TRIM(#{item.workGroupCd, jdbcType=VARCHAR})           
+        SET    WORK_GROUP_NM   = #{item.workGroupNm,   jdbcType=VARCHAR}
+             , WORK_GROUP_TYPE = #{item.workGroupType,   jdbcType=VARCHAR}
+             , USE_YN          = #{item.useYn,         jdbcType=VARCHAR}
+             , DESCRIPTION     = #{item.description,   jdbcType=VARCHAR}
+             , UPDATE_BY       = #{item.userId,        jdbcType=VARCHAR}
+             , UPDATE_DATE     = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+        WHERE  COMPANY_CD      = TRIM(#{item.companyCd,   jdbcType=VARCHAR})
+        AND    DIVISION_CD     = TRIM(#{item.divisionCd,  jdbcType=VARCHAR}) 
+        AND    WORK_GROUP_CD   = TRIM(#{item.workGroupCd, jdbcType=VARCHAR})           
         </foreach>
     </update>
     <delete id="remove_delBtn1" parameterType="java.util.List"> 
@@ -98,6 +103,7 @@
                    #{divisionCd, jdbcType=VARCHAR} as divisionCd,
                    #{workGroupCd, jdbcType=VARCHAR} as workGroupCd,
                    #{workGroupNm, jdbcType=VARCHAR} as workGroupNm,
+                   #{workGroupType, jdbcType=VARCHAR} as workGroupType,
                    #{useYn, jdbcType=VARCHAR} as useYn,
                    #{description, jdbcType=VARCHAR} as description,
                    #{userId, jdbcType=VARCHAR} as createBy,
@@ -110,18 +116,20 @@
             WORK_GROUP_CD = PARAM.workGroupCd )
     WHEN MATCHED THEN 
         UPDATE 
-        SET    WORK_GROUP_NM = PARAM.workGroupNm
-             , USE_YN = PARAM.useYn
-             , DESCRIPTION = PARAM.description
-             , CREATE_BY = PARAM.createBy
-             , CREATE_DATE = PARAM.createDate
-             , UPDATE_BY = PARAM.updateBy
-             , UPDATE_DATE = PARAM.updateDate
+        SET    WORK_GROUP_NM   = PARAM.workGroupNm
+             , WORK_GROUP_TYPE = PARAM.workGroupType
+             , USE_YN          = PARAM.useYn
+             , DESCRIPTION     = PARAM.description
+             , CREATE_BY       = PARAM.createBy
+             , CREATE_DATE     = PARAM.createDate
+             , UPDATE_BY       = PARAM.updateBy
+             , UPDATE_DATE     = PARAM.updateDate
     WHEN NOT MATCHED THEN
         INSERT ( COMPANY_CD
                , DIVISION_CD
                , WORK_GROUP_CD
                , WORK_GROUP_NM
+               , WORK_GROUP_TYPE
                , USE_YN
                , DESCRIPTION
                , CREATE_BY
@@ -132,6 +140,7 @@
                , PARAM.divisionCd
                , PARAM.workGroupCd
                , PARAM.workGroupNm
+               , PARAM.workGroupType
                , PARAM.useYn
                , PARAM.description
                , PARAM.createBy

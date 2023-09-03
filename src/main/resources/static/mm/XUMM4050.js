@@ -19,7 +19,7 @@ var VIEW= {
 	},
 	cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {receiptNo['receiptNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {receiptNo:e.item['receiptNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	}
 };

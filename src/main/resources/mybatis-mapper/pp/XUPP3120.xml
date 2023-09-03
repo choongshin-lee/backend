@@ -17,6 +17,9 @@
 				     , MI.ITEM_TYPE
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
 				     , MI.ITEM_SPEC
+				     , MI.NET_WEIGHT
+				     , MI.NET_WEIGHT_UOM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.NET_WEIGHT_UOM) FROM DUAL) AS NET_WEIGHT_UOM_NM
 				     , MWG.WORK_GROUP_CD
 				     , MWG.WORK_GROUP_NM
 				     , MWO.WORK_CENTER_CD
@@ -175,6 +178,9 @@
              , MIN(A.TOTAL_CLOSE_QTY)           AS TOTAL_CLOSE_QTY
              , MIN((A.WO_QTY - A.TOTAL_GOOD_QTY - A.TOTAL_DEFECT_QTY - A.TOTAL_CLOSE_QTY)) AS REMAIN_QTY
              , MIN(A.WO_START_DATE)             AS WO_START_DATE
+             , MIN(A.NET_WEIGHT)                AS NET_WEIGHT
+             , MIN(A.NET_WEIGHT_UOM)            AS NET_WEIGHT_UOM
+             , MIN((SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.NET_WEIGHT_UOM) FROM DUAL)) AS NET_WEIGHT_UOM_NM
         FROM ( SELECT MWO.COMPANY_CD
                     , MWO.DIVISION_CD
                     , MWO.WORK_ORDER_ID
@@ -207,16 +213,22 @@
                     , NVL(MW.CLOSE_QTY, 0)  AS TOTAL_CLOSE_QTY
                     , MW.WO_QTY
                     , TO_CHAR(MW.WO_START_TIME ,'YYYY-MM-DD')  AS WO_START_DATE
+                    , MI.NET_WEIGHT
+                    , MI.NET_WEIGHT_UOM
                FROM   MOM_WO_OPERATION_PATH MWO
                     , MOM_WORK_ORDER MW
                     , C_PATH  P
+                    , MOM_ITEM MI
                WHERE  MWO.COMPANY_CD     = P.COMPANY_CD(+)                     
                AND    MWO.DIVISION_CD    = P.DIVISION_CD(+)                     
-               AND    MWO.WORK_ORDER_ID  = P.WORK_ORDER_ID (+)     
-               AND    MWO.OPERATION_ID   = P.OPERATION_ID  (+)            
+               AND    MWO.WORK_ORDER_ID  = P.WORK_ORDER_ID(+)     
+               AND    MWO.OPERATION_ID   = P.OPERATION_ID(+)            
                AND    MW.COMPANY_CD      = MWO.COMPANY_CD                     
                AND    MW.DIVISION_CD     = MWO.DIVISION_CD                     
                AND    MW.WORK_ORDER_ID   = MWO.WORK_ORDER_ID  
+               AND    MW.COMPANY_CD      = MI.COMPANY_CD                     
+               AND    MW.DIVISION_CD     = MI.DIVISION_CD                     
+               AND    MW.ITEM_ID         = MI.ITEM_ID
                AND    MWO.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
                AND    MWO.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
                AND    MWO.WORK_ORDER_ID  = #{workOrderId, jdbcType=VARCHAR} ) A
@@ -252,6 +264,8 @@
 						              , END_TIME
 						              , GOOD_QTY
 						              , DEFECT_QTY
+						              , NET_WEIGHT
+						              , NET_WEIGHT_UOM
 						              , DESCRIPTION
 						              , VAL_MSG
 						              , MULTI_MSG
@@ -269,6 +283,8 @@
 						              , TO_DATE(#{item.endDate, jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS') 
 						              , #{item.goodQty, jdbcType=NUMERIC}
 						              , #{item.defectQty, jdbcType=NUMERIC}
+						              , #{item.netWeight, jdbcType=NUMERIC}
+						              , #{item.netWeightUom, jdbcType=VARCHAR}
 						              , #{item.description, jdbcType=VARCHAR}
 						              , #{item.valMsg, jdbcType=VARCHAR}
 						              , #{item.multiMsg, jdbcType=VARCHAR}
