@@ -19,7 +19,10 @@
 	             , MSO.ITEM_TYPE
 	             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSO.COMPANY_CD, MSO.DIVISION_CD, 'MD0002', MSO.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM
 	             , MSO.ITEM_SPEC
-	             , MSO.PREV_QTY       AS BC_ORDER_QTY
+	             , MSO.CUSTOMER_DUE_DATE
+	             , MSO.SO_UOM
+                 , MSO.SO_UOM_NM
+                 , MSO.PREV_QTY       AS BC_ORDER_QTY
 	             , MSO.ORDER_QTY      AS AC_ORDER_QTY
 	             , MSO.SALES_ORDER_ID
 	             , MSO.UPDATE_BY
@@ -31,6 +34,7 @@
 	        FROM   MOM_SALES_ORDER_V MSO
 	        WHERE  MSO.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
 	        AND    MSO.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}	  
+	        AND    MSO.CUSTOMER_DUE_DATE BETWEEN TO_DATE(#{customerDueDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{customerDueDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 	        AND    MSO.CHANGE_YN   = 'Y'    
 	        <if test="soNo != null and soNo != ''">
 	        AND    (UPPER(MSO.SO_NO) LIKE '%' || UPPER(#{soNo, jdbcType=VARCHAR}) || '%' )

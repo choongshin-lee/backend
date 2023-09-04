@@ -9,7 +9,6 @@
 		    SELECT MD.COMPANY_CD
                  , MD.DIVISION_CD
                  , MD.DEMAND_ID
-                 , MD.DEMAND_ID AS KEY_ID
                  , MD.DEMAND_TYPE
                  , MD.PRIORITY
                  , MD.DESCRIPTION
@@ -20,6 +19,8 @@
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MD.COMPANY_CD,MD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM     
                  , MI.ITEM_SPEC
                  , TO_CHAR(MD.DUE_DATE ,'YYYY-MM-DD') AS DUE_DATE
+                 , MD.UOM
+                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MD.COMPANY_CD, MD.DIVISION_CD, MD.UOM) FROM DUAL) AS UOM_NM
                  , MD.QTY
                  , NVL(MWO.GOOD_QTY, 0)  AS WO_RESULT_QTY
                  , NVL(MWO.CLOSE_QTY,0) AS CLOSE_QTY
@@ -29,13 +30,16 @@
                  , MWO.WORK_ORDER_ID
                  , MSD.SO_NO
                  , MSD.SO_SEQ
-                 , MD.UPDATE_BY
-                 ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MD.COMPANY_CD, MD.DIVISION_CD, MD.UPDATE_BY) FROM DUAL ) AS UPDATEBYNM
+                 , (SELECT TO_CHAR(MSM.SO_DATE ,'YYYY-MM-DD') 
+                    FROM   MOM_SO_MST MSM 
+                    WHERE  MSM.COMPANY_CD  = MSD.COMPANY_CD
+		            AND    MSM.DIVISION_CD = MSD.DIVISION_CD
+		            AND    MSM.SO_NO       = MSD.SO_NO )  AS SO_DATE
+                 , MD.UPDATE_BY  AS UPDATE_USER_NO
+                 ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MD.COMPANY_CD, MD.DIVISION_CD, MD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
                  , TO_CHAR(MD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-                 , CASE WHEN NVL(MWO.GOOD_QTY, 0) > 0 THEN 'N' 
-		           ELSE 'Y'
-		           END               AS MODIFY_YN   
-		         , ROWIDTOCHAR(MD.ROWID) AS GRID_ID
+                 , DECODE(NVL(MD.CONFIRM_FLAG, 'N'), 'Y', 'N', 'Y')            AS MODIFY_YN   
+		         , ROWIDTOCHAR(MD.ROWID) AS KEY_ID
 	             , COUNT(*) OVER() AS TOTAL_COUNT
 	             , ROW_NUMBER() OVER(PARTITION BY MD.COMPANY_CD,MD.DIVISION_CD ORDER BY MD.DEMAND_ID ) AS ROW_CNT 
             FROM   MOM_DEMAND MD
@@ -81,31 +85,12 @@
 	WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
 	</if>
     </select>
-	<select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-    { CALL MOM_DEMAND_PKG.SP_CREATE_MANUAL_DEMAND( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
-                                                 , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
-                                                 , #{companyCd,  jdbcType=VARCHAR, mode=IN}
-                                                 , #{divisionCd, jdbcType=VARCHAR, mode=IN}
-                                                 , #{demandType,       jdbcType=VARCHAR, mode=IN} 
-                                                 , #{itemId,           jdbcType=VARCHAR, mode=IN}  
-                                                 , TO_DATE(#{dueDate,  jdbcType=VARCHAR, mode=IN},'YYYY-MM-DD')
-                                                 , #{qty,              jdbcType=NUMERIC, mode=IN}  
-                                                 , #{priority,         jdbcType=NUMERIC, mode=IN}  
-                                                 , #{workCenterCd,     jdbcType=VARCHAR, mode=IN}  
-                                                 , #{description,      jdbcType=VARCHAR, mode=IN} 
-                                                 , #{userId,           jdbcType=VARCHAR, mode=IN} )}    	              
-    </select>  
-    <update id="modify_saveBtn1" parameterType="java.util.List">      
-        <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close=";END;">
-        UPDATE MOM_DEMAND 
-        SET    PRIORITY    = #{item.priority, jdbcType=NUMERIC}
-             , DUE_DATE    = SUBSTR(#{item.dueDate,  jdbcType=VARCHAR},1,10)      
-             , DESCRIPTION = #{item.description, jdbcType=VARCHAR}
-             , UPDATE_BY   = #{item.userId, jdbcType=VARCHAR}
-             , UPDATE_DATE = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-        WHERE  COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-        AND    DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-        AND    DEMAND_ID   = #{item.demandId, jdbcType=VARCHAR}
-        </foreach>                            
-    </update>
+	<select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_PP_PKG.MAIN( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+                          , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+                          , #{companyCd,  jdbcType=VARCHAR, mode=IN}
+                          , #{divisionCd, jdbcType=VARCHAR, mode=IN}		
+                          , 'PRE'									  
+                          , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+    </select>    
 </mapper>
