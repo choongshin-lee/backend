@@ -15,7 +15,11 @@
     SELECT A.*
     FROM   (
     </if>
-            SELECT A.*    
+            SELECT A.*
+	             , CASE WHEN A.DAY_OFF_YN = 'Y' THEN 0
+	               ELSE 
+	                   NVL(A.WORK_TIME,0) - NVL(A.REST_TIME,0) - NVL(A.PALN_SHUTDOWN_TIME,0) + NVL(A.UNMANNED_OPERATION_TIME,0)
+	               END AS REAL_WORK_TIME    
             FROM   ( SELECT MCD.COMPANY_CD
 					      , MCD.COMPANY_NM
 					      , MCD.DIVISION_CD
@@ -42,36 +46,32 @@
 					         AND    MC.DATE_ID      = MSS.APPLY_DATE) AS WEEK_DAY 
 					      , MSS.SHIFT_CD
 					      , MS.SHIFT_NM
-					      , CASE WHEN DAY_OFF_YN = 'N' THEN MS.START_TIME
-		                         WHEN DAY_OFF_YN = 'Y' THEN '00:00'                       
+					      , MSS.DAY_OFF_YN
+					      , CASE WHEN MSS.DAY_OFF_YN = 'N' THEN MS.START_TIME
+		                         WHEN MSS.DAY_OFF_YN = 'Y' THEN '00:00'                       
 		                    ELSE '00:00'
 		                    END AS START_TIME
-		                  , CASE WHEN DAY_OFF_YN = 'N' THEN MS.END_TIME
-		                         WHEN DAY_OFF_YN = 'Y' THEN '00:00'
+		                  , CASE WHEN MSS.DAY_OFF_YN = 'N' THEN MS.END_TIME
+		                         WHEN MSS.DAY_OFF_YN = 'Y' THEN '00:00'
 		                    ELSE '00:00'
 		                    END AS END_TIME
-			              ,  MSS.DAY_OFF_YN
-						  , CASE WHEN DAY_OFF_YN = 'Y' THEN 0
+			              , CASE WHEN MSS.DAY_OFF_YN = 'Y' THEN 0
 			                ELSE 
 			                    (SELECT MOM_COMMON_PKG.FN_GET_SHIFT_WORK_TIME(MSS.COMPANY_CD, MSS.DIVISION_CD, MSS.SHIFT_CD) FROM DUAL)
 			                END AS WORK_TIME                  
-			              , CASE WHEN DAY_OFF_YN = 'Y' THEN 0
+			              , CASE WHEN MSS.DAY_OFF_YN = 'Y' THEN 0
 			                ELSE 
 	                            (SELECT MOM_COMMON_PKG.FN_GET_SHIFT_REST_TIME(MSS.COMPANY_CD, MSS.DIVISION_CD, MSS.SHIFT_CD) FROM DUAL)  
 			                END AS REST_TIME        
-			              , CASE WHEN DAY_OFF_YN = 'Y' THEN 0
+			              , CASE WHEN MSS.DAY_OFF_YN = 'Y' THEN 0
 			                ELSE 
 			                    NVL(MSS.PALN_SHUTDOWN_TIME,0)
 			                END AS PALN_SHUTDOWN_TIME       
-			              , CASE WHEN DAY_OFF_YN = 'Y' THEN 0
+			              , CASE WHEN MSS.DAY_OFF_YN = 'Y' THEN 0
 			                ELSE 
 			                    NVL(MSS.UNMANNED_OPERATION_TIME,0)
 			                END AS UNMANNED_OPERATION_TIME           
-			              , CASE WHEN DAY_OFF_YN = 'Y' THEN 0
-			                ELSE 
-			                    NVL(MS.WORK_TIME,0) - NVL(MT.REST_TIME,0) - NVL(MSS.PALN_SHUTDOWN_TIME,0) + NVL(MSS.UNMANNED_OPERATION_TIME,0)
-			                END AS REAL_WORK_TIME
-						  , MSS.UPDATE_BY
+			              , MSS.UPDATE_BY
 						  , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MSS.COMPANY_CD, MSS.DIVISION_CD, MSS.UPDATE_BY) FROM DUAL ) AS UPDATE_BY_NM
 						  , TO_CHAR(MSS.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 			              , MSS.DESCRIPTION
@@ -83,15 +83,11 @@
 					      , MOM_SHIFT           MS
 					      , MOM_WORK_GROUP 		MWG
 					      , MOM_WORK_CENTER     MWC
-					      , MOM_SHIFT_REST_TIME_V MT
        		         WHERE  MCD.COMPANY_CD      = MSS.COMPANY_CD
 					 AND    MCD.DIVISION_CD     = MSS.DIVISION_CD   
 					 AND    MSS.COMPANY_CD      = MS.COMPANY_CD
 					 AND    MSS.DIVISION_CD     = MS.DIVISION_CD    
 					 AND    MSS.SHIFT_CD        = MS.SHIFT_CD 
-					 AND    MS.COMPANY_CD       = MT.COMPANY_CD(+)
-					 AND    MS.DIVISION_CD      = MT.DIVISION_CD(+)    
-					 AND    MS.SHIFT_CD         = MT.SHIFT_CD(+) 
 					 AND    MWC.COMPANY_CD      = MWG.COMPANY_CD
 					 AND    MWC.DIVISION_CD     = MWG.DIVISION_CD    
 					 AND    MWC.WORK_GROUP_CD   = MWG.WORK_GROUP_CD 
@@ -181,7 +177,7 @@
       VALUES 
               (   #{item.companyCd, jdbcType=VARCHAR}
                 , #{item.divisionCd, jdbcType=VARCHAR}
-                , #{item.workCenterCd, jdbcType=VARCHAR}
+                , #{item.fromWorkCenterCd, jdbcType=VARCHAR}
                 , #{item.shiftCd, jdbcType=VARCHAR}
                 , #{item.applyDate, jdbcType=VARCHAR}
                 , #{item.dayOffYn, jdbcType=VARCHAR}
@@ -214,7 +210,7 @@
       VALUES 
               (   #{item.companyCd, jdbcType=VARCHAR}
                 , #{item.divisionCd, jdbcType=VARCHAR}
-                , #{item.workCenterCd, jdbcType=VARCHAR}
+                , #{item.fromWorkCenterCd, jdbcType=VARCHAR}
                 , #{item.shiftCd, jdbcType=VARCHAR}
                 , #{item.applyDate, jdbcType=VARCHAR}
                 , #{item.dayOffYn, jdbcType=VARCHAR}
@@ -241,7 +237,7 @@
       WHERE  1=1
       AND    COMPANY_CD = #{item.companyCd, jdbcType=VARCHAR}
       AND    DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-      AND    WORK_CENTER_CD = #{item.workCenterCd, jdbcType=VARCHAR}
+      AND    WORK_CENTER_CD = #{item.fromWorkCenterCd, jdbcType=VARCHAR}
       AND    APPLY_DATE = #{item.applyDate, jdbcType=VARCHAR}
     </foreach>
   </update>
@@ -251,7 +247,7 @@
        <foreach collection="list" item="item" open="" close="" separator="OR">
         (       COMPANY_CD = #{item.companyCd, jdbcType=VARCHAR}
            AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-           AND  WORK_CENTER_CD = #{item.workCenterCd, jdbcType=VARCHAR}
+           AND  WORK_CENTER_CD = #{item.fromWorkCenterCd, jdbcType=VARCHAR}
            AND  APPLY_DATE = #{item.applyDate, jdbcType=VARCHAR}
         )
        </foreach>

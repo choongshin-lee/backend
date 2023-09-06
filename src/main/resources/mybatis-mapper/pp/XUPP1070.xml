@@ -54,4 +54,12 @@
 	WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
 	</if> 
     </select>
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_PP_PKG.SP_PRODUCTION_PLAN_CONFIRM( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+						                        , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+						                        , #{companyCd,  jdbcType=VARCHAR, mode=IN}
+						                        , #{divisionCd, jdbcType=VARCHAR, mode=IN}		
+						                        , 'PRE'									  
+						                        , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+    </select>    
 </mapper>  	

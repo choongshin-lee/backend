@@ -67,11 +67,9 @@
 					AND MPO.WORK_CENTER_CD = #{workCenterCd, jdbcType=VARCHAR}
 					</if>	
 					<if test="state != null and state != ''">
-					AND MPO.WR_STATE IN (${state})
+					AND MPO.WR_STATE = #{state, jdbcType=VARCHAR} 
 					</if>
-					<if test="outsourcingYn != null and outsourcingYn != ''">
-					AND MPO.OUTSOURCING_YN =  #{outsourcingYn, jdbcType=VARCHAR}
-					</if>	
+					AND MPO.OUTSOURCING_YN = 'N'
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
@@ -95,19 +93,28 @@
     <update id="modify_customBtn1-2" parameterType="java.util.List">
         <foreach collection="list" item="item" separator=";" open="DECLARE BEGIN" close=";END;">
 	    UPDATE MOM_PRODUCT_ORDER
-	    SET    WORK_CENTER_CD = #{item.workCenterCd, jdbcType=VARCHAR}
-	         , ROUTING_ID     = #{item.routingId, jdbcType=VARCHAR}       
-	         , CONFIRM_QTY    = #{item.confirmQty, jdbcType=NUMERIC}         
-	         , PRIORITY       = #{item.priority, jdbcType=NUMERIC}       
-	         , BOR_ID         = #{item.borId, jdbcType=VARCHAR}
-	         , UPDATE_BY      = #{item.userId, jdbcType=VARCHAR}
-	         , UPDATE_DATE     = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-	     WHERE  1=1
-	     AND    COMPANY_CD       = #{item.companyCd, jdbcType=VARCHAR}
-	     AND    DIVISION_CD      = #{item.divisionCd, jdbcType=VARCHAR}
-	     AND    PRODUCT_ORDER_ID = #{item.workOrderId, jdbcType=VARCHAR}
+	    SET    WORK_CENTER_CD   = #{item.workCenterCd, jdbcType=VARCHAR}
+	         , CONFIRM_QTY      = #{item.confirmQty, jdbcType=NUMERIC}         
+	         , PRIORITY         = #{item.priority, jdbcType=NUMERIC}       
+	         , UPDATE_BY        = #{item.userId, jdbcType=VARCHAR}
+	         , UPDATE_DATE      = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+	    WHERE  1=1
+	    AND    COMPANY_CD       = #{item.companyCd, jdbcType=VARCHAR}
+	    AND    DIVISION_CD      = #{item.divisionCd, jdbcType=VARCHAR}
+	    AND    PRODUCT_ORDER_ID = #{item.workOrderId, jdbcType=VARCHAR}
 	    </foreach>
     </update>
+        <delete id="remove_customBtn1-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_WORK_ORDER
+        <where>
+            <foreach collection="list" item="item" open="" close="" separator="OR">
+            (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+             AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+             AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+            )
+            </foreach>
+        </where>
+    </delete> 
     <insert id="create_customBtn1-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_WORK_ORDER( COMPANY_CD
@@ -145,22 +152,11 @@
                                 ) 
         </foreach>
     </insert>
-    <delete id="remove_customBtn1-1" parameterType="java.util.List">
-        DELETE FROM MOM_PROC_WORK_ORDER
-        <where>
-            <foreach collection="list" item="item" open="" close="" separator="OR">
-            (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-             AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-             AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
-            )
-            </foreach>
-        </where>
-    </delete> 
     <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WO_PKG.SP_CONFIRM_WORK_ORDER( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
-					                           , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
-					                           , #{companyCd,  jdbcType=VARCHAR , mode=IN}
-					                           , #{divisionCd, jdbcType=VARCHAR, mode=IN}											  
-					                           , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+        { CALL MOM_WO_PKG.SP_CONFIRM_PRODUCT_ORDER( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+					                              , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+					                              , #{companyCd,  jdbcType=VARCHAR , mode=IN}
+					                              , #{divisionCd, jdbcType=VARCHAR, mode=IN}											  
+					                              , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
     </select>    
 </mapper>
