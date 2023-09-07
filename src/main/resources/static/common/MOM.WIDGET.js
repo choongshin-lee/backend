@@ -6568,7 +6568,7 @@ var momWidget = {
         let menuParamMap = {};
         var queryId = menuId == undefined ? that.pageProperty[index]['menuId'] + '.findBtn' + (index + 1) : menuId + '.findBtn' + (index + 1);
         
-        if(menuId == 'XUPP1070' ||  menuId == 'XUPP1080'){
+        if(menuId == 'XUPP1070' ||  menuId == 'XUPP1080' ||  menuId == 'XUPP1100' ){
 	        if (btnId == 'EXCEL_DOWN') {
 	            var fileName1 = that.pageProperty[index]['programId'] + '_' + get_current_date('yyyy-mm-dd');
 	            var excelDownOpt1 = {

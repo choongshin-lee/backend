@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUPP1100">
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	SELECT A.*
+	FROM   (
+	</if>   
+	        <if test="pivot != null and pivot != ''">
+	        SELECT *
+	        FROM   (
+	        </if>
+	                WITH C_WO AS ( SELECT A.WORK_CENTER_CD, MWC.WORK_CENTER_NM, A.PLAN_DATE, A.PLAN_QTY , A.SS_QTY
+			                             , TRUNC((A.PLAN_QTY/A.SS_QTY) * 100)  AS CAPA_RATE
+			                             , A.COMPANY_CD , A.DIVISION_CD
+			                        FROM   ( SELECT A.WORK_CENTER_CD
+			                                      , A.PLAN_DATE
+			                                      , A.COMPANY_CD
+			                                      , A.DIVISION_CD
+			                                      , TRUNC(SUM(A.PLAN_QTY)/60)  AS PLAN_QTY
+			                                      , ( SELECT (SELECT MOM_COMMON_PKG.FN_GET_SHIFT_WORK_TIME(MSS.COMPANY_CD, MSS.DIVISION_CD, MSS.SHIFT_CD) FROM DUAL) - (SELECT MOM_COMMON_PKG.FN_GET_SHIFT_REST_TIME(MSS.COMPANY_CD, MSS.DIVISION_CD, MSS.SHIFT_CD) FROM DUAL)  
+			                                          FROM   MOM_SHIFT_SCHEDULE MSS
+			                                          WHERE  MSS.COMPANY_CD      =  A.COMPANY_CD
+			                                          AND    MSS.DIVISION_CD     = A.DIVISION_CD
+			                                          AND    MSS.WORK_CENTER_CD  = A.WORK_CENTER_CD
+			                                          AND    MSS.APPLY_DATE      = A.PLAN_DATE )     AS SS_QTY
+			                                 FROM   ( SELECT MPO.WORK_CENTER_CD, MPO.ITEM_ID
+			                                               , GREATEST(MPO.PLAN_DATE, TRUNC((SELECT MOM_COMMON_PKG.FN_GET_LOCAL_TIME(MPO.COMPANY_CD, MPO.DIVISION_CD)FROM DUAL)))   AS PLAN_DATE
+			                                               , (MPO.PLAN_QTY * NVL( ( SELECT MOM_COMMON_PKG.FN_GET_TACT_TIME(MPO.COMPANY_CD, MPO.DIVISION_CD, MPO.ITEM_ID, MPO.WORK_CENTER_CD) FROM  DUAL), 1)) PLAN_QTY
+			                                               , MPO.COMPANY_CD
+			                                               , MPO.DIVISION_CD
+			                                          FROM   MOM_PRODUCT_ORDER MPO 
+			                                          WHERE  MPO.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+			                                          AND    MPO.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
+			                                          AND    MPO.WR_STATE       = 'R'
+			                                          AND    MPO.OUTSOURCING_YN = 'N'
+			                                          UNION 
+			                                          SELECT MWO.WORK_CENTER_CD, MWO.ITEM_ID
+			                                               , GREATEST(MWO.PLAN_DATE, TRUNC((SELECT MOM_COMMON_PKG.FN_GET_LOCAL_TIME(MWO.COMPANY_CD, MWO.DIVISION_CD)FROM DUAL)))   AS PLAN_DATE   
+			                                               , (MWO.WO_QTY * NVL((SELECT MOM_COMMON_PKG.FN_GET_TACT_TIME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.ITEM_ID, MWO.WORK_CENTER_CD) FROM  DUAL) , 1)) AS PLAN_QTY 
+			                                               , MWO.COMPANY_CD
+			                                               , MWO.DIVISION_CD
+			                                          FROM   MOM_WORK_ORDER MWO 
+			                                          WHERE  MWO.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+			                                          AND    MWO.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+			                                          AND    MWO.WO_STATE       IN ('G','F')
+			                                          AND    MWO.OUTSOURCING_YN = 'N' ) A
+			                                 GROUP BY A.WORK_CENTER_CD
+			                                        , A.PLAN_DATE
+			                                        , A.COMPANY_CD
+			                                        , A.DIVISION_CD ) A 
+			                             , MOM_WORK_CENTER MWC
+			                        WHERE  A.COMPANY_CD     = MWC.COMPANY_CD
+			                        AND    A.DIVISION_CD    = MWC.DIVISION_CD
+			                        AND    A.WORK_CENTER_CD = MWC.WORK_CENTER_CD 
+			                        <if test="workCenterCdNm != null and workCenterCdNm != ''">
+						            AND    (UPPER(MWC.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWC.WORK_CENTER_NM) LIKE '%' || UPPER(#{workCenterCdNm, jdbcType=VARCHAR}) || '%')    
+						            </if> 
+			                        )                 
+					SELECT A.WORK_CENTER_CD
+					     , A.WORK_CENTER_NM
+					     , A.PLAN_DATE 
+					     , A.CATEGORY_CD 
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD,A.DIVISION_CD, 'PP0014', A.CATEGORY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS  CATEGORY_NM
+					     , CASE WHEN  A.CATEGORY_CD = 'A' THEN
+                              (SELECT TRUNC(SUM(A.PLAN_QTY)/60)  AS PLAN_QTY
+							   FROM   (  SELECT (MPO.PLAN_QTY * NVL( ( SELECT MOM_COMMON_PKG.FN_GET_TACT_TIME(MPO.COMPANY_CD, MPO.DIVISION_CD, MPO.ITEM_ID, MPO.WORK_CENTER_CD) FROM  DUAL), 1)) PLAN_QTY
+								               ,  MPO.PLAN_DATE
+								               ,  MPO.PRODUCT_ORDER_ID
+								          FROM   MOM_PRODUCT_ORDER MPO 
+								          WHERE  MPO.COMPANY_CD     = A.COMPANY_CD
+								          AND    MPO.DIVISION_CD    = A.DIVISION_CD
+								          AND    MPO.WR_STATE       = 'R'
+								          AND    MPO.OUTSOURCING_YN = 'N'
+								          AND    MPO.WORK_CENTER_CD = A.WORK_CENTER_CD
+								          AND    MPO.PLAN_DATE      <![CDATA[<]]> TRUNC((SELECT MOM_COMMON_PKG.FN_GET_LOCAL_TIME(A.COMPANY_CD, A.DIVISION_CD)FROM DUAL))
+								          UNION 
+								          SELECT (MWO.WO_QTY * NVL((SELECT MOM_COMMON_PKG.FN_GET_TACT_TIME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.ITEM_ID, MWO.WORK_CENTER_CD) FROM  DUAL) , 1)) AS PLAN_QTY
+								               ,  PLAN_DATE
+								               , MWO.WORK_ORDER_ID
+								          FROM   MOM_WORK_ORDER MWO 
+								          WHERE  MWO.COMPANY_CD      = A.COMPANY_CD
+								          AND    MWO.DIVISION_CD     = A.DIVISION_CD
+								          AND    MWO.WO_STATE       IN ('G','F')
+								          AND    MWO.OUTSOURCING_YN = 'N'  
+								          AND    MWO.WORK_CENTER_CD = A.WORK_CENTER_CD
+								          AND    MWO.PLAN_DATE      <![CDATA[<]]> TRUNC((SELECT MOM_COMMON_PKG.FN_GET_LOCAL_TIME(A.COMPANY_CD, A.DIVISION_CD)FROM DUAL))) A)				     
+					       ELSE  NULL
+					       END   AS  PAST_QTY 
+					     , A.PLAN_QTY 
+                         , A.WORK_CENTER_CD||'_'|| A.CATEGORY_CD         AS KEY_ID 
+			             , COUNT(*) OVER() AS TOTAL_COUNT
+			             , DENSE_RANK() OVER(ORDER BY A.WORK_CENTER_CD, A.CATEGORY_CD  ) AS ROW_COUNT
+			             , A.COMPANY_CD
+			             , A.DIVISION_CD
+					FROM  ( SELECT A.WORK_CENTER_CD
+							     , A.WORK_CENTER_NM
+							     , TO_CHAR(A.PLAN_DATE ,'YYYY-MM-DD')  AS PLAN_DATE      
+							     , 'A'                                 AS CATEGORY_CD
+							     , A.PLAN_QTY                          AS PLAN_QTY
+							     , A.COMPANY_CD
+			                     , A.DIVISION_CD
+							FROM   C_WO A
+							UNION 
+							SELECT B.WORK_CENTER_CD
+							     , B.WORK_CENTER_NM
+							     , TO_CHAR(B.PLAN_DATE ,'YYYY-MM-DD')  AS PLAN_DATE      
+							     , 'B'                                 AS CATEGORY_CD
+							     , B.SS_QTY   	                       AS PLAN_QTY
+							     , B.COMPANY_CD
+			                     , B.DIVISION_CD
+							FROM   C_WO B
+							UNION 
+							SELECT C.WORK_CENTER_CD
+							     , C.WORK_CENTER_NM
+							     , TO_CHAR(C.PLAN_DATE ,'YYYY-MM-DD')  AS PLAN_DATE      
+							     , 'C'                                 AS CATEGORY_CD
+							     , C.CAPA_RATE 						   AS PLAN_QTY
+							     , C.COMPANY_CD
+			                     , C.DIVISION_CD						
+							FROM   C_WO C  ) A 
+	        <if test="pivot != null and pivot != ''">
+            )
+            PIVOT(SUM(PLAN_QTY) FOR PLAN_DATE IN(${pivot}))
+            </if>       
+	<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	       ) A
+	WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+	</if> 
+    </select>
+    <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    SELECT A.PLAN_QUERY_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'PP0015', A.PLAN_QUERY_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PLAN_QUERY_TYPE_NM
+		     , A.PRODUCT_ORDER_ID
+		     , A.ITEM_ID
+		     , TO_CHAR(A.PLAN_DATE ,'YYYY-MM-DD')  AS PLAN_DATE
+		     , A.UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UOM) FROM DUAL) AS UOM_NM
+		     , A.PLAN_QTY
+		     , ( SELECT MOM_COMMON_PKG.FN_GET_TACT_TIME(A.COMPANY_CD, A.DIVISION_CD, A.ITEM_ID, A.WORK_CENTER_CD) FROM  DUAL) AS  TACT_TIME
+		FROM   (SELECT 'PWO'              AS PLAN_QUERY_TYPE
+		             ,  MPO.WORK_CENTER_CD
+		             ,  MPO.PRODUCT_ORDER_ID
+		             ,  MPO.ITEM_ID
+		             ,  MPO.PLAN_DATE
+		             ,  MPO.UOM
+		             ,  MPO.PLAN_QTY
+		             , ( SELECT MOM_COMMON_PKG.FN_GET_TACT_TIME(MPO.COMPANY_CD, MPO.DIVISION_CD, MPO.ITEM_ID, MPO.WORK_CENTER_CD) FROM  DUAL) AS  TACT_TIME
+		             , MPO.COMPANY_CD
+		             , MPO.DIVISION_CD
+		        FROM   MOM_PRODUCT_ORDER MPO 
+		        WHERE  MPO.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+		        AND    MPO.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
+		        AND    MPO.WR_STATE       = 'R'
+		        AND    MPO.OUTSOURCING_YN = 'N'
+		        AND    MPO.WORK_CENTER_CD = #{workCenterCd, jdbcType=VARCHAR}
+		        UNION 
+		        SELECT 'WO' AS TYPE
+		             ,  MWO.WORK_CENTER_CD
+		             ,  MWO.WORK_ORDER_ID   AS  PRODUCT_ORDER_ID
+		             ,  MWO.ITEM_ID
+		             ,  MWO.PLAN_DATE
+		             ,  MWO.MFG_UOM    AS UOM 
+		             ,  MWO.WO_QTY
+		             ,  (SELECT MOM_COMMON_PKG.FN_GET_TACT_TIME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.ITEM_ID, MWO.WORK_CENTER_CD) FROM  DUAL) AS TACT_TIME
+		             , MWO.COMPANY_CD
+		             , MWO.DIVISION_CD
+		        FROM   MOM_WORK_ORDER MWO 
+		        WHERE  MWO.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+		        AND    MWO.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
+		        AND    MWO.WO_STATE       IN ('G','F')
+		        AND    MWO.OUTSOURCING_YN = 'N'  
+		        AND    MWO.WORK_CENTER_CD = #{workCenterCd, jdbcType=VARCHAR}
+		        ) A
+		ORDER BY A.PLAN_DATE, A.PLAN_QUERY_TYPE, A.ITEM_ID
+    </select>
+</mapper>  	
