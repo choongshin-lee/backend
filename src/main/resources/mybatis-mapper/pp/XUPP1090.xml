@@ -38,18 +38,29 @@
 			             , CPP.UPDATE_BY  AS UPDATE_USER_NO
                          ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(CPP.COMPANY_CD, CPP.DIVISION_CD, CPP.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
                          , TO_CHAR(CPP.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE   
+                         , MSO.CUSTOMER_CD
+                         , MSO.CUSTOMER_NM
+                         ,(SELECT TO_CHAR(MD.DUE_DATE ,'YYYY-MM-DD') 
+                           FROM   MOM_DEMAND MD
+                           WHERE  MD.COMPANY_CD  = CPP.COMPANY_CD
+                           AND    MD.DIVISION_CD = CPP.DIVISION_CD
+                           AND    MD.DEMAND_ID   = CPP.DEMAND_ID )  AS DUE_DATE
 			             , ROWIDTOCHAR(CPP.ROWID)     AS KEY_ID
 			             , COUNT(*) OVER()            AS TOTAL_COUNT
 			             , ROW_NUMBER() OVER(PARTITION BY CPP.COMPANY_CD, CPP.DIVISION_CD ORDER BY CPP.PRODUCT_ORDER_ID ) AS ROW_CNT         
 			        FROM   CAL_OUT_PRODUCTION_PLAN CPP
 			             , MOM_ITEM   MI
 			             , MOM_WORK_CENTER MWC
+			             , MOM_SALES_ORDER_V MSO 
 			        WHERE  CPP.COMPANY_CD      = MI.COMPANY_CD
 			        AND    CPP.DIVISION_CD     = MI.DIVISION_CD
 			        AND    CPP.ITEM_ID         = MI.ITEM_ID
 			        AND    CPP.COMPANY_CD     = MWC.COMPANY_CD(+)
 			        AND    CPP.DIVISION_CD    = MWC.DIVISION_CD(+)
 			        AND    CPP.WORK_CENTER_CD = MWC.WORK_CENTER_CD(+)    
+			        AND    CPP.COMPANY_CD     = MSO.COMPANY_CD(+)
+                    AND    CPP.DIVISION_CD    = MSO.DIVISION_CD(+)
+                    AND    CPP.SALES_ORDER_ID = MSO.SALES_ORDER_ID(+)
 			        AND    CPP.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
 			        AND    CPP.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
 			        AND    CPP.PLAN_DATE BETWEEN TO_DATE(#{planDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{planDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999

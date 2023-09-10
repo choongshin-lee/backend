@@ -211,6 +211,7 @@
                     , MI.NET_WEIGHT
                     , MI.NET_WEIGHT_UOM
                     , P.DEFECT_TYPE
+                    , ''  AS NON_WORK_REASON_CD
                     , DECODE(P.STATE, 'R', 1, 'W',2, 'E',3) AS SORT_NO
                FROM   MOM_WO_OPERATION_PATH MWO
                     , MOM_WORK_ORDER MW
@@ -373,5 +374,101 @@
 					                           	     , #{divisionCd, jdbcType=VARCHAR, mode=IN}
 					                           	     , 'E'											  
 					                           	     , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+  </select>  
+  <delete id="remove_customBtn2-3" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_WO_NON_WORK
+        <where>
+        <foreach collection="list" item="item" open="" close="" separator="OR">
+        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+           AND  BUTTON_TYPE = 'H'
+           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+        )
+        </foreach>
+        </where>
+    </delete>
+    <insert id="create_customBtn2-3" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_WO_NON_WORK( COMPANY_CD
+								 , DIVISION_CD
+								 , BUTTON_TYPE
+							 	 , WORK_ORDER_ID
+								 , WO_RESULT_ID
+								 , REASON_CD
+								 , DESCRIPTION
+								 , VAL_MSG
+								 , MULTI_MSG
+								 , CREATE_BY
+								 , CREATE_DATE
+								 )
+        VALUES                   ( #{item.companyCd, jdbcType=VARCHAR}
+				                 , #{item.divisionCd, jdbcType=VARCHAR}
+				                 , 'H'
+				                 , #{item.workOrderId, jdbcType=VARCHAR}
+				                 , #{item.woResultId, jdbcType=VARCHAR}
+				                 , #{item.nonWorkReasonCd, jdbcType=VARCHAR}
+				                 , #{item.description, jdbcType=VARCHAR}
+				                 , #{item.valMsg, jdbcType=VARCHAR}
+				                 , #{item.multiMsg, jdbcType=VARCHAR}
+				                 , #{item.userId, jdbcType=VARCHAR}
+				                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+				                 )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn2-3" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+       { CALL MOM_WO_PKG.SP_CREATE_WO_HOLD_RELEASE( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+					                              , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+					                           	  , #{companyCd,  jdbcType=VARCHAR , mode=IN}
+					                           	  , #{divisionCd, jdbcType=VARCHAR, mode=IN}
+					                           	  , 'H'											  
+					                           	  , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+  </select>  
+  <delete id="remove_customBtn2-4" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_WO_NON_WORK
+        <where>
+        <foreach collection="list" item="item" open="" close="" separator="OR">
+        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+           AND  BUTTON_TYPE = 'R'
+           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+        )
+        </foreach>
+        </where>
+    </delete>
+    <insert id="create_customBtn2-4" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_WO_NON_WORK( COMPANY_CD
+								 , DIVISION_CD
+								 , BUTTON_TYPE
+							 	 , WORK_ORDER_ID
+								 , WO_RESULT_ID
+								 , REASON_CD
+								 , DESCRIPTION
+								 , VAL_MSG
+								 , MULTI_MSG
+								 , CREATE_BY
+								 , CREATE_DATE
+								 )
+        VALUES                   ( #{item.companyCd, jdbcType=VARCHAR}
+				                 , #{item.divisionCd, jdbcType=VARCHAR}
+				                 , 'R'
+				                 , #{item.workOrderId, jdbcType=VARCHAR}
+				                 , #{item.woResultId, jdbcType=VARCHAR}
+				                 , #{item.nonWorkReasonCd, jdbcType=VARCHAR}
+				                 , #{item.description, jdbcType=VARCHAR}
+				                 , #{item.valMsg, jdbcType=VARCHAR}
+				                 , #{item.multiMsg, jdbcType=VARCHAR}
+				                 , #{item.userId, jdbcType=VARCHAR}
+				                 , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+				                 )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn2-4" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+       { CALL MOM_WO_PKG.SP_CREATE_WO_HOLD_RELEASE( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+					                              , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+					                           	  , #{companyCd,  jdbcType=VARCHAR , mode=IN}
+					                           	  , #{divisionCd, jdbcType=VARCHAR, mode=IN}
+					                           	  , 'R'											  
+					                           	  , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
   </select>  
 </mapper>

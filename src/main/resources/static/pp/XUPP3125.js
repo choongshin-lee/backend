@@ -66,7 +66,7 @@ var VIEW= {
 	customCallBack: function(index,your,action,btnId,param,result,data) {
 	    if(index == 1 &&  btnId == 'customBtn2-1'){	
 		    //widget.findBtnClicked(1, {}, true, btnId,menuId,VIEW);
-		    widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);							   		   			
+		    //widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);							   		   			
 		}
 	}
 };

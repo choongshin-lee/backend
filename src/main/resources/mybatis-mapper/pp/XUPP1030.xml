@@ -39,13 +39,15 @@
                  ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MD.COMPANY_CD, MD.DIVISION_CD, MD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
                  , TO_CHAR(MD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
                  , DECODE(NVL(MD.CONFIRM_FLAG, 'N'), 'Y', 'N', 'Y')            AS MODIFY_YN   
+                 , MSD.CUSTOMER_CD
+                 , MSD.CUSTOMER_NM
 		         , ROWIDTOCHAR(MD.ROWID) AS KEY_ID
 	             , COUNT(*) OVER() AS TOTAL_COUNT
 	             , ROW_NUMBER() OVER(PARTITION BY MD.COMPANY_CD,MD.DIVISION_CD ORDER BY MD.DEMAND_ID ) AS ROW_CNT 
             FROM   MOM_DEMAND MD
                  , MOM_ITEM   MI
                  , MOM_WORK_ORDER MWO
-                 , MOM_SO_DTL MSD
+                 , MOM_SALES_ORDER_V MSD
             WHERE  MD.COMPANY_CD     = MI.COMPANY_CD
             AND    MD.DIVISION_CD    = MI.DIVISION_CD
             AND    MD.ITEM_ID        = MI.ITEM_ID
