@@ -209,6 +209,24 @@
     <if test="searchKey != null and searchKey != ''">
     AND    ( UPPER(ITEM_ID) LIKE '%' || UPPER(TRIM(#{searchKey, jdbcType=VARCHAR}) || '%' ))
     </if>
+    <if test="inspectionYn != null and inspectionYn != ''">
+    AND    ITEM_ID IN ( SELECT MB.ITEM_ID
+						FROM   MOM_BOR MB
+						     , MOM_ROUTING_PATH MR
+						     , MOM_OPERATION MO
+						WHERE  MB.COMPANY_CD    = MR.COMPANY_CD
+						AND    MB.DIVISION_CD   = MR.DIVISION_CD
+						AND    MB.ROUTING_ID    = MR.ROUTING_ID    
+						AND    MR.COMPANY_CD    = MO.COMPANY_CD
+						AND    MR.DIVISION_CD   = MO.DIVISION_CD
+						AND    MR.OPERATION_ID  = MO.OPERATION_ID   
+						AND    MR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+						AND    MR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}      
+						AND    MO.INSPECTION_YN = 'Y'
+						AND    MB.USE_YN        = 'Y'
+						AND    MR.USE_YN        = 'Y'
+						AND    MO.USE_YN        = 'Y')
+    </if>
     ORDER BY LABEL
     </select>
     <select id="get_DD00021" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
@@ -252,8 +270,30 @@
          , OPERATION_ID   ||'('|| OPERATION_NM     ||')' AS LABEL
 	FROM MOM_OPERATION
 	WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
-    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
+    <if test="inspectionYn != null and inspectionYn != ''">
+    AND    INSPECTION_YN = #{inspectionYn, jdbcType=VARCHAR}
+    </if> 
     AND    USE_YN      = 'Y'
+    <if test="itemId != null and itemId != ''">
+    AND    OPERATION_ID IN (SELECT MR.OPERATION_ID
+							FROM   MOM_BOR MB
+							     , MOM_ROUTING_PATH MR
+							     , MOM_OPERATION MO
+							WHERE  MB.COMPANY_CD = MR.COMPANY_CD
+							AND    MB.DIVISION_CD = MR.DIVISION_CD
+							AND    MB.ROUTING_ID  = MR.ROUTING_ID    
+							AND    MR.COMPANY_CD = MO.COMPANY_CD
+							AND    MR.DIVISION_CD = MO.DIVISION_CD
+							AND    MR.OPERATION_ID  = MO.OPERATION_ID  
+							AND    MR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+							AND    MR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}          
+							AND    MO.INSPECTION_YN = 'Y'
+							AND    MB.USE_YN = 'Y'
+							AND    MR.USE_YN = 'Y'
+							AND    MO.USE_YN = 'Y'
+							AND    MB.ITEM_ID       = #{itemId, jdbcType=VARCHAR} )	
+    </if>
 	ORDER BY LABEL
     </select>    
     <select id="get_DD00025" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   
@@ -787,24 +827,6 @@
 	SELECT CODE
 	     , LABEL
 	FROM   (SELECT  MP.PARTNER_CD   AS CODE 
-	             ,  MP.PARTNER_CD ||'('|| MP.PARTNER_NM   ||')' AS LABEL
-	        FROM    MOM_PARTNER MP
-	        WHERE   MP.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
-	        AND     MP.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
-	        AND     MP.USE_YN       = 'Y'
-	        AND     'N' = ( SELECT  MG.OUT_SOURCING_FLAG
-	                        FROM    MOM_USER MU
-	                             ,  MOM_AUTH_GROUP MG
-	                        WHERE   MU.COMPANY_CD    = MG.COMPANY_CD
-	                        AND     MU.DIVISION_CD   = MG.DIVISION_CD
-	                        AND     MU.AUTH_GROUP_CD = MG.AUTH_GROUP_CD
-	                        AND     MU.COMPANY_CD    = MP.COMPANY_CD
-	                        AND     MU.DIVISION_CD   = MP.DIVISION_CD
-	                        AND     MU.USER_NO       = #{userId, jdbcType=VARCHAR}
-	                        AND     MG.OUT_SOURCING_FLAG = 'N' 
-	                        AND     MU.USE_YN            = 'Y')
-	        UNION 
-	        SELECT  MP.PARTNER_CD   AS CODE 
 	             ,  MP.PARTNER_CD ||'('|| MP.PARTNER_NM   ||')' AS LABEL
 	        FROM    MOM_USER MU
 	             ,  MOM_AUTH_GROUP MG

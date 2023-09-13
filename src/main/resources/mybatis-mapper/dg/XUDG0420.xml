@@ -74,6 +74,7 @@
         AND    MPM.DO_INVOICE_YN = 'N'
         AND    MPC.MARKET_CD     = DECODE(#{processCd, jdbcType=VARCHAR}, 'RD', 'D', 'RO', 'O')
         AND    MPD.STATE         = 'POF'  --확정
+        AND    MPM.PO_REFERENCE_TYPE IN ('10,'20')
         <if test="partnerCd != null and partnerCd != ''">
         AND    MPM.VENDOR_CD     = #{partnerCd, jdbcType=VARCHAR}
         </if>

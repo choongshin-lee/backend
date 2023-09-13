@@ -8,9 +8,9 @@
 		</if>
 		            SELECT MIS.COMPANY_CD
 		                 , MIS.DIVISION_CD
-		                 , MIS.INSPECTION_TYPE  
-		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MIS.COMPANY_CD,MIS.DIVISION_CD, 'MD0039', MIS.INSPECTION_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS INSPECTION_TYPE_NM
 		                 , MIS.ITEM_ID
+		                 , MIS.OPERATION_ID
+		                 , MO.OPERATION_NM 
 		                 , MI.ITEM_NM
 		                 , MI.ITEM_SPEC
 		                 , MI.ITEM_TYPE
@@ -37,9 +37,6 @@
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MIS.COMPANY_CD,MIS.DIVISION_CD, 'MD0046', MIS.AQL, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS AQL_NM
 		                 , MIS.INSPECTION_LEVEL
 		                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MIS.COMPANY_CD,MIS.DIVISION_CD, 'MD0046', MIS.INSPECTION_LEVEL, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS INSPECTION_LEVEL_NM
-		                 , MIS.FP_PQC_FLAG
-		                 , MIS.MP_PQC_FLAG
-		                 , MIS.LP_PQC_FLAG
 		                 , MIS.USE_YN
 		                 , MIS.UPDATE_DATE
 		                 , MIS.UPDATE_BY
@@ -48,17 +45,23 @@
 		                 , MIS.DESCRIPTION
 		                 , ROWIDTOCHAR(MIS.ROWID)            AS KEY_ID
 						 , COUNT(*) OVER()   AS TOTAL_COUNT
-						 , ROW_NUMBER() OVER(PARTITION BY MIS.COMPANY_CD,MIS.DIVISION_CD ORDER BY MIS.INSPECTION_TYPE,MIS.ITEM_ID,MIS.INSPECTION_LIST) AS ROW_CNT
-		            FROM   MOM_INSPECTION_SPEC MIS
+						 , ROW_NUMBER() OVER(PARTITION BY MIS.COMPANY_CD,MIS.DIVISION_CD ORDER BY MIS.ITEM_ID,MIS.OPERATION_ID,MIS.INSPECTION_LIST) AS ROW_CNT
+		            FROM   MOM_INSPECTION_PQC_SPEC MIS
 		                 , MOM_ITEM MI
+		                 , MOM_OPERATION MO
 		            WHERE  MIS.COMPANY_CD   = MI.COMPANY_CD
 		            AND    MIS.DIVISION_CD  = MI.DIVISION_CD
 		            AND    MIS.ITEM_ID      = MI.ITEM_ID     
+		            AND    MIS.COMPANY_CD   = MO.COMPANY_CD
+		            AND    MIS.DIVISION_CD  = MO.DIVISION_CD
+		            AND    MIS.OPERATION_ID = MO.OPERATION_ID
 		            AND    MIS.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
 		  			AND    MIS.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
-		            AND    MIS.INSPECTION_TYPE = 'PQC'
 		            <if test="itemIdNm != null and itemIdNm != ''">
 					AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
+					</if> 
+					<if test="operationIdNm != null and operationIdNm != ''">
+					AND    (UPPER(MIS.OPERATION_ID) LIKE '%' || UPPER(#{operationIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MO.OPERATION_NM) LIKE '%' || UPPER(#{operationIdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
 		            <if test="useYn != null and useYn != ''">
 		            AND    MIS.USE_YN = #{useYn, jdbcType=VARCHAR}
@@ -69,12 +72,11 @@
 		</if> 
     </select>
     <delete id="remove_createBtn1" parameterType="java.util.List">
-	    DELETE FROM MOM_PROC_INSPECTION_SPEC
+	    DELETE FROM MOM_PROC_INSPECT_PQC_SPEC
 	        <where>
 	            <foreach collection="list" item="item" open="" close="" separator="OR">
 	          (       COMPANY_CD        = #{item.companyCd, jdbcType=VARCHAR}
 	             AND  DIVISION_CD       = #{item.divisionCd, jdbcType=VARCHAR}
-	             AND  INSPECTION_TYPE   = 'PQC'
 	             AND  CREATE_BY         = #{item.userId, jdbcType=VARCHAR}
 	          )
 	            </foreach>
@@ -82,91 +84,82 @@
     </delete>  
     <insert id="create_createBtn1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_INSPECTION_SPEC( COMPANY_CD
-									 , DIVISION_CD
-									 , INSPECTION_TYPE
-									 , ITEM_ID
-									 , INSPECTION_METHOD
-									 , INSPECTION_LIST
-									 , INSPECTION_SPEC
-									 , INSPECTION_UOM
-									 , INSPECTION_EQUIPMENT
-									 , SAMPLING_INSPECTION_TYPE
-									 , SAMPLING_COUNT
-									 , SORT_NO
-									 , SL_MEASURE_TYPE
-									 , SL
-									 , USL
-									 , LSL
-									 , AQL
-									 , INSPECTION_LEVEL
-									 , FP_PQC_FLAG
-									 , MP_PQC_FLAG
-									 , LP_PQC_FLAG
-									 , USE_YN
-									 , DESCRIPTION
-									 , DEL_YN
-									 , VAL_MSG
-									 , MULTI_MSG
-									 , CREATE_BY
-									 , CREATE_DATE
-								     )
-        VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}
-				                    , #{item.divisionCd, jdbcType=VARCHAR}
-				                    , #{item.inspectionType, jdbcType=VARCHAR}
-					                , #{item.itemId, jdbcType=VARCHAR}
-					                , #{item.inspectionMethod, jdbcType=VARCHAR}
-					                , #{item.inspectionList, jdbcType=VARCHAR}
-					                , #{item.inspectionSpec, jdbcType=VARCHAR}
-					                , #{item.inspectionUom, jdbcType=VARCHAR}
-					                , #{item.inspectionEquipment, jdbcType=VARCHAR}
-					                , #{item.samplingInspectionType, jdbcType=VARCHAR}
-					                , #{item.samplingCount, jdbcType=NUMERIC}
-					                , #{item.sortNo, jdbcType=NUMERIC}
-					                , #{item.slMeasureType, jdbcType=VARCHAR}
-					                , #{item.sl, jdbcType=NUMERIC}
-					                , #{item.usl, jdbcType=NUMERIC}
-					                , #{item.lsl, jdbcType=NUMERIC}
-					                , #{item.aql, jdbcType=NUMERIC}
-					                , #{item.inspectionLevel, jdbcType=VARCHAR}
-					                , #{item.fpPqcFlag, jdbcType=VARCHAR}
-					                , #{item.mpPqcFlag, jdbcType=VARCHAR}
-					                , #{item.lpPqcFlag, jdbcType=VARCHAR}
-				                    , #{item.useYn, jdbcType=VARCHAR}
-				                    , #{item.description, jdbcType=VARCHAR}
-				                    , #{item.delYn, jdbcType=VARCHAR}
-				                    , #{item.valMsg, jdbcType=VARCHAR}
-				                    , #{item.multiMsg, jdbcType=VARCHAR}
-				                    , #{item.userId, jdbcType=VARCHAR}
-				                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-			                        )
+        INTO MOM_PROC_INSPECT_PQC_SPEC( COMPANY_CD
+									  , DIVISION_CD
+									  , ITEM_ID
+									  , OPERATION_ID
+									  , INSPECTION_METHOD
+									  , INSPECTION_LIST
+									  , INSPECTION_SPEC
+									  , INSPECTION_UOM
+									  , INSPECTION_EQUIPMENT
+									  , SAMPLING_INSPECTION_TYPE
+									  , SAMPLING_COUNT
+									  , SORT_NO
+									  , SL_MEASURE_TYPE
+									  , SL
+									  , USL
+									  , LSL
+									  , AQL
+									  , INSPECTION_LEVEL
+									  , USE_YN
+									  , DESCRIPTION
+									  , DEL_YN
+									  , VAL_MSG
+									  , MULTI_MSG
+									  , CREATE_BY
+									  , CREATE_DATE
+								      )
+        VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
+				                      , #{item.divisionCd, jdbcType=VARCHAR}
+				                      , #{item.itemId, jdbcType=VARCHAR}
+				                      , #{item.operationId, jdbcType=VARCHAR}
+					                  , #{item.inspectionMethod, jdbcType=VARCHAR}
+					                  , #{item.inspectionList, jdbcType=VARCHAR}
+					                  , #{item.inspectionSpec, jdbcType=VARCHAR}
+					                  , #{item.inspectionUom, jdbcType=VARCHAR}
+					                  , #{item.inspectionEquipment, jdbcType=VARCHAR}
+					                  , #{item.samplingInspectionType, jdbcType=VARCHAR}
+					                  , #{item.samplingCount, jdbcType=NUMERIC}
+					                  , #{item.sortNo, jdbcType=NUMERIC}
+					                  , #{item.slMeasureType, jdbcType=VARCHAR}
+					                  , #{item.sl, jdbcType=NUMERIC}
+					                  , #{item.usl, jdbcType=NUMERIC}
+					                  , #{item.lsl, jdbcType=NUMERIC}
+					                  , #{item.aql, jdbcType=NUMERIC}
+					                  , #{item.inspectionLevel, jdbcType=VARCHAR}
+					                  , #{item.useYn, jdbcType=VARCHAR}
+				                      , #{item.description, jdbcType=VARCHAR}
+				                      , #{item.delYn, jdbcType=VARCHAR}
+				                      , #{item.valMsg, jdbcType=VARCHAR}
+				                      , #{item.multiMsg, jdbcType=VARCHAR}
+				                      , #{item.userId, jdbcType=VARCHAR}
+				                      , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+			                          )
         </foreach>
     </insert>
         <select id="proc_createBtn1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_INSPECTION_SPEC( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-		                                                    , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-			                                                , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-			                                                , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
-			                                                , 'PQC'
-			                                                , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
-			                                                , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_INSPECTION_PQC_SPEC( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+		                                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                                    , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                                    , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
+			                                                    , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
+			                                                    , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
     </select>  
     <select id="get_excelUpBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT NVL(VAL_MSG,'PASS') AS VAL_MSG
 	         , MULTI_MSG      
-	    FROM   MOM_PROC_INSPECTION_SPEC
+	    FROM   MOM_PROC_INSPECT_PQC_SPEC
 	    WHERE  COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 	    AND    DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
-	    AND  INSPECTION_TYPE   = 'PQC'
 	    AND    CREATE_BY       = #{userId, jdbcType=VARCHAR}
   </select> 
     <delete id="remove_excelUpBtnV1" parameterType="java.util.List">
-	    DELETE FROM MOM_PROC_INSPECTION_SPEC
+	    DELETE FROM MOM_PROC_INSPECT_PQC_SPEC
 	        <where>
 	            <foreach collection="list" item="item" open="" close="" separator="OR">
 	          (       COMPANY_CD      = #{item.companyCd, jdbcType=VARCHAR}
 	             AND  DIVISION_CD     = #{item.divisionCd, jdbcType=VARCHAR}
-	             AND  INSPECTION_TYPE = 'IQC'
 	             AND  CREATE_BY       = #{item.userId, jdbcType=VARCHAR}
 	          )
 	            </foreach>
@@ -174,73 +167,66 @@
     </delete>  
     <insert id="create_excelUpBtnV1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_INSPECTION_SPEC( COMPANY_CD
-									 , DIVISION_CD
-									 , INSPECTION_TYPE
-									 , ITEM_ID
-									 , INSPECTION_METHOD
-									 , INSPECTION_LIST
-									 , INSPECTION_SPEC
-									 , INSPECTION_UOM
-									 , INSPECTION_EQUIPMENT
-									 , SAMPLING_INSPECTION_TYPE
-									 , SAMPLING_COUNT
-									 , SORT_NO
-									 , SL_MEASURE_TYPE
-									 , SL
-									 , USL
-									 , LSL
-									 , AQL
-									 , INSPECTION_LEVEL
-									 , FP_PQC_FLAG
-									 , MP_PQC_FLAG
-									 , LP_PQC_FLAG
-									 , USE_YN
-									 , DESCRIPTION
-									 , DEL_YN
-									 , VAL_MSG
-									 , MULTI_MSG
-									 , CREATE_BY
-									 , CREATE_DATE
-								     )
-        VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}
-				                    , #{item.divisionCd, jdbcType=VARCHAR}
-				                    , #{item.inspectionType, jdbcType=VARCHAR}
-					                , #{item.itemId, jdbcType=VARCHAR}
-					                , #{item.inspectionMethod, jdbcType=VARCHAR}
-					                , #{item.inspectionList, jdbcType=VARCHAR}
-					                , #{item.inspectionSpec, jdbcType=VARCHAR}
-					                , #{item.inspectionUom, jdbcType=VARCHAR}
-					                , #{item.inspectionEquipment, jdbcType=VARCHAR}
-					                , #{item.samplingInspectionType, jdbcType=VARCHAR}
-					                , #{item.samplingCount, jdbcType=NUMERIC}
-					                , #{item.sortNo, jdbcType=NUMERIC}
-					                , #{item.slMeasureType, jdbcType=VARCHAR}
-					                , #{item.sl, jdbcType=NUMERIC}
-					                , #{item.usl, jdbcType=NUMERIC}
-					                , #{item.lsl, jdbcType=NUMERIC}
-					                , #{item.aql, jdbcType=NUMERIC}
-					                , #{item.inspectionLevel, jdbcType=VARCHAR}
-					                , #{item.fpPqcFlag, jdbcType=VARCHAR}
-					                , #{item.mpPqcFlag, jdbcType=VARCHAR}
-					                , #{item.lpPqcFlag, jdbcType=VARCHAR}
-				                    , #{item.useYn, jdbcType=VARCHAR}
-				                    , #{item.description, jdbcType=VARCHAR}
-				                    , 'N'
-				                    , #{item.valMsg, jdbcType=VARCHAR}
-				                    , #{item.multiMsg, jdbcType=VARCHAR}
-				                    , #{item.userId, jdbcType=VARCHAR}
-				                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-			                        )
+        INTO MOM_PROC_INSPECT_PQC_SPEC( COMPANY_CD
+									  , DIVISION_CD
+									  , ITEM_ID
+									  , OPERATION_ID
+									  , INSPECTION_METHOD
+									  , INSPECTION_LIST
+									  , INSPECTION_SPEC
+									  , INSPECTION_UOM
+									  , INSPECTION_EQUIPMENT
+									  , SAMPLING_INSPECTION_TYPE
+									  , SAMPLING_COUNT
+									  , SORT_NO
+									  , SL_MEASURE_TYPE
+									  , SL
+									  , USL
+									  , LSL
+									  , AQL
+									  , INSPECTION_LEVEL
+									  , USE_YN
+									  , DESCRIPTION
+									  , DEL_YN
+									  , VAL_MSG
+									  , MULTI_MSG
+									  , CREATE_BY
+									  , CREATE_DATE
+								      )
+        VALUES                        ( #{item.companyCd, jdbcType=VARCHAR}
+				                      , #{item.divisionCd, jdbcType=VARCHAR}
+				                      , #{item.itemId, jdbcType=VARCHAR}
+				                      , #{item.operationId, jdbcType=VARCHAR}
+					                  , #{item.inspectionMethod, jdbcType=VARCHAR}
+					                  , #{item.inspectionList, jdbcType=VARCHAR}
+					                  , #{item.inspectionSpec, jdbcType=VARCHAR}
+					                  , #{item.inspectionUom, jdbcType=VARCHAR}
+					                  , #{item.inspectionEquipment, jdbcType=VARCHAR}
+					                  , #{item.samplingInspectionType, jdbcType=VARCHAR}
+					                  , #{item.samplingCount, jdbcType=NUMERIC}
+					                  , #{item.sortNo, jdbcType=NUMERIC}
+					                  , #{item.slMeasureType, jdbcType=VARCHAR}
+					                  , #{item.sl, jdbcType=NUMERIC}
+					                  , #{item.usl, jdbcType=NUMERIC}
+					                  , #{item.lsl, jdbcType=NUMERIC}
+					                  , #{item.aql, jdbcType=NUMERIC}
+					                  , #{item.inspectionLevel, jdbcType=VARCHAR}
+					                  , #{item.useYn, jdbcType=VARCHAR}
+				                      , #{item.description, jdbcType=VARCHAR}
+				                      , 'N'
+				                      , #{item.valMsg, jdbcType=VARCHAR}
+				                      , #{item.multiMsg, jdbcType=VARCHAR}
+				                      , #{item.userId, jdbcType=VARCHAR}
+				                      , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+			                          )        
         </foreach>
     </insert>
     <select id="proc_excelUpBtnV1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_INSPECTION_SPEC( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-		                                                    , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-			                                                , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-			                                                , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
-			                                                , 'PQC'
-			                                                , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
-			                                                , #{userId,      jdbcType=VARCHAR, mode=IN} )}                     
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_INSPECTION_PQC_SPEC( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+		                                                        , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+			                                                    , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+			                                                    , #{divisionCd,  jdbcType=VARCHAR, mode=IN}
+			                                                    , #{actionMode,  jdbcType=VARCHAR, mode=IN}        
+			                                                    , #{userId,      jdbcType=VARCHAR, mode=IN} )}                     
     </select>         
 </mapper>

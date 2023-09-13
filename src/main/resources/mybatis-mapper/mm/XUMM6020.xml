@@ -130,7 +130,7 @@
 					               , ITEM_ID
 					               , IQC_RESULT
 					               , LOT_MANAGEMENT_YN
-					               , LOT_ID
+					               , HCN_CD
 					               , VAL_MSG
 					               , MULTI_MSG
 					               , DESCRIPTION
@@ -185,7 +185,7 @@
 					               , ITEM_ID
 					               , IQC_RESULT
 					               , LOT_MANAGEMENT_YN
-					               , LOT_ID
+					               , HCN_CD
 					               , VAL_MSG
 					               , MULTI_MSG
 					               , DESCRIPTION

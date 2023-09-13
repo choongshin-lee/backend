@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUPP3140">
+	<select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	        SELECT A.*
+		    FROM   (
+		    </if>		
+					SELECT A.COMPANY_CD
+			             , A.DIVISION_CD
+			             , A.WORK_ORDER_ID
+			             , A.WO_RESULT_ID
+			             , A.NON_WORK_STATE
+			             , A.NON_WORK_STATE_NM
+			             , A.WO_RESULT_STATE
+			             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'PP0009', A.WO_RESULT_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_RESULT_STATE_NM
+			             , A.WO_STATE
+			             , A.WO_STATE_NM
+			             , A.ITEM_ID
+			             , A.ITEM_NM
+			             , A.ITEM_TYPE
+			             , A.ITEM_TYPE_NM
+			             , A.ITEM_SPEC
+			             , A.OPERATION_ID
+			             , A.OPERATION_NM
+			             , A.NON_WORK_START_TIME
+			             , A.NON_WORK_END_TIME
+			             , A.NON_WORK_TIME
+			             , A.NON_WORK_REASON_CD
+			             , A.NON_WORK_REASON_NM
+			             , A.DESCRIPTION
+			             , A.CREATE_USER_NO 
+			             , A.CREATE_USER_NM
+			             , A.CREATE_DATE
+			             , A.KEY_ID
+				         , A.TOTAL_COUNT
+				         , A.ROW_CNT
+					FROM   (
+							SELECT MNW.COMPANY_CD
+					             , MNW.DIVISION_CD
+					             , MNW.WORK_ORDER_ID
+					             , MNW.WO_RESULT_ID
+					             , MNW.STATE          AS NON_WORK_STATE
+					             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MNW.COMPANY_CD, MNW.DIVISION_CD, 'PP0018', MNW.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS NON_WORK_STATE_NM
+					             , (SELECT MOM_WO_PKG.FN_GET_WO_RESULT_STATE(MNW.COMPANY_CD, MNW.DIVISION_CD, MNW.WO_RESULT_ID) FROM DUAL ) AS WO_RESULT_STATE
+                                 , MWO.WO_STATE
+                                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'PP0003', MWO.WO_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS WO_STATE_NM
+					             , MI.ITEM_ID
+					             , MI.ITEM_NM
+					             , MI.ITEM_TYPE
+					             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+					             , MI.ITEM_SPEC
+					             , MNW.OPERATION_ID
+					             , (SELECT MOM_COMMON_PKG.FN_GET_OPERATION_NAME(MNW.COMPANY_CD, MNW.DIVISION_CD, MNW.OPERATION_ID) FROM DUAL) AS OPERATION_NM
+					             , TO_CHAR(MNW.START_TIME ,'YYYY-MM-DD HH24:MI:SS')   AS NON_WORK_START_TIME
+					             , TO_CHAR(MNW.END_TIME ,'YYYY-MM-DD HH24:MI:SS')     AS NON_WORK_END_TIME
+					             , MNW.NON_WORK_TIME
+					             , MNW.REASON_CD     AS  NON_WORK_REASON_CD
+					             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MNW.COMPANY_CD, MNW.DIVISION_CD, 'PP0018', MNW.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS NON_WORK_REASON_NM
+					             ,  MNW.DESCRIPTION
+					             ,  MNW.CREATE_BY     AS CREATE_USER_NO 
+					             ,  (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MNW.COMPANY_CD, MNW.DIVISION_CD, MNW.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
+					             ,  TO_CHAR(MNW.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE
+					             , ROWIDTOCHAR(MNW.ROWID) AS KEY_ID
+						         , COUNT(*) OVER() AS TOTAL_COUNT
+						         , ROW_NUMBER() OVER(PARTITION BY MNW.COMPANY_CD,MNW.DIVISION_CD ORDER BY MNW.WORK_ORDER_ID, MNW.WO_RESULT_ID, MNW.OPERATION_ID  ) AS ROW_CNT 
+					        FROM   MOM_WO_NON_WORK MNW 
+					             , MOM_WORK_ORDER  MWO
+					             , MOM_ITEM        MI
+					        WHERE  MNW.COMPANY_CD      = MWO.COMPANY_CD 
+					        AND    MNW.DIVISION_CD     = MWO.DIVISION_CD
+					        AND    MNW.WORK_ORDER_ID   = MWO.WORK_ORDER_ID
+					        AND    MWO.COMPANY_CD      = MI.COMPANY_CD
+					   		AND    MWO.DIVISION_CD     = MI.DIVISION_CD
+						   	AND    MWO.ITEM_ID         = MI.ITEM_ID 
+					        AND    MNW.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+							AND    MNW.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
+							AND    MNW.CREATE_DATE BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					        <if test="workOrderId != null and workOrderId != ''">
+							AND    (UPPER(MNW.WORK_ORDER_ID) LIKE '%' || UPPER(#{workOrderId, jdbcType=VARCHAR}) || '%')	  
+							</if>  
+					        <if test="woResultId != null and woResultId != ''">
+							AND    (UPPER(MNW.WO_RESULT_ID) LIKE '%' || UPPER(#{woResultId, jdbcType=VARCHAR}) || '%')	  
+							</if>  
+					        <if test="itemIdNm != null and itemIdNm != ''">
+							AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')	  
+							</if>	) A
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	           ) A
+	    WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+	    </if> 					
+	</select>
+</mapper>

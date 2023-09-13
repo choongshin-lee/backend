@@ -394,6 +394,7 @@
 								 , BUTTON_TYPE
 							 	 , WORK_ORDER_ID
 								 , WO_RESULT_ID
+								 , OPERATION_ID
 								 , REASON_CD
 								 , DESCRIPTION
 								 , VAL_MSG
@@ -406,6 +407,7 @@
 				                 , 'H'
 				                 , #{item.workOrderId, jdbcType=VARCHAR}
 				                 , #{item.woResultId, jdbcType=VARCHAR}
+				                 , #{item.operationId, jdbcType=VARCHAR}
 				                 , #{item.nonWorkReasonCd, jdbcType=VARCHAR}
 				                 , #{item.description, jdbcType=VARCHAR}
 				                 , #{item.valMsg, jdbcType=VARCHAR}
@@ -442,6 +444,7 @@
 								 , BUTTON_TYPE
 							 	 , WORK_ORDER_ID
 								 , WO_RESULT_ID
+								 , OPERATION_ID
 								 , REASON_CD
 								 , DESCRIPTION
 								 , VAL_MSG
@@ -454,6 +457,7 @@
 				                 , 'R'
 				                 , #{item.workOrderId, jdbcType=VARCHAR}
 				                 , #{item.woResultId, jdbcType=VARCHAR}
+				                 , #{item.operationId, jdbcType=VARCHAR}
 				                 , #{item.nonWorkReasonCd, jdbcType=VARCHAR}
 				                 , #{item.description, jdbcType=VARCHAR}
 				                 , #{item.valMsg, jdbcType=VARCHAR}
