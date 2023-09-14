@@ -90,7 +90,8 @@
 					</if>	
 					<if test="state != null and state != ''">
 					AND    MPI.STATE = #{state, jdbcType=VARCHAR}
-					</if>	
+					</if>
+					AND    MPI.PROCESS_CD IN ('RO', 'RD')	
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}

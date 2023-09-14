@@ -55,6 +55,7 @@
 					     , TO_CHAR(MPI.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE
 					     , MPI.IQC_FLAG
 					     , MPI.RECEIPT_QTY
+					     , MPI.RECEIPT_YN
 					     , TO_CHAR(MPI.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS')     AS CREATE_DATE
 						 , MPI.CREATE_BY                                         AS CREATE_USER_NO
 						 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
@@ -87,6 +88,9 @@
 					<if test="state != null and state != ''">
 					AND    MPI.STATE = #{state, jdbcType=VARCHAR}
 					</if>	
+				    <if test="receiptYn != null and receiptYn != ''">
+					AND    MPI.RECEIPT_YN = #{receiptYn, jdbcType=VARCHAR}
+					</if>
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}

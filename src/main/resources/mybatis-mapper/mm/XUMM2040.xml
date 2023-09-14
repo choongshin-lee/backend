@@ -118,6 +118,7 @@
         <foreach collection="list" item="item" open="" close="" separator="OR">
         (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
            AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
+           AND  PO_TYPE		= 'P'
            AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
         )
         </foreach>
@@ -127,6 +128,7 @@
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_PO_CONFIRM( COMPANY_CD
 				                , DIVISION_CD
+				                , PO_TYPE
 				                , PO_NO
 				                , VAL_MSG
 				                , MULTI_MSG
@@ -134,6 +136,7 @@
 				                , CREATE_DATE )
         VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
 				                , #{item.divisionCd, jdbcType=VARCHAR}
+				                , 'P'
 				                , #{item.poNo, jdbcType=VARCHAR}
 				                , #{item.valMsg, jdbcType=VARCHAR}
 				                , #{item.multiMsg, jdbcType=VARCHAR}
@@ -146,7 +149,8 @@
         { CALL MOM_MATERIAL_PKG.SP_PO_CONFIRM( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 	                                         , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 	                                         , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-	                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  
+	                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}	
+	                                         , 'P'										  
 	                                         , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>  
 </mapper>

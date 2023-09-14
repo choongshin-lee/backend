@@ -10,12 +10,12 @@
 					     , MPM.DIVISION_CD
 					     , MPM.INOUT_NO       AS RECEIPT_NO
 					     , MPD.SEQ
-					     , MPD.PURCHASE_INOUT_ID
+					     , MPD.PURCHASE_INOUT_ID  AS RECEIPT_DETAIL_NO
 					     , TO_CHAR(MPD.RECEIPT_DATE ,'YYYY-MM-DD') AS RECEIPT_DATE
 					     , MPD.IO_TYPE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
 					     , MPM.WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
+					     , MWH.WAREHOUSE_NM  AS RECEIPT_WAREHOUSE_NM
 					     , MPD.ITEM_ID
 					     , MI.ITEM_NM
 					     , MI.ITEM_SPEC
@@ -49,15 +49,19 @@
 					     , MOM_PURCHASE_INOUT_DTL MPD
 					     , MOM_ITEM MI
 					     , MOM_PARTNER MP
-					WHERE  MPM.COMPANY_CD  = MPD.COMPANY_CD
-					AND    MPM.DIVISION_CD = MPD.DIVISION_CD
-					AND    MPM.INOUT_NO    = MPD.INOUT_NO
-					AND    MPD.COMPANY_CD  = MI.COMPANY_CD
-					AND    MPD.DIVISION_CD = MI.DIVISION_CD
-					AND    MPD.ITEM_ID     = MI.ITEM_ID
-					AND    MPM.COMPANY_CD  = MP.COMPANY_CD
-					AND    MPM.DIVISION_CD = MP.DIVISION_CD
-					AND    MPM.VENDOR_CD   = MP.PARTNER_CD
+					     , MOM_WAREHOUSE MWH
+					WHERE  MPM.COMPANY_CD    = MPD.COMPANY_CD
+					AND    MPM.DIVISION_CD   = MPD.DIVISION_CD
+					AND    MPM.INOUT_NO      = MPD.INOUT_NO
+					AND    MPD.COMPANY_CD    = MI.COMPANY_CD
+					AND    MPD.DIVISION_CD   = MI.DIVISION_CD
+					AND    MPD.ITEM_ID       = MI.ITEM_ID
+					AND    MPM.COMPANY_CD    = MP.COMPANY_CD
+					AND    MPM.DIVISION_CD   = MP.DIVISION_CD
+					AND    MPM.VENDOR_CD     = MP.PARTNER_CD
+					AND    MPM.COMPANY_CD    = MWH.COMPANY_CD
+                    AND    MPM.DIVISION_CD   = MWH.DIVISION_CD
+                    AND    MPM.WAREHOUSE_CD  = MWH.WAREHOUSE_CD
 					AND    MPM.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
 					AND    MPM.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MPD.RECEIPT_DATE  BETWEEN TO_DATE(#{receiptDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{receiptDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
@@ -70,9 +74,9 @@
 					<if test="itemType != null and itemType != ''">
 					AND    MI.ITEM_TYPE IN (${itemType})
 					</if>
-					<if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
-					AND    MPM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}
-					</if> 
+					<if test="receiptWarehouseCdNm != null and receiptWarehouseCdNm != ''">
+					AND    (UPPER(MPM.WAREHOUSE_CD) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{receiptWarehouseCdNm, jdbcType=VARCHAR}) || '%')    
+					</if>
 					AND    MPM.PROCESS_CD = 'OP'
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A

@@ -64,7 +64,8 @@
 	    AND      MPIM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}
 	    </if>							
 	    AND      MPIM.STATE       = 'PIR'  -- 접수		
-	    AND      MPIM.IQC_FLAG    = 'Y'				
+	    AND      MPIM.IQC_FLAG    = 'Y'	
+	    AND    MPIM.PROCESS_CD  <![CDATA[<>]]> 'OP' 			
 	    ORDER BY MPIM.INOUT_NO				
     </select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">

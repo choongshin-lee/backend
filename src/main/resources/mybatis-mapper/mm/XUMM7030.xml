@@ -23,7 +23,8 @@
 		     , MPIM.LC_NO				
 		     , MPIM.IQC_FLAG				
 		     , MPIM.AMOUNT                                    AS RECEIPT_AMOUNT				
-		     , TO_CHAR(MPIM.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE				
+		     , TO_CHAR(MPIM.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE
+		     , TO_CHAR(MPIM.RECEIPT_DATE ,'YYYY-MM-DD')       AS RECEIPT_DATE
 		     , MPIM.VENDOR_INVOICE
 		     , MPIM.CURRENCY_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
@@ -46,6 +47,7 @@
 		AND    MPIM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}			
 		AND    MPIM.RECEIPT_DATE BETWEEN TO_DATE(#{receiptDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{receiptDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 		AND    MPIM.STATE = 'PIGR'
+		AND    MPIM.PROCESS_CD  <![CDATA[<>]]> 'OP' 
 	    <if test="receiptNo != null and receiptNo != ''">
 	    AND    (UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{receiptNo, jdbcType=VARCHAR}) || '%')	  
 	    </if>			

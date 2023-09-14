@@ -85,7 +85,7 @@
 			                           , 'WIP'     
 			                   		   , #{item.receiptId, jdbcType=VARCHAR}
 					                   , #{item.receiptDetailId, jdbcType=VARCHAR}
-					                   , #{item.deliveryRequestNo, jdbcType=VARCHAR}
+					                   , #{item.receiptNo, jdbcType=VARCHAR}
 					                   , #{item.description, jdbcType=VARCHAR}
 					                   , #{item.delYn, jdbcType=VARCHAR}
 					                   , #{item.valMsg, jdbcType=VARCHAR}
