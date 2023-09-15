@@ -19,6 +19,8 @@
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MD.COMPANY_CD,MD.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM     
                  , MI.ITEM_SPEC
                  , TO_CHAR(MD.DUE_DATE ,'YYYY-MM-DD') AS DUE_DATE
+                 , TO_CHAR(MD.CUSTOMER_DUE_DATE ,'YYYY-MM-DD') AS CUSTOMER_DUE_DATE
+                 , MD.DEMAND_LEAD_TIME
                  , MD.UOM
                  , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MD.COMPANY_CD, MD.DIVISION_CD, MD.UOM) FROM DUAL) AS UOM_NM
                  , MD.QTY
@@ -30,11 +32,7 @@
                  , MWO.WORK_ORDER_ID
                  , MSD.SO_NO
                  , MSD.SO_SEQ
-                 , (SELECT TO_CHAR(MSM.SO_DATE ,'YYYY-MM-DD') 
-                    FROM   MOM_SO_MST MSM 
-                    WHERE  MSM.COMPANY_CD  = MSD.COMPANY_CD
-		            AND    MSM.DIVISION_CD = MSD.DIVISION_CD
-		            AND    MSM.SO_NO       = MSD.SO_NO )  AS SO_DATE
+                 , MSD.SO_DATE
                  , MD.UPDATE_BY  AS UPDATE_USER_NO
                  ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MD.COMPANY_CD, MD.DIVISION_CD, MD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
                  , TO_CHAR(MD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE

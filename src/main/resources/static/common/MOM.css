@@ -2431,7 +2431,8 @@ border-color: #d8dce3 !important;
     height: 50rem;
 }
 .searcharea-pop.R7-remark-out {
-    height: 38rem;
+    /*height: 38rem;*/
+    height: 44rem;
 }
 .searcharea-pop.R8-remark-in {
     height: 55rem;

@@ -30,6 +30,7 @@
 		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MP.COMPANY_CD,MP.DIVISION_CD,'SM0030', MP.COUNTRY_CD, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS COUNTRY_NM
 		             , MP.CURRENCY_CD
 		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MP.COMPANY_CD,MP.DIVISION_CD,'SM0017', MP.CURRENCY_CD, #{langCd, jdbcType=VARCHAR})  FROM DUAL ) AS CURRENCY_NM
+		             , MP.DEMAND_LEAD_TIME
 		             , MP.USE_YN
 		             , MP.DESCRIPTION
 		             , MP.UPDATE_BY                                      AS UPDATE_USER_NO
@@ -91,6 +92,7 @@
 							 , TAX_TYPE
 							 , COUNTRY_CD
 							 , CURRENCY_CD
+							 , DEMAND_LEAD_TIME
 							 , USE_YN
 							 , DESCRIPTION
 							 , DEL_YN
@@ -119,6 +121,7 @@
 				             , #{item.taxType,          jdbcType=VARCHAR}
 				             , #{item.countryCd,        jdbcType=VARCHAR}
 				             , #{item.currencyCd,       jdbcType=VARCHAR}
+				             , #{item.demandLeadTime,   jdbcType=NUMERIC}
 				             , #{item.useYn,   		    jdbcType=VARCHAR}  
 				             , #{item.description,      jdbcType=VARCHAR}    
 				             , #{item.delYn, jdbcType=VARCHAR}
@@ -177,6 +180,7 @@
 							 , TAX_TYPE
 							 , COUNTRY_CD
 							 , CURRENCY_CD
+							 , DEMAND_LEAD_TIME
 							 , USE_YN
 							 , DESCRIPTION
 							 , DEL_YN
@@ -205,6 +209,7 @@
 				             , #{item.taxType,          jdbcType=VARCHAR}
 				             , #{item.countryCd,        jdbcType=VARCHAR}
 				             , #{item.currencyCd,       jdbcType=VARCHAR}
+				             , #{item.demandLeadTime,   jdbcType=NUMERIC}
 				             , #{item.useYn,   		    jdbcType=VARCHAR}  
 				             , #{item.description,      jdbcType=VARCHAR} }    
 				             , 'N'
