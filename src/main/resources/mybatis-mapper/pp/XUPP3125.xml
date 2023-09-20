@@ -87,10 +87,7 @@
 		        <if test="workGroupCdNm != null and workGroupCdNm != ''">
 			    AND    (UPPER(MWC.WORK_GROUP_CD) LIKE '%' || UPPER(#{workGroupCdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MWG.WORK_GROUP_NM) LIKE '%' || UPPER(#{workGroupCdNm , jdbcType=VARCHAR}))
 			    </if>	
-			    <if test="workCenterCdNm != null and workCenterCdNm != ''">
-			    AND    (UPPER(MWO.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MWC.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR})) 
-			    </if>	
-				AND    MWO.WO_STATE IN (SELECT MC.CODE
+			    AND    MWO.WO_STATE IN (SELECT MC.CODE
 										FROM   MOM_CODE MC
 										WHERE  MC.COMPANY_CD  = MWO.COMPANY_CD
 										AND    MC.DIVISION_CD = MWO.DIVISION_CD 
@@ -101,141 +98,141 @@
 										AND    MC.USE_YN      = 'Y'
 										AND    MC.ATTRIBUTE1  = 'Y' )
 				AND    MWO.OUTSOURCING_YN = 'N'
+				<if test="workCenterCd != null and workCenterCd != ''">
+			    AND    MWO.WORK_CENTER_CD = #{workCenterCd , jdbcType=VARCHAR}  
+			    </if>
+			    AND    MWO.WORK_CENTER_CD IN ( SELECT MCR.WORK_CENTER_CD
+											   FROM   MOM_USER_WORK_CENTER_REL MCR
+												    , MOM_WORK_CENTER MWC
+											   WHERE  MCR.COMPANY_CD     = MWC.COMPANY_CD
+											   AND    MCR.DIVISION_CD    = MWC.DIVISION_CD
+											   AND    MCR.WORK_CENTER_CD = MWC.WORK_CENTER_CD
+											   AND    MCR.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+											   AND    MCR.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR} 
+											   AND    MCR.USER_NO        = #{userId, jdbcType=VARCHAR}
+											   AND    MWC.USE_YN         = 'Y'
+											   AND    MCR.USE_YN         = 'Y')			
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 	           ) A
 	    WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
 	    </if> 
 	</select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-        WITH C_PATH AS ( SELECT MWP.COMPANY_CD
-	                          , MWP.DIVISION_CD
-	                          , MWP.WORK_ORDER_ID
-	                          , MWP.WO_RESULT_ID
-	                          , MWP.OPERATION_ID
-	                          , MWP.WO_RESULT_TYPE
-	                          , MWP.STATE
-	                          , MWP.WORK_DAY
-	                          , MWP.START_TIME
-	                          , MWP.END_TIME
-	                          , MWP.RESULT_QTY
-	                          , MWP.DEFECT_TYPE
-	                          , MWP.DESCRIPTION
-	                          , MWP.UPDATE_BY
-	                          , MWP.UPDATE_DATE
-	                          , MWO.WO_QTY 
-	                          , MWO.GOOD_QTY AS TOTAL_GOOD_QTY
-	                          , MWO.DEFECT_QTY  AS TOTAL_DEFECT_QTY
-	                          , MWO.CLOSE_QTY   AS TOTAL_CLOSE_QTY
-	                     FROM   MOM_WO_OPERATION_RESULT MWP
-	                          , MOM_WORK_ORDER   MWO
-	                     WHERE  MWP.COMPANY_CD     = MWO.COMPANY_CD 
-	                     AND    MWP.DIVISION_CD    = MWO.DIVISION_CD  
-	                     AND    MWP.WORK_ORDER_ID  = MWO.WORK_ORDER_ID  
-	                     AND    MWP.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
-	                     AND    MWP.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
-	                     AND    MWP.WORK_ORDER_ID  = #{workOrderId, jdbcType=VARCHAR}
-	                     AND    MWP.WO_RESULT_ID   = ( SELECT MWR.WO_RESULT_ID
-	                                                   FROM    MOM_WO_RESULT MWR
-	                                                   WHERE   MWR.COMPANY_CD     = MWP.COMPANY_CD 
-	                                                   AND     MWR.DIVISION_CD    = MWP.DIVISION_CD 
-	                                                   AND     MWR.WORK_ORDER_ID  = MWP.WORK_ORDER_ID 
-	                                                   AND     MWR.STATE          = 'R'
-	                                                 )
-	                   )
         SELECT A.COMPANY_CD
-             , A.DIVISION_CD
-             , A.WORK_ORDER_ID
-             , A.OPERATION_SEQ 
-             , A.OPERATION_ID
-             , MIN(A.KEY_ID)                    AS KEY_ID
-             , MIN(A.OPERATION_NM)              AS OPERATION_NM 
-             , MIN(A.WORK_STATION_CD)           AS WORK_STATION_CD 
-             , MIN(A.WORK_STATION_NM)           AS WORK_STATION_NM 
-             , MIN(A.INSPECTION_YN)             AS INSPECTION_YN 
-             , MIN(A.FINAL_OPERATION_YN)        AS FINAL_OPERATION_YN 
-             , MIN(A.MILESTONE)                 AS MILESTONE
-             , MIN(A.WORK_DAY)                  AS WORK_DAY 
-             , MIN(A.START_DATE)                AS START_DATE
-             , MIN(A.END_DATE)                  AS END_DATE 
-             , MIN(A.GOOD_QTY)                  AS GOOD_QTY 
-             , MIN(A.DEFECT_QTY)                AS DEFECT_QTY
-             , MIN(A.WO_RESULT_ID)              AS WO_RESULT_ID 
-             , MIN(A.STATE)                     AS STATE
-             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'PP0010', A.STATE, 'KR') FROM DUAL)) AS STATE_NM
-             , MIN(A.DESCRIPTION)               AS DESCRIPTION
-             , MIN(A.UPDATE_USER_NO)            AS UPDATE_USER_NO
-             , MIN(A.UPDATE_USER_NM)            AS UPDATE_USER_NM
-             , MIN(A.UPDATE_DATE)               AS UPDATE_DATE
-             , MIN(A.TOTAL_GOOD_QTY)            AS TOTAL_GOOD_QTY
-             , MIN(A.TOTAL_DEFECT_QTY)          AS TOTAL_DEFECT_QTY
-             , MIN(A.TOTAL_CLOSE_QTY)           AS TOTAL_CLOSE_QTY
-             , MIN((A.WO_QTY - A.TOTAL_GOOD_QTY - A.TOTAL_DEFECT_QTY - A.TOTAL_CLOSE_QTY)) AS REMAIN_QTY
-             , MIN(A.WO_START_DATE)             AS WO_START_DATE
-             , MIN(A.NET_WEIGHT)                AS NET_WEIGHT
-             , MIN(A.NET_WEIGHT_UOM)            AS NET_WEIGHT_UOM
-             , MIN((SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.NET_WEIGHT_UOM) FROM DUAL)) AS NET_WEIGHT_UOM_NM
-             , MIN(A.DEFECT_TYPE)  AS DEFECT_TYPE
-             , MIN(A.SORT_NO) AS SORT_NO
-        FROM ( SELECT MWO.COMPANY_CD
-                    , MWO.DIVISION_CD
-                    , MWO.WORK_ORDER_ID
-                    , MWO.OPERATION_SEQ 
-                    , MWO.OPERATION_ID
-                    , MWO.WORK_ORDER_ID || '_' || MWO.OPERATION_ID AS KEY_ID
-                    , (SELECT MOM_COMMON_PKG.FN_GET_OPERATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.OPERATION_ID) FROM DUAL) AS OPERATION_NM
-                    , MWO.WORK_STATION_CD
-                    , (SELECT MOM_COMMON_PKG.FN_GET_WORK_STATION_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, MWO.WORK_STATION_CD) FROM DUAL) AS WORK_STATION_NM
-                    , MWO.INSPECTION_YN
-                    , MWO.FINAL_OPERATION_YN
-                    , MWO.MILESTONE
-                    , TO_CHAR(P.WORK_DAY  ,'YYYY-MM-DD')    AS WORK_DAY
-                    , TO_CHAR(P.START_TIME  ,'YYYY-MM-DD HH24:MI:SS')  AS START_DATE
-                    , TO_CHAR(P.END_TIME  ,'YYYY-MM-DD HH24:MI:SS')    AS END_DATE
-                    , DECODE(P.WO_RESULT_TYPE, 'G', DECODE(P.RESULT_QTY, 0, '', P.RESULT_QTY))  AS GOOD_QTY
-                    , DECODE(P.WO_RESULT_TYPE, 'D', NVL(P.RESULT_QTY,0))  AS DEFECT_QTY
-                    , P.WO_RESULT_ID
-                    , CASE WHEN P.WO_RESULT_ID IS NULL THEN 
-                          'W' 
-                      ELSE
-                          P.STATE
-                      END AS  STATE 
-                    , P.DESCRIPTION
-                    , P.UPDATE_BY    AS UPDATE_USER_NO
-                    ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(P.COMPANY_CD, P.DIVISION_CD, P.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-                    , TO_CHAR(P.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-                    , NVL(MW.GOOD_QTY, 0)   AS TOTAL_GOOD_QTY
-                    , NVL(MW.DEFECT_QTY, 0) AS TOTAL_DEFECT_QTY
-                    , NVL(MW.CLOSE_QTY, 0)  AS TOTAL_CLOSE_QTY
-                    , MW.WO_QTY
-                    , TO_CHAR(MW.WO_START_TIME ,'YYYY-MM-DD')  AS WO_START_DATE
-                    , MI.NET_WEIGHT
-                    , MI.NET_WEIGHT_UOM
-                    , P.DEFECT_TYPE
-                    , ''  AS NON_WORK_REASON_CD
-                    , DECODE(P.STATE, 'R', 1, 'W',2, 'E',3) AS SORT_NO
-               FROM   MOM_WO_OPERATION_PATH MWO
-                    , MOM_WORK_ORDER MW
-                    , C_PATH  P
-                    , MOM_ITEM MI
-               WHERE  MWO.COMPANY_CD     = P.COMPANY_CD(+)                     
-               AND    MWO.DIVISION_CD    = P.DIVISION_CD(+)                     
-               AND    MWO.WORK_ORDER_ID  = P.WORK_ORDER_ID(+)     
-               AND    MWO.OPERATION_ID   = P.OPERATION_ID(+)            
-               AND    MW.COMPANY_CD      = MWO.COMPANY_CD                     
-               AND    MW.DIVISION_CD     = MWO.DIVISION_CD                     
-               AND    MW.WORK_ORDER_ID   = MWO.WORK_ORDER_ID  
-               AND    MW.COMPANY_CD      = MI.COMPANY_CD                     
-               AND    MW.DIVISION_CD     = MI.DIVISION_CD                     
-               AND    MW.ITEM_ID         = MI.ITEM_ID
-               AND    MWO.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
-               AND    MWO.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
-               AND    MWO.WORK_ORDER_ID  = #{workOrderId, jdbcType=VARCHAR} ) A
-        GROUP BY A.COMPANY_CD
-               , A.DIVISION_CD
-               , A.WORK_ORDER_ID
-               , A.OPERATION_SEQ 
-               , A.OPERATION_ID   
-        ORDER BY MIN(A.SORT_NO) ASC, A.OPERATION_SEQ
+		     , A.DIVISION_CD
+		     , A.WORK_ORDER_ID
+		     , A.WO_RESULT_ID
+		     , A.OPERATION_SEQ
+		     , A.OPERATION_ID
+		     , (SELECT MOM_COMMON_PKG.FN_GET_OPERATION_NAME(A.COMPANY_CD, A.DIVISION_CD, A.OPERATION_ID) FROM DUAL) AS OPERATION_NM
+		     , A.WORK_STATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_WORK_STATION_NAME(A.COMPANY_CD, A.DIVISION_CD, A.WORK_STATION_CD) FROM DUAL) AS WORK_STATION_NM
+		     , A.INSPECTION_YN
+		     , A.FINAL_OPERATION_YN
+		     , A.MILESTONE
+		     , A.WORK_DAY
+		     , A.START_DATE
+		     , A.END_DATE
+		     , A.STATE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'PP0010', A.STATE, 'KR') FROM DUAL)  AS STATE_NM
+		     , A.GOOD_QTY
+		     , A.DEFECT_QTY
+		     , A.DEFECT_TYPE
+		     , ''                                AS NON_WORK_REASON_CD
+		     , NVL(MWO.GOOD_QTY, 0)              AS TOTAL_GOOD_QTY
+		     , NVL(MWO.DEFECT_QTY, 0)            AS TOTAL_DEFECT_QTY
+		     , NVL(MWO.CLOSE_QTY, 0)             AS TOTAL_CLOSE_QTY
+		     , MWO.WO_QTY
+		     , (MWO.WO_QTY - NVL(MWO.GOOD_QTY, 0) - NVL(MWO.DEFECT_QTY, 0) - NVL(MWO.CLOSE_QTY, 0)) AS REMAIN_QTY
+		     , TO_CHAR(MWO.WO_START_TIME  ,'YYYY-MM-DD')   AS WO_START_DATE
+		     , MI.NET_WEIGHT
+		     , MI.NET_WEIGHT_UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.NET_WEIGHT_UOM) FROM DUAL) AS NET_WEIGHT_UOM_NM
+		     , A.DESCRIPTION
+		     , A.UPDATE_USER_NO
+		     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UPDATE_USER_NO) FROM DUAL ) AS UPDATE_USER_NM
+		     , A.UPDATE_DATE
+		     , A.WORK_ORDER_ID || '_' || A.OPERATION_ID  AS KEY_ID
+		FROM  ( SELECT MOP.COMPANY_CD
+		             , MOP.DIVISION_CD
+		             , MOP.WORK_ORDER_ID
+		             , ''                    AS WO_RESULT_ID
+		             , MOP.OPERATION_SEQ
+		             , MOP.OPERATION_ID
+		             , MOP.WORK_STATION_CD
+		             , MOP.INSPECTION_YN
+		             , MOP.FINAL_OPERATION_YN
+		             , MOP.MILESTONE
+		             , ''                    AS WORK_DAY
+		             , ''                    AS START_DATE
+		             , ''                    AS END_DATE
+		             , 'W'                   AS STATE
+		             , 0                     AS GOOD_QTY
+		             , 0                     AS DEFECT_QTY
+		             , ''                    AS DEFECT_TYPE
+		             , ''                    AS DESCRIPTION
+		             , ''                    AS UPDATE_USER_NO
+		             , ''                    AS UPDATE_DATE
+		        FROM   MOM_WO_OPERATION_PATH MOP
+		        WHERE  MOP.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+		        AND    MOP.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+		        AND    MOP.WORK_ORDER_ID = #{workOrderId, jdbcType=VARCHAR}
+		        AND    NOT EXISTS        ( SELECT '*'
+		                                   FROM   MOM_WO_RESULT MR
+		                                   WHERE  MR.COMPANY_CD    = MOP.COMPANY_CD
+		                                   AND    MR.DIVISION_CD   = MOP.DIVISION_CD
+		                                   AND    MR.WORK_ORDER_ID = MOP.WORK_ORDER_ID
+		                                   AND    MR.STATE          IN ('O', 'R', 'H') ) 
+		        UNION ALL
+		        SELECT MWR.COMPANY_CD
+		             , MWR.DIVISION_CD
+		             , MWR.WORK_ORDER_ID
+		             , MWR.WO_RESULT_ID
+		             , MIN(MWR.OPERATION_SEQ) AS OPERATION_SEQ
+		             , MWR.OPERATION_ID
+		             , MIN(MWR.WORK_STATION_CD) AS WORK_STATION_CD
+		             , MIN(MOP.INSPECTION_YN)   AS INSPECTION_YN
+		             , MIN(MOP.FINAL_OPERATION_YN) AS FINAL_OPERATION_YN
+		             , MIN(MOP.MILESTONE)          AS MILESTONE
+		             , MIN(TO_CHAR(MWR.WORK_DAY  ,'YYYY-MM-DD'))  AS WORK_DAY
+		             , MIN(TO_CHAR(MWR.START_TIME  ,'YYYY-MM-DD HH24:MI:SS'))   AS START_DATE
+		             , MIN(TO_CHAR(MWR.END_TIME  ,'YYYY-MM-DD HH24:MI:SS'))     AS END_DATE
+		             , MIN(MWR.STATE)                                           AS STATE
+		             , SUM(DECODE(MWR.WO_RESULT_TYPE, 'G', NVL(MWR.RESULT_QTY,NULL)))  AS GOOD_QTY
+		             , SUM(DECODE(MWR.WO_RESULT_TYPE, 'D', NVL(MWR.RESULT_QTY,NULL)))  AS DEFECT_QTY
+		             , MIN(MWR.DEFECT_TYPE) AS DEFECT_TYPE
+		             , MIN(MWR.DESCRIPTION) AS DESCRIPTION
+		             , MIN(MWR.UPDATE_BY)    AS UPDATE_USER_NO
+		             , MIN(TO_CHAR(MWR.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')) AS UPDATE_DATE
+		        FROM   MOM_WO_OPERATION_RESULT   MWR
+		             , MOM_WO_OPERATION_PATH MOP
+		        WHERE  MWR.COMPANY_CD    = MOP.COMPANY_CD 
+		        AND    MWR.DIVISION_CD   = MOP.DIVISION_CD
+		        AND    MWR.WORK_ORDER_ID = MOP.WORK_ORDER_ID
+		        AND    MWR.OPERATION_ID  = MOP.OPERATION_ID
+		        AND    MWR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+		        AND    MWR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+		        AND    MWR.WORK_ORDER_ID = #{workOrderId, jdbcType=VARCHAR}  
+		        AND    MWR.WO_RESULT_ID  = (SELECT MR.WO_RESULT_ID
+		                                    FROM   MOM_WO_RESULT MR
+		                                    WHERE  MR.COMPANY_CD    = MWR.COMPANY_CD
+		                                    AND    MR.DIVISION_CD   = MWR.DIVISION_CD
+		                                    AND    MR.WORK_ORDER_ID = MWR.WORK_ORDER_ID
+		                                    AND    MR.STATE          IN ('O', 'R', 'H') )
+		        GROUP BY MWR.COMPANY_CD
+		             , MWR.DIVISION_CD
+		             , MWR.WORK_ORDER_ID
+		             , MWR.WO_RESULT_ID
+		             , MWR.OPERATION_ID ) A
+		     , MOM_WORK_ORDER MWO
+		     , MOM_ITEM MI
+		WHERE  A.COMPANY_CD     = MWO.COMPANY_CD
+		AND    A.DIVISION_CD    = MWO.DIVISION_CD
+		AND    A.WORK_ORDER_ID  = MWO.WORK_ORDER_ID
+		AND    MWO.COMPANY_CD   = MI.COMPANY_CD
+		AND    MWO.DIVISION_CD  = MI.DIVISION_CD
+		AND    MWO.ITEM_ID      = MI.ITEM_ID
+		ORDER BY DECODE(A.STATE, 'R', 1, 'W',2, 'E',3) ASC, A.OPERATION_SEQ
     </select>
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_OPERATION_RESULT

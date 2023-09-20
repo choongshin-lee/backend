@@ -112,11 +112,13 @@
 		     , MBP.MILESTONE
 		     , CASE WHEN MBP.INSPECTION_YN = 'Y' THEN
 		           NVL(( SELECT MPS.USE_YN
-		             FROM   MOM_INSPECTION_PQC_SPEC MPS
-		             WHERE  MPS.COMPANY_CD   = MBP.COMPANY_CD
-		             AND    MPS.DIVISION_CD  = MBP.DIVISION_CD
-		             AND    MPS.ITEM_ID      = MB.ITEM_ID
-		             AND    MPS.OPERATION_ID = MBP.OPERATION_ID), 'N') 
+		                 FROM   MOM_INSPECTION_PQC_SPEC MPS
+		                 WHERE  MPS.COMPANY_CD   = MBP.COMPANY_CD
+		                 AND    MPS.DIVISION_CD  = MBP.DIVISION_CD
+		                 AND    MPS.ITEM_ID      = MB.ITEM_ID
+		                 AND    MPS.OPERATION_ID = MBP.OPERATION_ID
+		                 AND    MPS.USE_YN       = 'Y'
+                         AND    ROWNUM           = 1), 'N') 
 		       ELSE 'N'
 		       END          AS PQC_INFO_YN
 		FROM   MOM_BOR_PATH MBP

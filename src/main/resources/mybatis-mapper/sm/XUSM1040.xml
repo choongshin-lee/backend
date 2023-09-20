@@ -1,29 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mom.backend.XUSM1040">		
-		<select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
-		    SELECT *
-			FROM     MOM_USER_V 
-			WHERE    1=1
-		   <if test = "userNo != null and userNo != ''">
-	        AND UPPER(USER_NO) LIKE '%' || UPPER(#{userNo, jdbcType=VARCHAR}) || '%'
-	       </if>
-	       <if test = "userNm != null and userNm != ''">
-	        AND UPPER(USER_NM)  LIKE '%' || UPPER(#{userNm, jdbcType=VARCHAR}) || '%'
-	       </if>
-	       <if test = "deptNm != null and deptNm != ''">
-	        AND DEPT_CD  IN (${deptNm})
-	       </if>
-	       <if test = "authGroupNm != null and authGroupNm != ''">
-	        AND AUTH_GROUP_CD  IN (${authGroupNm})
-	       </if>
-	       <if test = "vendorNm != null and vendorNm != ''">
-	        AND UPPER(VENDOR_NM)  LIKE '%' || UPPER(#{vendorNm, jdbcType=VARCHAR}) || '%'
-	       </if>
-	       <if test = "useYn != null and useYn != ''">
-	        AND USE_YN  = #{useYn, jdbcType=VARCHAR}
-	       </if>	 
-			ORDER BY USER_NO
+    <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
+	    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+        SELECT A.*
+	    FROM   (
+	    </if>		
+			    SELECT MU.COMPANY_CD
+				     , MU.DIVISION_CD
+				     , MU.USER_NO
+				     , MU.USER_NM
+				     , MU.USER_NM_ENG
+				     , MU.PASSWORD
+				     , MU.POSITION
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MU.COMPANY_CD, MU.DIVISION_CD, 'SM0010', MU.POSITION) FROM DUAL) AS POSITION_NM
+				     , MU.EMAIL
+				     , MU.PHONE_NO
+				     , MU.TEL_NO
+				     , MU.FAX_NO
+				     , MU.DEPT_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_DEPARTMENT_NAME(MU.COMPANY_CD, MU.DIVISION_CD, MU.DEPT_CD) FROM DUAL)  AS DEPT_NM
+				     , MU.AUTH_GROUP_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_AUTH_NAME(MU.COMPANY_CD, MU.DIVISION_CD, MU.AUTH_GROUP_CD) FROM DUAL)   AS AUTH_GROUP_NM
+				     , MU.VENDOR_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MU.COMPANY_CD, MU.DIVISION_CD, MU.VENDOR_CD) FROM DUAL) AS VENDOR_NM
+				     , MU.DEFAULT_LANGUAGE
+				     , MU.MAP_ADDRESS
+				     , MU.IP_ADDRESS
+				     , MU.USE_YN
+				     , MU.DESCRIPTION
+				     , MU.CREATE_BY
+				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MU.COMPANY_CD, MU.DIVISION_CD, MU.CREATE_BY) FROM DUAL)  AS CREATE_BY_NM
+				     , TO_CHAR(MU.CREATE_DATE,'YYYY-MM-DD HH24:MI:SS') AS CREATE_DATE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MU.COMPANY_CD, MU.DIVISION_CD, MU.UPDATE_BY) FROM DUAL)  AS UPDATE_BY_NM
+				     , TO_CHAR(MU.UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+				     , ROWIDTOCHAR(MU.ROWID) AS KEY_ID
+	                 , COUNT(*) OVER() AS TOTAL_COUNT
+	                 , ROW_NUMBER() OVER(PARTITION BY MU.COMPANY_CD,MU.DIVISION_CD ORDER BY MU.USER_NO ) AS ROW_COUNT 
+				FROM   MOM_USER MU
+				     , MOM_PARTNER MP
+				WHERE  MU.COMPANY_CD   = MP.COMPANY_CD(+)
+                AND    MU.DIVISION_CD  = MP.DIVISION_CD(+)
+                AND    MU.VENDOR_CD    = MP.PARTNER_CD(+)  
+                AND    MU.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
+				AND    MU.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
+			    <if test = "userNo != null and userNo != ''">
+		        AND    UPPER(MU.USER_NO) LIKE '%' || UPPER(#{userNo, jdbcType=VARCHAR}) || '%'
+		       </if>
+		       <if test = "userNm != null and userNm != ''">
+		        AND    UPPER(MU.USER_NM)  LIKE '%' || UPPER(#{userNm, jdbcType=VARCHAR}) || '%'
+		       </if>
+		       <if test = "deptNm != null and deptNm != ''">
+		        AND    MU.DEPT_CD  IN (${deptNm})
+		       </if>
+		       <if test = "authGroupNm != null and authGroupNm != ''">
+		        AND    MU.AUTH_GROUP_CD  IN (${authGroupNm})
+		       </if>
+		       <if test = "vendorNm != null and vendorNm != ''">
+		        AND    UPPER(MP.PARTNER_NM)  LIKE '%' || UPPER(#{vendorNm, jdbcType=VARCHAR}) || '%'
+		       </if>
+		       <if test = "useYn != null and useYn != ''">
+		        AND    MU.USE_YN  = #{useYn, jdbcType=VARCHAR}
+		       </if>	
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	           ) A
+	    WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+	    </if> 	        
+		ORDER BY USER_NO
 	    </select>
 	    <insert id="create_createBtn1" parameterType="java.util.List">  
             INSERT INTO MOM_USER (

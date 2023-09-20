@@ -844,4 +844,19 @@
 	        AND     MU.USE_YN            = 'Y' )
 	ORDER BY LABEL   
 	</select> 
+	<select id="get_DD00063" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	SELECT MWC.WORK_CENTER_CD  AS CODE 
+	     , MWC.WORK_CENTER_CD   ||'('|| MWC.WORK_CENTER_NM     ||')' AS LABEL
+	FROM   MOM_USER_WORK_CENTER_REL MCR
+	     , MOM_WORK_CENTER MWC
+	WHERE  MCR.COMPANY_CD     = MWC.COMPANY_CD
+	AND    MCR.DIVISION_CD    = MWC.DIVISION_CD
+	AND    MCR.WORK_CENTER_CD = MWC.WORK_CENTER_CD
+	AND    MCR.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+	AND    MCR.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR} 
+	AND    MCR.USER_NO        = #{userId, jdbcType=VARCHAR}
+	AND    MWC.USE_YN = 'Y'
+	AND    MCR.USE_YN = 'Y'
+	ORDER BY LABEL   
+	</select> 
 </mapper>

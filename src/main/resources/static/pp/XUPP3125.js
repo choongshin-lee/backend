@@ -58,8 +58,22 @@ var VIEW= {
 	},
     customCallInit: function(index,your,action,btnId,param,result) {
 		if(index == 1){
-			if(action=='D'&& btnId == 'customBtn2-1'){
-                result.param = param;
+			//if(action=='D'&& btnId == 'customBtn2-1'){
+            //    result.param = param;
+            //}
+            let checkItem = widget.getCheckedRowItems(widget.grid[1]);
+	        if(btnId == 'customGridPopBtn2-5'){ 
+		        if(checkItem.length==0){
+                    result.msg = '하단에서 작업지시번호 선택필수!';
+                    result.result = 'WARN';
+                    return;
+                }
+                $('#workOrderIdSP21').val(checkItem[0]['workOrderId']);
+                //$('#woResultIdSP21').val(checkItem[0]['woResultId']);
+                $('#operationIdSP21').val(checkItem[0]['operationId']);
+                $('#workOrderIdSP21').attr("disabled", true);
+                //$('#woResultIdSP21').attr("disabled", true);
+                $('#operationIdSP21').jqxComboBox({disabled: true});
             }		
 		}
 	},
@@ -75,6 +89,7 @@ $(document).ready(function(event){
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
-	momWidget.gridPopup.init(2,21,1,'XUDG0500', VIEW);
+	momWidget.gridPopup.init(2,21,1,'XUDG0580', VIEW);  
+
 	VIEW.init();
 });
