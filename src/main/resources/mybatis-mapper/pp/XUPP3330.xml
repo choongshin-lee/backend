@@ -19,7 +19,7 @@
 					                       , MII.COMPANY_CD
 					                       , MII.DIVISION_CD
 					                       , MII.ITEM_INOUT_ID
-					                  FROM   MOM_ITEM_INOUT MII
+					                  FROM   MOM_STOCK_INOUT MII
 					                  WHERE  MII.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 					                  AND    MII.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
 					                  AND    MII.IO_DATE     BETWEEN TO_DATE(#{deductStartDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD') AND  TO_DATE(#{deductStartDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 23.9997/24 
@@ -68,7 +68,7 @@
 					FROM   C_DEDUCT CD
 					     , MOM_ITEM MI
 					     , MOM_WORK_ORDER MWO
-					     , MOM_ITEM_INOUT MC
+					     , MOM_STOCK_INOUT MC
 					WHERE  CD.COMPANY_CD     = MI.COMPANY_CD
 					AND    CD.DIVISION_CD    = MI.DIVISION_CD
 					AND    CD.ITEM_ID        = MI.ITEM_ID

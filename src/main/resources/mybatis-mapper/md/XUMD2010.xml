@@ -27,9 +27,6 @@
                  , MI.NET_WEIGHT
                  , MI.NET_WEIGHT_UOM 
                  , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.NET_WEIGHT_UOM) FROM DUAL) AS NET_WEIGHT_UOM_NM
-                 , MI.GROSS_WEIGHT
-                 , MI.GROSS_WEIGHT_UOM
-                 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.GROSS_WEIGHT_UOM) FROM DUAL) AS GROSS_WEIGHT_UOM_NM
                  , MI.STORAGE_WAREHOUSE_CD 
                  , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.STORAGE_WAREHOUSE_CD) FROM DUAL) AS STORAGE_WAREHOUSE_NM
                  , MI.ISSUE_TYPE
@@ -61,9 +58,12 @@
                  , MI.REORDER_POINT
                  , MI.SAFETY_STOCK_QTY
                  , MI.LOT_MANAGEMENT_YN
+                 , MI.LOT_MARK
+                 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0052', MI.LOT_MARK, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS LOT_MARK_NM
                  , MI.PO_OVER_RECEIPT_RATE
                  , MI.PO_USER_NO     AS PO_USER_NO
                  , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.PO_USER_NO) FROM DUAL ) AS PO_USER_NO_NM
+                 , MI.DISCONTINUE_YN
                  , MI.USE_YN
                  , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'SM0001', MI.USE_YN, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS USE_YN_NM
                  , MI.DESCRIPTION
@@ -128,8 +128,6 @@
 						  , MATERIAL_PROPERTIES
 						  , NET_WEIGHT
 						  , NET_WEIGHT_UOM
-						  , GROSS_WEIGHT
-						  , GROSS_WEIGHT_UOM
 						  , STORAGE_WAREHOUSE_CD
 						  , ISSUE_TYPE
 						  , SALES_UOM
@@ -153,8 +151,10 @@
 						  , REORDER_POINT
 						  , SAFETY_STOCK_QTY
 						  , LOT_MANAGEMENT_YN
+						  , LOT_MARK
 						  , PO_OVER_RECEIPT_RATE
 						  , PO_USER_NO
+						  , DISCONTINUE_YN
 						  , USE_YN
 						  , DESCRIPTION
 						  , DEL_YN
@@ -162,7 +162,6 @@
 						  , MULTI_MSG
 						  , CREATE_BY
 						  , CREATE_DATE
-
                           )
         VALUES            ( #{item.companyCd, jdbcType=VARCHAR}
                           , #{item.divisionCd, jdbcType=VARCHAR}
@@ -179,8 +178,6 @@
                           , #{item.materialProperties, jdbcType=VARCHAR}
                           , #{item.netWeight, jdbcType=NUMERIC}
                           , #{item.netWeightUom, jdbcType=VARCHAR}
-                          , #{item.grossWeight, jdbcType=NUMERIC}
-                          , #{item.grossWeightUom, jdbcType=VARCHAR}
                           , #{item.storageWarehouseCd, jdbcType=VARCHAR}
                           , #{item.issueType, jdbcType=VARCHAR}                          
                           , #{item.salesUom, jdbcType=VARCHAR}
@@ -204,8 +201,10 @@
                           , #{item.reorderPoint, jdbcType=NUMERIC}
                           , #{item.safetyStockQty, jdbcType=NUMERIC}
                           , #{item.lotManagementYn, jdbcType=VARCHAR}
+                          , #{item.lotMark, jdbcType=VARCHAR}
                           , #{item.poOverReceiptRate, jdbcType=NUMERIC}
                           , #{item.poUserNo, jdbcType=VARCHAR}
+                          , #{item.discontinueYn, jdbcType=VARCHAR}
                           , #{item.useYn, jdbcType=VARCHAR}
                           , #{item.description, jdbcType=VARCHAR}
                           , #{item.delYn, jdbcType=VARCHAR}
@@ -271,8 +270,6 @@
 						  , MATERIAL_PROPERTIES
 						  , NET_WEIGHT
 						  , NET_WEIGHT_UOM
-						  , GROSS_WEIGHT
-						  , GROSS_WEIGHT_UOM
 						  , STORAGE_WAREHOUSE_CD
 						  , ISSUE_TYPE
 						  , SALES_UOM
@@ -296,8 +293,10 @@
 						  , REORDER_POINT
 						  , SAFETY_STOCK_QTY
 						  , LOT_MANAGEMENT_YN
+						  , LOT_MARK
 						  , PO_OVER_RECEIPT_RATE
 						  , PO_USER_NO
+						  , DISCONTINUE_YN
 						  , USE_YN
 						  , DESCRIPTION
 						  , DEL_YN
@@ -322,8 +321,6 @@
                           , #{item.materialProperties, jdbcType=VARCHAR}
                           , #{item.netWeight, jdbcType=NUMERIC}
                           , #{item.netWeightUom, jdbcType=VARCHAR}
-                          , #{item.grossWeight, jdbcType=NUMERIC}
-                          , #{item.grossWeightUom, jdbcType=VARCHAR}
                           , #{item.storageWarehouseCd, jdbcType=VARCHAR}
                           , #{item.issueType, jdbcType=VARCHAR}                          
                           , #{item.salesUom, jdbcType=VARCHAR}
@@ -347,8 +344,10 @@
                           , #{item.reorderPoint, jdbcType=NUMERIC}
                           , #{item.safetyStockQty, jdbcType=NUMERIC}
                           , #{item.lotManagementYn, jdbcType=VARCHAR}
+                          , #{item.lotMark, jdbcType=VARCHAR}
                           , #{item.poOverReceiptRate, jdbcType=NUMERIC}
                           , #{item.poUserNo, jdbcType=VARCHAR}
+                          , #{item.discontinueYn, jdbcType=VARCHAR}
                           , #{item.useYn, jdbcType=VARCHAR}
                           , #{item.description, jdbcType=VARCHAR}
                           , 'N'

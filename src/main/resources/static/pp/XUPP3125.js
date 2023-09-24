@@ -74,13 +74,23 @@ var VIEW= {
                 $('#workOrderIdSP21').attr("disabled", true);
                 //$('#woResultIdSP21').attr("disabled", true);
                 $('#operationIdSP21').jqxComboBox({disabled: true});
-            }		
+            }	
+		}
+		else if(index == 0 &&  btnId == 'customBtn1-1'){	
+		    momWidget.splashHide();
+         	window.open('../PDF/'+param[0].itemId+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+         				   		   			
 		}
 	},
 	customCallBack: function(index,your,action,btnId,param,result,data) {
-	    if(index == 1 &&  btnId == 'customBtn2-1'){	
+	    if(index == 1 &&  btnId == 'customBtn2-3'){	
 		    //widget.findBtnClicked(1, {}, true, btnId,menuId,VIEW);
 		    //widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);							   		   			
+		}
+		else if(index == 0 &&  btnId == 'customBtn1-1'){	
+		    momWidget.splashHide();
+         	window.open('../PDF/'+e.value+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+         				   		   			
 		}
 	}
 };
@@ -93,3 +103,4 @@ $(document).ready(function(event){
 
 	VIEW.init();
 });
+

@@ -232,7 +232,31 @@
 		AND    MWO.COMPANY_CD   = MI.COMPANY_CD
 		AND    MWO.DIVISION_CD  = MI.DIVISION_CD
 		AND    MWO.ITEM_ID      = MI.ITEM_ID
-		ORDER BY DECODE(A.STATE, 'R', 1, 'W',2, 'E',3) ASC, A.OPERATION_SEQ
+		AND    A.OPERATION_SEQ  = (SELECT MIN(OPERATION_SEQ)
+								   FROM   ( SELECT MIN(MOP.OPERATION_SEQ)  AS   OPERATION_SEQ
+									        FROM   MOM_WO_OPERATION_PATH MOP
+									        WHERE  MOP.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+									        AND    MOP.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+									        AND    MOP.WORK_ORDER_ID = #{workOrderId, jdbcType=VARCHAR}  
+									        AND    NOT EXISTS        ( SELECT '*'
+									                                   FROM   MOM_WO_RESULT MR
+									                                   WHERE  MR.COMPANY_CD    = MOP.COMPANY_CD
+									                                   AND    MR.DIVISION_CD   = MOP.DIVISION_CD
+									                                   AND    MR.WORK_ORDER_ID = MOP.WORK_ORDER_ID
+									                                   AND    MR.STATE          IN ('O', 'R', 'H') )   
+									        UNION ALL                          
+									        SELECT MIN(MWR.OPERATION_SEQ)  OPERATION_SEQ
+									        FROM   MOM_WO_OPERATION_RESULT   MWR
+									        WHERE   MWR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+									        AND    MWR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
+									        AND    MWR.WORK_ORDER_ID = #{workOrderId, jdbcType=VARCHAR}  
+									        AND    MWR.WO_RESULT_ID  = (SELECT MR.WO_RESULT_ID
+									                                    FROM   MOM_WO_RESULT MR
+									                                    WHERE  MR.COMPANY_CD    = MWR.COMPANY_CD
+									                                    AND    MR.DIVISION_CD   = MWR.DIVISION_CD
+									                                    AND    MR.WORK_ORDER_ID = MWR.WORK_ORDER_ID
+									                                    AND    MR.STATE          IN ('O', 'R', 'H') )                           
+									        AND    MWR.STATE  <![CDATA[<>]]> 'E' ))		
     </select>
     <delete id="remove_customBtn2-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_OPERATION_RESULT

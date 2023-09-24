@@ -77,7 +77,6 @@
 				    AND    MWO.WO_START_TIME BETWEEN TO_DATE(#{woStartDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{woStartDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 				    AND    MWO.OUTSOURCING_YN    = 'N'
 				    AND    MWO.WO_STATE          = 'F'
-				    AND    MWO.MATERIAL_INPUT_YN = 'N'  
 				    <if test="itemIdNm != null and itemIdNm != ''">
 					AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm , jdbcType=VARCHAR}))
 					</if> 
@@ -133,6 +132,7 @@
 		     ,(SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDL.COMPANY_CD, MDL.DIVISION_CD, MDL.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 			 , TO_CHAR(MDL.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 			 , ROWIDTOCHAR(MDL.ROWID)  AS KEY_ID
+			 , MDL.DEDUCT_ID
 		FROM   MOM_WORK_ORDER  MWO
 		     , MOM_MATERIAL_DEDUCT_LIST MDL
 		     , MOM_ITEM MI
@@ -153,19 +153,24 @@
 		     , MS.ITEM_ID
 		     , MI.ITEM_NM
 		     , MI.ITEM_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWO.COMPANY_CD, MWO.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
 		     , MI.ITEM_SPEC
 		     , MS.WAREHOUSE_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MS.COMPANY_CD, MS.DIVISION_CD, MS.WAREHOUSE_CD) FROM DUAL)  AS WAREHOUSE_NM
 		     , MS.LOCATION_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MS.COMPANY_CD, MS.DIVISION_CD, MS.LOCATION_CD) FROM DUAL) AS LOCATION_NM
 		     , MS.LOT_ID
+		     , MS.HCN_CD
 		     , MI.UOM           AS STOCK_UOM
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS STOCK_UOM_NM
 		     , MS.STOCK_QTY
 		     , MS.ALLOCATE_QTY
 		     , MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0) AS AVAILABLE_QTY
 		     , MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0) AS INPUT_QTY
+		     , #{workOrderId, jdbcType=VARCHAR}      AS WORK_ORDER_ID
+		     , #{deductId, jdbcType=VARCHAR}         AS WORK_ORDER_ID
+		     , #{stockInputQty, jdbcType=NUMERIC}    AS STOCK_INPUT_QTY
+		     , MS.ITEM_STOCK_ID
 		     , MS.DESCRIPTION
 		FROM   MOM_STOCK MS
 		     , MOM_ITEM  MI
@@ -177,50 +182,51 @@
 		AND    MS.ITEM_ID       = #{itemId, jdbcType=VARCHAR}
 		AND    MS.WAREHOUSE_CD  = #{warehouseCd, jdbcType=VARCHAR}
 	</select>  
-    <delete id="remove_createBtn2" parameterType="java.util.List">
-        DELETE FROM MOM_PROC_MTL_DEDUCT_LIST
+    <delete id="remove_customBtn3-1" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_MATERIAL_INPUT
             <where>
             <foreach collection="list" item="item" open="" close="" separator="OR">
-            (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
+            (     COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
              AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
              AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
             )
             </foreach>
             </where>
     </delete>  
-    <insert id="create_createBtn2" parameterType="java.util.List">
+    <insert id="create_customBtn3-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_MTL_DEDUCT_LIST( COMPANY_CD
-                                     , DIVISION_CD
-                                     , WORK_ORDER_ID
-                                     , ITEM_ID
-                                     , REQ_QTY
-                                     , DEDUCT_TYPE 
-                                     , DESCRIPTION
-                                     , VAL_MSG
-                                     , MULTI_MSG
-                                     , CREATE_BY
-                                     , CREATE_DATE )
-        VALUES                       ( #{item.companyCd, jdbcType=VARCHAR}
-                                     , #{item.divisionCd, jdbcType=VARCHAR}
-                                     , #{item.workOrderId, jdbcType=VARCHAR}
-                                     , #{item.itemId, jdbcType=VARCHAR}
-                                     , #{item.reqQty, jdbcType=NUMERIC}
-                                     , #{item.deductType, jdbcType=VARCHAR}
-                                     , #{item.description, jdbcType=VARCHAR}
-                                     , #{item.valMsg, jdbcType=VARCHAR}
-                                     , #{item.multiMsg, jdbcType=VARCHAR}
-                                     , #{item.userId, jdbcType=VARCHAR}
-                                     , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-                                     )
+        INTO MOM_PROC_MATERIAL_INPUT( COMPANY_CD
+                                    , DIVISION_CD
+                                    , WORK_ORDER_ID
+                                    , DEDUCT_ID
+                                    , ITEM_STOCK_ID
+                                    , INPUT_QTY
+                                    , STOCK_INPUT_QTY
+                                    , DESCRIPTION
+                                    , VAL_MSG
+                                    , MULTI_MSG
+                                    , CREATE_BY
+                                    , CREATE_DATE )
+        VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}
+                                    , #{item.divisionCd, jdbcType=VARCHAR}
+                                    , #{item.workOrderId, jdbcType=VARCHAR}
+                                    , #{item.deductId, jdbcType=VARCHAR}
+                                    , #{item.itemStockId, jdbcType=VARCHAR}
+                                    , #{item.inputQty, jdbcType=NUMERIC}
+                                    , #{item.stockInputQty, jdbcType=NUMERIC}
+                                    , #{item.description, jdbcType=VARCHAR}
+                                    , #{item.valMsg, jdbcType=VARCHAR}
+                                    , #{item.multiMsg, jdbcType=VARCHAR}
+                                    , #{item.userId, jdbcType=VARCHAR}
+                                    , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                    )
         </foreach>
     </insert>
-    <select id="proc_createBtn2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_WO_PKG.SP_UPSERT_MATERIAL_DEDUCT_LIST( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
-                                                        , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
-                                                        , #{companyCd,  jdbcType=VARCHAR, mode=IN}
-                                                        , #{divisionCd, jdbcType=VARCHAR, mode=IN}                        
-                                                        , #{actionType, jdbcType=VARCHAR, mode=IN}
-                                                        , #{userId,     jdbcType=VARCHAR, mode=IN} )}                   
+    <select id="proc_customBtn3-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WO_PKG.SP_CREATE_MATERIAL_INPUT( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+                                                  , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+                                                  , #{companyCd,  jdbcType=VARCHAR, mode=IN}
+                                                  , #{divisionCd, jdbcType=VARCHAR, mode=IN}                        
+                                                  , #{userId,     jdbcType=VARCHAR, mode=IN} )}                   
     </select>  
 </mapper>

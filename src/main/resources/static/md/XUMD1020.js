@@ -6,7 +6,8 @@ var XUMD1020 = {
 	createdFlag		: undefined,
 	init: function() {
 		var that = this;		
-	} 		
+	},
+		
 };
 
 $(document).ready(function(event){	
