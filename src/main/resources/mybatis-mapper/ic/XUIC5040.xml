@@ -26,8 +26,8 @@
 				     , MDD.QTY                       AS DELIVERY_REQUEST_QTY
 				     , MDD.DO_UOM                    AS DELIVERY_UOM 
 				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS DELIVERY_UOM_NM
-				     , MDD.CONVERSION_UOM
-				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
+				     , MDD.CONVERSION_UOM     AS STOCK_UOM	
+			         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM) FROM DUAL) AS STOCK_UOM_NM
 				     , TO_CHAR(MDM.ISSUE_DUE_DATE ,'YYYY-MM-DD')      AS DELIVERY_DUE_DATE
 				     , MDM.STATE
 					 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'IC0002', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
@@ -38,7 +38,7 @@
 					 , ROWIDTOCHAR(MDD.ROWID)            AS KEY_ID
 				     , COUNT(*) OVER()   AS TOTAL_COUNT
 				     , ROW_NUMBER() OVER(PARTITION BY MDM.COMPANY_CD, MDM.DIVISION_CD ORDER BY MDD.DO_NO) AS ROW_CNT
-		   	         , MDD.REFERENCE_NO
+		   	         , MDD.REFERENCE_NO     AS WORK_ORDER_ID 
                      , MDD.REFERENCE_DTL_NO
 				     , MDM.DESCRIPTION
 				FROM   MOM_DO_MST MDM
@@ -62,11 +62,18 @@
 				AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
 				AND    MDM.PROCESS_CD          = 'RM'
 				AND    MDM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+				AND    EXISTS ( SELECT '*'
+				                FROM   MOM_WAREHOUSE_MANAGER MLM
+				                WHERE  MLM.COMPANY_CD    = MDM.COMPANY_CD
+				                AND    MLM.DIVISION_CD   = MDM.DIVISION_CD
+				                AND    MLM.WAREHOUSE_CD  = MDM.REQUEST_WAREHOUSE_CD 
+				                AND    MLM.USE_YN       = 'Y'
+				                AND    MLM.USER_NO      = #{userId, jdbcType=VARCHAR}  )
 				<if test="deliveryRequestNo != null and deliveryRequestNo != ''">
 				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{deliveryRequestNo, jdbcType=VARCHAR}) || '%')   
 				</if>
-				<if test="requestWarehouseCdNm != null and requestWarehouseCdNm != ''">
-		        AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWR.WAREHOUSE_NM) LIKE '%' || UPPER(#{requestWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
+				<if test="requestWarehouseCd != null and requestWarehouseCd != ''">
+		        AND    MDM.REQUEST_WAREHOUSE_CD  = #{requestWarehouseCd, jdbcType=VARCHAR}   
 		        </if> 
 				<if test="issueWarehouseCdNm != null and issueWarehouseCdNm != ''">
 				AND    (UPPER(MDM.ISSUE_WAREHOUSE_CD) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWI.WAREHOUSE_NM) LIKE '%' || UPPER(#{issueWarehouseCdNm, jdbcType=VARCHAR}) || '%')   

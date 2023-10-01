@@ -107,7 +107,7 @@
         AND    MDD.ITEM_ID      = MI.ITEM_ID
         AND    MDD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
         AND    MDD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
-        AND    MDD.DO_NO        = #{deliveryRequestNo, jdbcType=VARCHAR}  
+        AND    MDD.DO_NO        = #{returnRequestNo, jdbcType=VARCHAR}  
     </select> 
     <delete id="remove_createBtn1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_DO_MST
