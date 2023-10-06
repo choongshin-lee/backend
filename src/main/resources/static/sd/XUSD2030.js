@@ -1,4 +1,4 @@
-var menuId = 'XUWL4030';
+var menuId = 'XUSD2030';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
@@ -17,10 +17,11 @@ var VIEW= {
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {receiptId:e.item['receiptId'],receiptWarehouseCd:e.item['receiptWarehouseCd']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {shippingNo:e.item['shippingNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 };
+
 $(document).ready(function(event){	
 	momSetup.init();
 	momWidget.init(1, menuId, VIEW);	

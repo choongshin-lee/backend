@@ -23,12 +23,13 @@
 						 , ROW_NUMBER() OVER(PARTITION BY MWM.COMPANY_CD,MWM.DIVISION_CD ORDER BY MWM.WAREHOUSE_CD) AS ROW_CNT
 					FROM  MOM_WAREHOUSE_MANAGER MWM
 					    , MOM_WAREHOUSE MWH
-					WHERE MWM.COMPANY_CD   = MWH.COMPANY_CD
-					AND   MWM.DIVISION_CD  = MWH.DIVISION_CD
-					AND   MWM.WAREHOUSE_CD = MWH.WAREHOUSE_CD 
-					AND   MWM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
-					AND   MWM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
-					AND   MWM.USER_NO      = #{userId, jdbcType=VARCHAR}	
+					WHERE MWM.COMPANY_CD       = MWH.COMPANY_CD
+					AND   MWM.DIVISION_CD      = MWH.DIVISION_CD
+					AND   MWM.WAREHOUSE_CD     = MWH.WAREHOUSE_CD 
+					AND   MWM.COMPANY_CD       = #{companyCd, jdbcType=VARCHAR}
+					AND   MWM.DIVISION_CD      = #{divisionCd, jdbcType=VARCHAR}	
+					AND   MWM.USER_NO          = #{userId, jdbcType=VARCHAR}	
+					AND   MWH.WAREHOUSE_USE_YN = 'Y'
 					<if test="warehouseCdNm != null and warehouseCdNm != ''">
 					AND    (UPPER(MWH.WAREHOUSE_CD) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%')    
 					</if> 
@@ -43,10 +44,10 @@
 		     , MLM.LOCATION_DO_NO
 		     , MLM.LOCATION_DO_NM
 		     , MLM.WAREHOUSE_CD
-		     , MLM.FROM_ZONE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD,'MD0020', MLM.FROM_ZONE, #{langCd, jdbcType=VARCHAR}) FROM DUAL ) AS FROM_ZONE_NM
-		     , MLM.TO_ZONE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD,'MD0020', MLM.TO_ZONE, #{langCd, jdbcType=VARCHAR}) FROM DUAL ) AS TO_ZONE_NM 
+		     , MLM.FROM_LOCATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.FROM_LOCATION_CD) FROM DUAL) AS FROM_LOCATION_NM 
+		     , MLM.TO_LOCATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.TO_LOCATION_CD) FROM DUAL) AS TO_LOCATION_NM 
 		     , MLM.DESCRIPTION
 		     , MLM.UPDATE_BY              AS UPDATE_USER_NO
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLM.COMPANY_CD, MLM.DIVISION_CD, MLM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
@@ -65,7 +66,7 @@
 		     , MLD.SEQ 
              , MLD.DELIVERY_ORDER_ID 
 		     , MLD.LOCATION_CD
-		     , ML.LOCATION_NM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.LOCATION_CD) FROM DUAL ) AS LOCATION_NM
 		     , MLD.LOGISTICS_UNIT_CD
 		     , MLD.LOT_ID
 		     , MLD.ITEM_ID
@@ -83,12 +84,8 @@
 		     , TO_CHAR(MLD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
 		     , ROWIDTOCHAR(MLD.ROWID)            AS KEY_ID
 		FROM   MOM_LOCATION_DO_DTL MLD
-		     , MOM_LOCATION ML
 		     , MOM_ITEM MI 
-		WHERE  MLD.COMPANY_CD     = ML.COMPANY_CD
-		AND    MLD.DIVISION_CD    = ML.DIVISION_CD
-		AND    MLD.LOCATION_CD    = ML.LOCATION_CD    
-		AND    MLD.COMPANY_CD     = MI.COMPANY_CD
+		WHERE  MLD.COMPANY_CD     = MI.COMPANY_CD
 		AND    MLD.DIVISION_CD    = MI.DIVISION_CD
 		AND    MLD.ITEM_ID        = MI.ITEM_ID    
 		AND    MLD.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
@@ -114,8 +111,8 @@
                                      , LOCATION_DO_NO
                                      , LOCATION_DO_NM
                                      , WAREHOUSE_CD
-                                     , FROM_ZONE
-                                     , TO_ZONE
+                                     , FROM_LOCATION_CD
+                                     , TO_LOCATION_CD
                                      , DESCRIPTION
                                      , DEL_YN
                                      , VAL_MSG
@@ -128,8 +125,8 @@
                                      , #{item.locationDoNo, jdbcType=VARCHAR}
                                      , #{item.locationDoNm, jdbcType=VARCHAR}
                                      , #{item.warehouseCd, jdbcType=VARCHAR}
-                                     , #{item.fromZone, jdbcType=VARCHAR}
-                                     , #{item.toZone, jdbcType=VARCHAR}
+                                     , #{item.fromLocationCd, jdbcType=VARCHAR}
+                                     , #{item.toLocationCd, jdbcType=VARCHAR}
                                      , #{item.description, jdbcType=VARCHAR}
                                      , #{item.delYn, jdbcType=VARCHAR}
                                      , #{item.valMsg, jdbcType=VARCHAR}
@@ -166,9 +163,9 @@
                     		            , SEQ
                     		            , DELIVERY_ORDER_ID
                     		            , LOCATION_CD
-                    		            , LOGISTICS_UNIT_CD
                     		            , LOT_ID
 			                            , ITEM_ID
+			                            , UOM
 			                            , QTY
 			                            , ITEM_STOCK_ID
 			                            , DESCRIPTION
@@ -183,9 +180,9 @@
 			                            , #{item.seq, jdbcType=NUMERIC}
 			                            , #{item.deliveryOrderId, jdbcType=VARCHAR}
 			                            , #{item.locationCd, jdbcType=VARCHAR}
-			                            , #{item.logisticsUnitCd, jdbcType=VARCHAR}
 			                            , #{item.lotId, jdbcType=VARCHAR}
 			                   		    , #{item.itemId, jdbcType=VARCHAR}
+			                   		    , #{item.uom, jdbcType=VARCHAR}
 					                    , #{item.deliveryRequestQty, jdbcType=NUMERIC}
 					                    , #{item.itemStockId, jdbcType=VARCHAR}
 					                    , #{item.description, jdbcType=VARCHAR}

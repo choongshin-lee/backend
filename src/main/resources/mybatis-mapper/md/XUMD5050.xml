@@ -12,6 +12,11 @@
                          , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MLR.COMPANY_CD,MLR.DIVISION_CD, 'MD0036', MLR.RESOURCE_GROUP_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS RESOURCE_GROUP_NM
                          , MLR.RESOURCE_CD
                          , MLR.RESOURCE_NM
+                         , MLR.PACKING_NO1_YN
+                         , MLR.PACKING_NO2_YN
+                         , MLR.PACKING_NO3_YN
+                         , MLR.PACKING_NO4_YN
+                         , MLR.PACKING_NO5_YN
                          , MLR.USE_YN
                          , MLR.DESCRIPTION
                          , MLR.UPDATE_BY      AS UPDATE_USER_NO
@@ -55,6 +60,11 @@
                                         , RESOURCE_CD  
                                         , RESOURCE_NM  
                                         , RESOURCE_GROUP_CD 
+                                        , PACKING_NO1_YN
+                                        , PACKING_NO2_YN
+                                        , PACKING_NO3_YN
+                                        , PACKING_NO4_YN
+                                        , PACKING_NO5_YN
                                         , USE_YN
                                         , DESCRIPTION
                                         , DEL_YN
@@ -68,6 +78,11 @@
                                        , #{item.resourceCd, jdbcType=VARCHAR}
                                        , #{item.resourceNm, jdbcType=VARCHAR}
                                        , #{item.resourceGroupCd, jdbcType=VARCHAR}
+                                       , #{item.packingNo1Yn, jdbcType=VARCHAR}
+                                       , #{item.packingNo2Yn, jdbcType=VARCHAR}
+                                       , #{item.packingNo3Yn, jdbcType=VARCHAR}
+                                       , #{item.packingNo4Yn, jdbcType=VARCHAR}
+                                       , #{item.packingNo5Yn, jdbcType=VARCHAR}
                                        , #{item.useYn, jdbcType=VARCHAR}
                                        , #{item.description, jdbcType=VARCHAR}
                                        , #{item.delYn, jdbcType=VARCHAR}
@@ -112,6 +127,11 @@
                                         , RESOURCE_CD  
                                         , RESOURCE_NM  
                                         , RESOURCE_GROUP_CD 
+                                        , PACKING_NO1_YN
+                                        , PACKING_NO2_YN
+                                        , PACKING_NO3_YN
+                                        , PACKING_NO4_YN
+                                        , PACKING_NO5_YN
                                         , USE_YN
                                         , DESCRIPTION
                                         , DEL_YN
@@ -125,6 +145,11 @@
                                         , #{item.resourceCd, jdbcType=VARCHAR}
                                         , #{item.resourceNm, jdbcType=VARCHAR}
                                         , #{item.resourceGroupCd, jdbcType=VARCHAR}
+                                        , #{item.packingNo1Yn, jdbcType=VARCHAR}
+                                        , #{item.packingNo2Yn, jdbcType=VARCHAR}
+                                        , #{item.packingNo3Yn, jdbcType=VARCHAR}
+                                        , #{item.packingNo4Yn, jdbcType=VARCHAR}
+                                        , #{item.packingNo5Yn, jdbcType=VARCHAR}
                                         , #{item.useYn, jdbcType=VARCHAR}
                                         , #{item.description, jdbcType=VARCHAR}
                                         , 'N'

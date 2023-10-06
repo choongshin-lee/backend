@@ -22,6 +22,7 @@ var VIEW= {
                 return;
             }	
 			$('#warehouseCdDP2').val(checkItem[0]['warehouseCd']);
+
 		}
 		else if(index==2){	
 			let checkItem = widget.getCheckedRowItems(widget.grid[1]); 
@@ -31,6 +32,7 @@ var VIEW= {
                 return;
             }
             $('#locationDoNoDP3').val(checkItem[0]['locationDoNo']);	
+            
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
@@ -55,10 +57,10 @@ var VIEW= {
 	        let checkItem = widget.getCheckedRowItems(widget.grid[1]);
 	        if(btnId == 'customGridPopBtn3-2'){ 
                 $('#warehouseCdSP31').val(checkItem[0]['warehouseCd']);
-                $('#zoneSP31').val(checkItem[0]['fromZone']);
+                $('#locationCdSP31').val(checkItem[0]['fromLocationCd']);
                 $('#drNoSP21').val('');
                 $('#warehouseCdSP31').jqxComboBox({disabled: true});
-                $('#zoneSP31').jqxComboBox({disabled: true});
+                $('#locationCdSP31').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 30){         
@@ -80,3 +82,63 @@ $(document).ready(function(event){
 	momWidget.gridPopup.init(3,31,1,'XUDG0510', VIEW);  
 	VIEW.init();
 });
+
+$(document).on('click', '#fromLocationCdDP2', function () {
+   var b = $(this).val();;
+   
+   mom_ajax('R', 'DD.DD00036', {warehouseCd: $('#warehouseCdDP2').val()}, function (result, data) {
+       if (result == 'SUCCESS') {
+           if(result != 'SUCCESS') {
+               momWidget.splashHide();
+               $('#fromLocationCdDP2').val(''); 
+                   
+           }
+           var valueITem =''
+           var newItems = [];
+           if(data.length == 0 ){
+               $('#fromLocationCdDP2').val(''); 
+       	       $('#fromLocationCdDP2').jqxComboBox('source', newItems);
+		   }
+		   else {
+                valueITem = data[0].code;
+                for (var i = 0; i < data.length; i++) {
+                    newItems.push(data[i]);
+                }
+                $('#fromLocationCdDP2').val(''); 
+                $('#fromLocationCdDP2').jqxComboBox('source', newItems);
+                $('#fromLocationCdDP2' ).val(valueITem); 
+           }  
+       }
+   });   
+
+})
+
+$(document).on('click', '#toLocationCdDP2', function () {
+   var b = $(this).val();;
+   
+   mom_ajax('R', 'DD.DD00036', {warehouseCd: $('#warehouseCdDP2').val()}, function (result, data) {
+       if (result == 'SUCCESS') {
+           if(result != 'SUCCESS') {
+               momWidget.splashHide();
+               $('#toLocationCdDP2').val(''); 
+                   
+           }
+           var valueITem =''
+           var newItems = [];
+           if(data.length == 0 ){
+               $('#toLocationCdDP2').val(''); 
+       	       $('#toLocationCdDP2').jqxComboBox('source', newItems);
+		   }
+		   else {
+                valueITem = data[0].code;
+                for (var i = 0; i < data.length; i++) {
+                    newItems.push(data[i]);
+                }
+                $('#toLocationCdDP2').val(''); 
+                $('#toLocationCdDP2').jqxComboBox('source', newItems);
+                $('#toLocationCdDP2' ).val(valueITem); 
+           }  
+       }
+   });   
+
+})

@@ -454,6 +454,21 @@
     <if test="resourceGroupCd != null and resourceGroupCd != ''">
     AND    RESOURCE_GROUP_CD = #{resourceGroupCd, jdbcType=VARCHAR} 
     </if>
+    <if test="packingNo1Yn != null and packingNo1Yn != ''">
+    AND    PACKING_NO1_YN = #{packingNo1Yn, jdbcType=VARCHAR} 
+    </if>
+    <if test="packingNo2Yn != null and packingNo2Yn != ''">
+    AND    PACKING_NO2_YN = #{packingNo2Yn, jdbcType=VARCHAR} 
+    </if>
+    <if test="packingNo3Yn != null and packingNo3Yn != ''">
+    AND    PACKING_NO3_YN = #{packingNo3Yn, jdbcType=VARCHAR} 
+    </if>
+    <if test="packingNo4Yn != null and packingNo4Yn != ''">
+    AND    PACKING_NO4_YN = #{packingNo4Yn, jdbcType=VARCHAR} 
+    </if>
+    <if test="packingNo5Yn != null and packingNo5Yn != ''">
+    AND    PACKING_NO5_YN = #{packingNo5Yn, jdbcType=VARCHAR} 
+    </if>
     ORDER BY RESOURCE_NM    
     </select>  
     <select id="get_DD00039" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">   

@@ -6,6 +6,8 @@
 		     , MSO.DIVISION_CD
 		     , MSO.SHIP_TO_CD   
 		     , MSO.SHIP_TO_NM	
+		     , MSO.CUSTOMER_CD
+		     , MSO.CUSTOMER_NM
 		     , MSO.SO_NO
 		     , MSO.SO_SEQ
 		     , MSO.STORAGE_WAREHOUSE_CD    AS SHIPPING_WAREHOUSE_CD
@@ -38,7 +40,8 @@
 		FROM   MOM_SALES_ORDER_V MSO
 		WHERE  MSO.COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
 		AND    MSO.DIVISION_CD = #{divisionCd, jdbcType=VARCHAR}
-		AND    MSO.SHIP_TO_CD  = #{shipToCd, jdbcType=VARCHAR}
+		AND    MSO.CUSTOMER_CD = #{customerCd, jdbcType=VARCHAR}
+		AND    MSO.SHIP_TO_CD  = #{destinationCd, jdbcType=VARCHAR}
 		AND    MSO.CURRENCY_CD = #{currencyCd, jdbcType=VARCHAR}
 		AND    MSO.ORDER_QTY - MSO.DR_REQUEST_QTY - MSO.CANCEL_QTY > 0
 		<if test="soNo != null and soNo != ''">
@@ -48,7 +51,7 @@
 		       , MSO.SO_SEQ
     </select>  
     <delete id="remove_customBtn21-1" parameterType="java.util.List">
-        DELETE FROM MOM_PROC_DO_DTL
+        DELETE FROM MOM_PROC_SHIP_ORDER_DTL
         <where>
 	        <foreach collection="list" item="item" open="" close="" separator="OR">
 	        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
@@ -61,59 +64,54 @@
    </delete>  
    <insert id="create_customBtn21-1" parameterType="java.util.List">
        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-	       INTO MOM_PROC_DO_DTL( COMPANY_CD
-                    		   , DIVISION_CD
-                    		   , PROCESS_CD
-			                   , DO_NO
-			                   , SEQ
-			                   , DELIVERY_ORDER_ID
-			                   , QTY
-			                   , ITEM_ID
-			                   , DO_UOM
-			                   , CONVERSION_UOM
-			                   , CURRENCY_CD
-			                   , EXCHANGE_RATE
-			                   , UNIT_PRICE
-			                   , IO_TYPE
-			                   , REFERENCE_NO
-			                   , REFERENCE_DTL_NO
-			                   , DESCRIPTION
-			                   , DEL_YN
-			                   , VAL_MSG
-			                   , MULTI_MSG
-			                   , CREATE_BY
-			                   , CREATE_DATE )
-           VALUES              ( #{item.companyCd, jdbcType=VARCHAR}  
-			                   , #{item.divisionCd, jdbcType=VARCHAR} 
-			                   , 'CR'        
-			                   , #{item.shippingRequestNo, jdbcType=VARCHAR}
-			                   , #{item.seq, jdbcType=NUMERIC}
-			                   , #{item.deliveryOrderId, jdbcType=VARCHAR}
-			                   , #{item.remainQty, jdbcType=NUMERIC}
-			                   , #{item.itemId, jdbcType=VARCHAR}
-			                   , #{item.soUom, jdbcType=VARCHAR}
-			                   , #{item.conversionUom, jdbcType=VARCHAR}
-			                   , #{item.currencyCd, jdbcType=VARCHAR}
-			                   , #{item.exchangeRate, jdbcType=NUMERIC}
-			                   , #{item.unitPrice, jdbcType=NUMERIC}
-			                   , #{item.ioType, jdbcType=VARCHAR}
-			                   , #{item.soNo, jdbcType=VARCHAR}
-			                   , #{item.salesOrderId, jdbcType=VARCHAR}
-			                   , #{item.description, jdbcType=VARCHAR}
-			                   , #{item.delYn, jdbcType=VARCHAR}
-			                   , #{item.valMsg, jdbcType=VARCHAR}
-			                   , #{item.multiMsg, jdbcType=VARCHAR}
-			                   , #{item.userId, jdbcType=VARCHAR}
-			                   , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-			                   )
+	       INTO MOM_PROC_SHIP_ORDER_DTL( COMPANY_CD
+									   , DIVISION_CD
+									   , PROCESS_CD
+									   , SHIPPING_NO
+									   , SEQ
+									   , SHIPPING_ORDER_ID
+									   , ITEM_ID
+									   , SHIPPING_UOM
+									   , QTY
+									   , UNIT_PRICE
+									   , IO_TYPE
+									   , REFERENCE_NO
+									   , REFERENCE_DTL_NO
+									   , DESCRIPTION
+									   , DEL_YN
+									   , VAL_MSG
+									   , MULTI_MSG
+									   , CREATE_BY
+									   , CREATE_DATE
+                                       )
+           VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}  
+					                   , #{item.divisionCd, jdbcType=VARCHAR} 
+					                   , 'CR'        
+					                   , #{item.shippingNo, jdbcType=VARCHAR}
+					                   , #{item.seq, jdbcType=NUMERIC}
+					                   , #{item.shippingOrderId, jdbcType=VARCHAR}
+					                   , #{item.itemId, jdbcType=VARCHAR}
+					                   , #{item.soUom, jdbcType=VARCHAR}
+					                   , #{item.remainQty, jdbcType=NUMERIC}
+					                   , #{item.unitPrice, jdbcType=NUMERIC}
+					                   , #{item.ioType, jdbcType=VARCHAR}
+					                   , #{item.soNo, jdbcType=VARCHAR}
+					                   , #{item.salesOrderId, jdbcType=VARCHAR}
+					                   , #{item.description, jdbcType=VARCHAR}
+					                   , #{item.delYn, jdbcType=VARCHAR}
+					                   , #{item.valMsg, jdbcType=VARCHAR}
+					                   , #{item.multiMsg, jdbcType=VARCHAR}
+					                   , #{item.userId, jdbcType=VARCHAR}
+					                   , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+					                   )
         </foreach>
     </insert>
     <select id="proc_customBtn21-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_STOCK_PKG.SP_UPSERT_DO_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-	                                         , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-	                                         , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-	                                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}		
-	                                         , 'CR'									  
-	                                         , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
+        { CALL MOM_SO_PKG.SP_UPSERT_SHIP_ORDER_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+		                                          , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+		                                          , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+		                                          , #{divisionCd,  jdbcType=VARCHAR, mode=IN}		
+		                                          , 'CR'									  
+		                                          , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>    
 </mapper>    

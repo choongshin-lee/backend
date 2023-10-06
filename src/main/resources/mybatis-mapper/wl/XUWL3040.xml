@@ -6,81 +6,157 @@
 		    SELECT A.*
 		    FROM   (
 		</if>
-		            SELECT MWM.COMPANY_CD
-					     , MWM.DIVISION_CD
-					     , MWM.RECEIPT_ID
-					     , MWM.RECEIPT_NM
-					     , MWD.SEQ
-					     , MWD.RECEIPT_DETAIL_ID 
-					     , MWM.WAREHOUSE_CD       AS RECEIPT_WAREHOUSE_CD
-					     , MWH.WAREHOUSE_NM	      AS RECEIPT_WAREHOUSE_NM	
-					     , MWM.TO_WAREHOUSE_CD    AS REQUEST_WAREHOUSE_CD
-                         , MWT.WAREHOUSE_NM       AS REQUEST_WAREHOUSE_NM	
-					     , MWM.STATE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, 'WM0002', MWM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
-					     , MWD.ITEM_ID
+		            SELECT A.COMPANY_CD
+					     , A.DIVISION_CD
+					     , A.RECEIPT_ID
+					     , A.RECEIPT_NM
+					     , A.SEQ
+					     , A.RECEIPT_DETAIL_ID 
+					     , A.REQUEST_WAREHOUSE_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(A.COMPANY_CD, A.DIVISION_CD,A.REQUEST_WAREHOUSE_CD) FROM DUAL) AS REQUEST_WAREHOUSE_NM
+					     , A.RECEIPT_WAREHOUSE_CD 
+					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(A.COMPANY_CD, A.DIVISION_CD,A.RECEIPT_WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
+					     , A.STATE  
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'WM0002', A.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM  
+					     , A.ITEM_ID 
 					     , MI.ITEM_NM
 					     , MI.ITEM_SPEC
 					     , MI.ITEM_TYPE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-					     , MWD.RECEIPT_QTY
-					     , MWD.INOUT_UOM      AS RECEIPT_UOM
-					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MWD.COMPANY_CD, MWD.DIVISION_CD, MWD.INOUT_UOM) FROM DUAL) AS RECEIPT_UOM_NM
-					     , MWD.CONVERSION_QTY
-					     , MWD.CONVERSION_UOM
-					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MWD.COMPANY_CD, MWD.DIVISION_CD, MWD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
-					     , MWD.REFERENCE_NO
-					     , MWD.REFERENCE_DTL_NO
-					     , MWD.IO_TYPE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MWD.COMPANY_CD, MWD.DIVISION_CD, MWD.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
-					     , MWM.IO_RECEIPT_TYPE
-                         , (SELECT MOM_COMMON_PKG.FN_GET_WH_IO_RECEIPT_TYPE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.IO_RECEIPT_TYPE) FROM DUAL)  AS IO_RECEIPT_TYPE_NM
-					     , TO_CHAR(MWM.CONFIRM_DATE ,'YYYY-MM-DD HH24:MI:SS')   AS CONFIRM_DATE
-					     , MWM.CONFIRM_USER_NO
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
-					     , TO_CHAR(MWM.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS CREATE_DATE
-					     , MWM.CREATE_BY
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
-					     , TO_CHAR(MWM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS UPDATE_DATE
-					     , MWM.UPDATE_BY
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-					     , ROWIDTOCHAR(MWM.ROWID)            AS KEY_ID
+					     , A.ISSUE_REQUEST_QTY
+					     , A.ISSUE_UOM
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.ISSUE_UOM) FROM DUAL) AS ISSUE_UOM_NM
+					     , A.DO_NO  
+					     , A.DELIVERY_ORDER_ID
+					     , A.IO_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(A.COMPANY_CD, A.DIVISION_CD, A.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
+					     , A.CONFIRM_DATE
+					     , A.CONFIRM_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(A.COMPANY_CD, A.DIVISION_CD, A.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
+					     , A.CREATE_DATE
+					     , A.CREATE_BY
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(A.COMPANY_CD, A.DIVISION_CD, A.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
+					     , A.UPDATE_DATE
+					     , A.UPDATE_BY
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(A.COMPANY_CD, A.DIVISION_CD, A.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+					     , A.RECEIPT_DETAIL_ID||'-'||NVL(A.ITEM_INOUT_ID, '*****')            AS KEY_ID
 					     , COUNT(*) OVER()                               AS TOTAL_COUNT
-					     , ROW_NUMBER() OVER(PARTITION BY MWD.COMPANY_CD, MWD.DIVISION_CD ORDER BY MWD.RECEIPT_DETAIL_ID) AS ROW_CNT
-					FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
-					     , MOM_WAREHOUSE_RECEIPT_DTL MWD
-					     , MOM_WAREHOUSE MWH
-					     , MOM_WAREHOUSE MWT
-					     , MOM_ITEM MI
-					WHERE  MWM.COMPANY_CD      = MWD.COMPANY_CD
-					AND    MWM.DIVISION_CD     = MWD.DIVISION_CD
-					AND    MWM.RECEIPT_ID      = MWD.RECEIPT_ID
-					AND    MWM.COMPANY_CD      = MWH.COMPANY_CD
-					AND    MWM.DIVISION_CD     = MWH.DIVISION_CD
-					AND    MWM.WAREHOUSE_CD    = MWH.WAREHOUSE_CD
-					AND    MWM.COMPANY_CD      = MWT.COMPANY_CD
-					AND    MWM.DIVISION_CD     = MWT.DIVISION_CD
-					AND    MWM.TO_WAREHOUSE_CD = MWT.WAREHOUSE_CD
-					AND    MWD.COMPANY_CD      = MI.COMPANY_CD
-					AND    MWD.DIVISION_CD     = MI.DIVISION_CD
-					AND    MWD.ITEM_ID         = MI.ITEM_ID
-					AND    MWM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
-					AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
-					AND    MWM.IO_RECEIPT_TYPE = 'WMO'
-					AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					<if test="receiptId != null and receiptId != ''">
-					AND    (UPPER(MWM.RECEIPT_ID) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%')   
-					</if>
-					<if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
-					AND    MWM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}        
-					</if>
-					AND    MWM.WAREHOUSE_CD IN (SELECT MUM.WAREHOUSE_CD
-												FROM   MOM_USER_WH_IO_RECEIPT_MAP  MUM
-												WHERE  MUM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
-					                            AND    MUM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
-					  							AND    MUM.USER_NO         = #{userId, jdbcType=VARCHAR}	
-												AND    MUM.IO_RECEIPT_TYPE =  'WMO'
-												AND    MUM.USE_YN 		   = 'Y')
+					     , ROW_NUMBER() OVER(PARTITION BY A.COMPANY_CD, A.DIVISION_CD ORDER BY A.RECEIPT_DETAIL_ID) AS ROW_CNT
+					     , A.LOT_ID
+					     , A.LOCATION_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(A.COMPANY_CD, A.DIVISION_CD, A.LOCATION_CD) FROM DUAL)   AS LOCATION_NM
+					     , A.ISSUE_QTY
+					     , A.ISSUE_DATE
+					     , A.ITEM_INOUT_ID
+					FROM   (SELECT MWM.COMPANY_CD
+					             , MWM.DIVISION_CD
+					             , MWM.RECEIPT_ID
+					             , MWM.RECEIPT_NM
+					             , MWD.SEQ
+					             , MWD.RECEIPT_DETAIL_ID 
+					             , MWM.WAREHOUSE_CD       AS RECEIPT_WAREHOUSE_CD
+					             , MWM.TO_WAREHOUSE_CD    AS REQUEST_WAREHOUSE_CD 
+					             , MWM.STATE    
+					             , MWD.ITEM_ID 
+					             , MWD.RECEIPT_QTY            AS ISSUE_REQUEST_QTY   
+					             , MWD.INOUT_UOM              AS ISSUE_UOM
+					             , MWD.REFERENCE_NO           AS DO_NO  
+					             , MWD.REFERENCE_DTL_NO       AS DELIVERY_ORDER_ID
+					             , MWD.IO_TYPE
+					             , TO_CHAR(MWM.CONFIRM_DATE  ,'YYYY-MM-DD')   AS CONFIRM_DATE
+					             , MWM.CONFIRM_USER_NO     AS CONFIRM_USER_NO
+					             , TO_CHAR(MWM.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS CREATE_DATE
+					             , MWM.CREATE_BY
+					             , TO_CHAR(MWM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS UPDATE_DATE
+					             , MWM.UPDATE_BY
+					             , MSI.LOT_ID
+					             , MSI.LOCATION_CD
+					             , MSI.QTY                                   AS ISSUE_QTY
+					             , TO_CHAR(MWM.ISSUE_DATE ,'YYYY-MM-DD')     AS ISSUE_DATE
+					             , MSI.ITEM_INOUT_ID  
+					        FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
+					             , MOM_WAREHOUSE_RECEIPT_DTL MWD
+					             , MOM_REFERENCE_INOUT_MAPPING MRM
+					             , MOM_STOCK_INOUT             MSI
+					        WHERE  MWM.COMPANY_CD      = MWD.COMPANY_CD
+					        AND    MWM.DIVISION_CD     = MWD.DIVISION_CD
+					        AND    MWM.RECEIPT_ID      = MWD.RECEIPT_ID     
+					        AND    MWD.COMPANY_CD      = MRM.COMPANY_CD
+					        AND    MWD.DIVISION_CD     = MRM.DIVISION_CD
+					        AND    MWD.RECEIPT_DETAIL_ID = MRM.REFERENCE_DTL_NO
+					        AND    MRM.COMPANY_CD        = MSI.COMPANY_CD
+					        AND    MRM.DIVISION_CD       = MSI.DIVISION_CD
+					        AND    MRM.ITEM_INOUT_ID     = MSI.ITEM_INOUT_ID
+					        AND    MRM.REFERENCE_TYPE    = 'WR-R'
+					        AND    MWM.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
+					        AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
+					        AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					        <if test="receiptId != null and receiptId != ''">
+					        AND    (UPPER(MWM.RECEIPT_ID) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%')   
+					        </if>
+					        <if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
+					        AND    MWM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}        
+					        </if>
+					        AND    MWM.WAREHOUSE_CD IN (SELECT MUM.WAREHOUSE_CD
+					                                    FROM   MOM_USER_WH_IO_RECEIPT_MAP  MUM
+					                                    WHERE  MUM.COMPANY_CD      = 'CALCES'
+					                                    AND    MUM.DIVISION_CD     = 'DEV1' 
+					                                    AND    MUM.USER_NO         = 'super'  
+					                                    AND    MUM.IO_RECEIPT_TYPE =  'WMI'
+					                                    AND    MUM.USE_YN        = 'Y')
+					        UNION ALL
+					        SELECT MWM.COMPANY_CD
+					             , MWM.DIVISION_CD
+					             , MWM.RECEIPT_ID
+					             , MWM.RECEIPT_NM
+					             , MWD.SEQ
+					             , MWD.RECEIPT_DETAIL_ID 
+					             , MWM.WAREHOUSE_CD       AS RECEIPT_WAREHOUSE_CD
+					             , MWM.TO_WAREHOUSE_CD    AS REQUEST_WAREHOUSE_CD 
+					             , MWM.STATE    
+					             , MWD.ITEM_ID 
+					             , MWD.RECEIPT_QTY            AS ISSUE_REQUEST_QTY   
+					             , MWD.INOUT_UOM              AS ISSUE_UOM
+					             , MWD.REFERENCE_NO           AS DO_NO  
+					             , MWD.REFERENCE_DTL_NO       AS DELIVERY_ORDER_ID
+					             , MWD.IO_TYPE
+					             , TO_CHAR(MWM.CONFIRM_DATE ,'YYYY-MM-DD')   AS CONFIRM_DATE
+					             , MWM.CONFIRM_USER_NO
+					             , TO_CHAR(MWM.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS CREATE_DATE
+					             , MWM.CREATE_BY
+					             , TO_CHAR(MWM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS UPDATE_DATE
+					             , MWM.UPDATE_BY
+					             , NULL                AS LOT_ID
+					             , NULL                AS LOCATION_CD
+					             , NULL                AS ISSUE_QTY
+					             , NULL                AS ISSUE_DATE
+					              ,NULL                AS ITEM_INOUT_ID 
+					        FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
+					             , MOM_WAREHOUSE_RECEIPT_DTL MWD
+					        WHERE  MWM.COMPANY_CD      = MWD.COMPANY_CD
+					        AND    MWM.DIVISION_CD     = MWD.DIVISION_CD
+					        AND    MWM.RECEIPT_ID      = MWD.RECEIPT_ID     
+					        AND    MWM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+					        AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
+					        AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					        AND    MWM.ISSUE_DATE IS NULL
+					        <if test="receiptId != null and receiptId != ''">
+					        AND    (UPPER(MWM.RECEIPT_ID) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%')   
+					        </if>
+					        <if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
+					        AND    MWM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}        
+					        </if>
+					        AND    MWM.WAREHOUSE_CD IN (SELECT MUM.WAREHOUSE_CD
+					                                    FROM   MOM_USER_WH_IO_RECEIPT_MAP  MUM
+					                                    WHERE  MUM.COMPANY_CD      = 'CALCES'
+					                                    AND    MUM.DIVISION_CD     = 'DEV1' 
+					                                    AND    MUM.USER_NO         = 'super'  
+					                                    AND    MUM.IO_RECEIPT_TYPE =  'WMI'
+					                                    AND    MUM.USE_YN        = 'Y')    )  A
+					     , MOM_ITEM MI                                    
+					WHERE  A.COMPANY_CD      = MI.COMPANY_CD
+					AND    A.DIVISION_CD     = MI.DIVISION_CD
+					AND    A.ITEM_ID         = MI.ITEM_ID   
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}

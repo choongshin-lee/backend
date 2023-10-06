@@ -14,17 +14,15 @@
 					     , MW.WAREHOUSE_NM        AS ISSUE_WAREHOUSE_NM
 					     , MWM.TO_WAREHOUSE_CD    AS RECEIPT_WAREHOUSE_CD 
                          , MWT.WAREHOUSE_NM       AS RECEIPT_WAREHOUSE_NM 
-					     , MWM.WAREHOUSE_USER_NO  AS RECEIPT_USER_NO
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.WAREHOUSE_USER_NO) FROM DUAL ) AS RECEIPT_USER_NM
-					     , MWM.IO_RECEIPT_TYPE    AS INPUT_RECEIPT_TYPE 
-                         , (SELECT MOM_COMMON_PKG.FN_GET_WH_IO_RECEIPT_TYPE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.IO_RECEIPT_TYPE) FROM DUAL)  AS INPUT_RECEIPT_TYPE_NM
+					     , 'WMI'   AS INPUT_RECEIPT_TYPE 
+                         , (SELECT MOM_COMMON_PKG.FN_GET_WH_IO_RECEIPT_TYPE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, 'WMI') FROM DUAL)  AS INPUT_RECEIPT_TYPE_NM
 					     , MWM.STATE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, 'WM0002', MWM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_USE_YN(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.TO_WAREHOUSE_CD) FROM DUAL) AS LOCATION_USE_YN
 					     , MWM.DESCRIPTION
-					     , MWM.UPDATE_BY      AS UPDATE_USER_NO
-					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-					     , TO_CHAR(MWM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+					     , MWM.ISSUE_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.ISSUE_USER_NO) FROM DUAL ) AS ISSUE_USER_NM
+					     , TO_CHAR(MWM.ISSUE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS ISSUE_DATE
 					     , TO_CHAR(MWM.CREATE_DATE ,'YYYY-MM-DD') AS CREATE_DATE
 					     , ROWIDTOCHAR(MWM.ROWID)            AS KEY_ID
 					     , COUNT(*) OVER()   AS TOTAL_COUNT
@@ -40,9 +38,8 @@
 		            AND    MWM.TO_WAREHOUSE_CD = MWT.WAREHOUSE_CD
 					AND    MWM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 					AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
-					AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					AND    MWM.STATE           = 'WRG'
-					AND    MWM.IO_RECEIPT_TYPE = 'WMI'
+					AND    MWM.ISSUE_DATE  BETWEEN TO_DATE(#{issueDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{issueDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					AND    MWM.STATE           = 'WRI'
 					AND    EXISTS ( SELECT '*'
 			                        FROM   MOM_WAREHOUSE_RECEIPT_DTL MWD
 			                        WHERE  MWD.COMPANY_CD   = MWM.COMPANY_CD
@@ -64,74 +61,72 @@
 		</if>               
     </select> 
     <select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
-		SELECT A.*
-		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(A.COMPANY_CD, A.DIVISION_CD, A.LOCATION_CD) FROM DUAL ) AS LOCATION_NM 
-		FROM  ( SELECT MLD.COMPANY_CD
-		             , MLD.DIVISION_CD
-		             , MLD.RECEIPT_ID
-		             , MLD.SEQ
-		             , MLD.IO_TYPE
-		             , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
-		             , MLD.ITEM_ID
-		             , MI.ITEM_NM
-		             , MI.ITEM_SPEC
-		             , MI.ITEM_TYPE
-		             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-		             , MLD.INOUT_UOM 
-		             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.INOUT_UOM) FROM DUAL) AS INOUT_UOM_NM 
-		             , MLD.RECEIPT_QTY
-		             , MLD.CONVERSION_UOM     AS RECEIPT_UOM 
-		             , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.CONVERSION_UOM) FROM DUAL) AS RECEIPT_UOM_NM 
-		             , MLD.CONVERSION_QTY
-		             , MLD.REFERENCE_NO
-		             , MLD.REFERENCE_DTL_NO
-		             , MLD.RECEIPT_DETAIL_ID
-		             , MLD.FROM_RECEIPT_ID
-		             , MLD.FROM_RECEIPT_DTL_ID
-		             , MWI.WAREHOUSE_USE_YN
-		             , (SELECT MII.LOT_ID
-		                FROM   MOM_ITEM_INOUT MII
-		                WHERE  MII.COMPANY_CD       = MLD.COMPANY_CD
-		                AND    MII.DIVISION_CD      = MLD.DIVISION_CD
-		                AND    MII.REFERENCE_DTL_NO = MLD.FROM_RECEIPT_DTL_ID )   AS LOT_ID
-		             , CASE WHEN MWI.WAREHOUSE_USE_YN = 'Y' THEN
-		                   (SELECT MLI.LOGISTICS_UNIT_CD
-		                    FROM   MOM_LOCATION_ITEM_INOUT MLI
-		                    WHERE  MLI.COMPANY_CD       = MLD.COMPANY_CD
-		                    AND    MLI.DIVISION_CD      = MLD.DIVISION_CD
-		                    AND    MLI.REFERENCE_DTL_NO = MLD.FROM_RECEIPT_DTL_ID)
-		               ELSE  ''
-		               END   AS LOGISTICS_UNIT_CD  
-		             , CASE WHEN MWI.WAREHOUSE_USE_YN = 'Y' THEN
-		                   (SELECT ML.LOCATION_CD
-		                    FROM   MOM_LOCATION ML
-		                    WHERE  ML.COMPANY_CD      = MLM.COMPANY_CD
-		                    AND    ML.DIVISION_CD     = MLM.DIVISION_CD
-		                    AND    ML.WAREHOUSE_CD    = MLM.TO_WAREHOUSE_CD
-		                    AND    ML.LOGISTIC_USE_CD = 'RS')
-		               ELSE ''
-		               END  AS LOCATION_CD
-		             , MLD.DESCRIPTION
-		             , MLD.UPDATE_BY      AS UPDATE_USER_NO
-		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MLD.COMPANY_CD, MLD.DIVISION_CD, MLD.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
-		             , TO_CHAR(MLD.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
-		             , ROWIDTOCHAR(MLD.ROWID)            AS KEY_ID
-		        FROM   MOM_WAREHOUSE_RECEIPT_MST  MLM
-		            ,  MOM_WAREHOUSE_RECEIPT_DTL  MLD
-		            ,  MOM_WAREHOUSE MWI
-		            ,  MOM_ITEM MI
-		        WHERE  MLM.COMPANY_CD      = MLD.COMPANY_CD
-		        AND    MLM.DIVISION_CD     = MLD.DIVISION_CD
-		        AND    MLM.RECEIPT_ID      = MLD.RECEIPT_ID
-		        AND    MLM.COMPANY_CD      = MWI.COMPANY_CD
-		        AND    MLM.DIVISION_CD     = MWI.DIVISION_CD
-		        AND    MLM.TO_WAREHOUSE_CD = MWI.WAREHOUSE_CD
-		        AND    MLD.COMPANY_CD      = MI.COMPANY_CD
-		        AND    MLD.DIVISION_CD     = MI.DIVISION_CD
-		        AND    MLD.ITEM_ID         = MI.ITEM_ID    
-		        AND    MLD.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
-		        AND    MLD.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}
-		        AND    MLD.RECEIPT_ID      = #{receiptId, jdbcType=VARCHAR}   ) A
+		SELECT A.COMPANY_CD
+		     , A.DIVISION_CD
+		     , A.RECEIPT_ID
+		     , A.SEQ
+		     , A.IO_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(A.COMPANY_CD, A.DIVISION_CD, A.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
+		     , A.WAREHOUSE_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(A.COMPANY_CD, A.DIVISION_CD, A.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
+		     , A.LOCATION_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_LOCATION_NAME(A.COMPANY_CD, A.DIVISION_CD, A.LOCATION_CD) FROM DUAL)   AS LOCATION_NM
+		     , A.ITEM_ID
+		     , A.ITEM_NM
+		     , A.ITEM_SPEC
+		     , A.ITEM_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(A.COMPANY_CD, A.DIVISION_CD, 'MD0002', A.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+		     , A.LOT_ID
+		     , A.HCN_CD
+		     , A.RECEIPT_UOM
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.RECEIPT_UOM) FROM DUAL) AS RECEIPT_UOM_NM
+		     , A.RECEIPT_QTY
+		     , A.ALLOCATE_QTY
+		     , A.RECEIPT_DETAIL_ID 
+		     , A.SOURCE_ID      
+		     , A.REFERENCE_NO
+		     , A.REFERENCE_DTL_NO
+		     , A.DESCRIPTION
+		     , A.KEY_ID
+		FROM   (SELECT MWD.COMPANY_CD
+				     , MWD.DIVISION_CD
+				     , MWD.RECEIPT_ID
+				     , MWD.SEQ
+				     , MWD.IO_TYPE
+				     , MS.ITEM_ID
+				     , MI.ITEM_NM
+				     , MI.ITEM_SPEC
+				     , MI.ITEM_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+				     , MS.LOT_ID
+				     , MS.HCN_CD
+				     , MWD.INOUT_UOM  AS RECEIPT_UOM
+				     , MWD.RECEIPT_QTY
+				     , MSA.ALLOCATE_QTY
+				     , MWD.RECEIPT_DETAIL_ID 
+				     , MSA.SOURCE_ID      
+				     , MWD.REFERENCE_NO
+				     , MWD.REFERENCE_DTL_NO
+				     , MWD.DESCRIPTION
+				     , MWD.RECEIPT_DETAIL_ID||'_'||MSA.ITEM_STOCK_ID            AS KEY_ID
+				     , #{receiptWarehouseCd , jdbcType=VARCHAR}  		        AS WAREHOUSE_CD
+				     , (SELECT MOM_WMS_PKG.FN_GET_DEFAULT_LOCATION(MWD.COMPANY_CD, MWD.DIVISION_CD, #{receiptWarehouseCd , jdbcType=VARCHAR}) FROM DUAL ) AS LOCATION_CD
+				FROM   MOM_WAREHOUSE_RECEIPT_DTL MWD
+				     ,  MOM_ITEM MI
+				     , MOM_STOCK_ALLOCATE MSA
+				     , MOM_STOCK MS
+				WHERE  MWD.COMPANY_CD        = MI.COMPANY_CD
+				AND    MWD.DIVISION_CD       = MI.DIVISION_CD
+				AND    MWD.ITEM_ID           = MI.ITEM_ID
+				AND    MWD.COMPANY_CD        = MSA.COMPANY_CD
+				AND    MWD.DIVISION_CD       = MSA.DIVISION_CD
+				AND    MWD.RECEIPT_DETAIL_ID = MSA.SOURCE_ID     
+				AND    MSA.COMPANY_CD        = MS.COMPANY_CD
+				AND    MSA.DIVISION_CD       = MS.DIVISION_CD
+				AND    MSA.ITEM_STOCK_ID     = MS.ITEM_STOCK_ID
+				AND    MWD.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
+				AND    MWD.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}
+				AND    MWD.RECEIPT_ID        = #{receiptId, jdbcType=VARCHAR} ) A
 	</select>  
     <delete id="remove_createBtn1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_WAREHOUSE_RECEIPT_MST
@@ -184,5 +179,46 @@
                                                          , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
                                                          , 'WMI'
                                                          , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
-    </select>     	
+    </select> 
+        <delete id="remove_createBtn2" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_TO_WH_RECEIPT
+          <where>
+              <foreach collection="list" item="item" open="" close="" separator="OR">
+            (       COMPANY_CD      = #{item.companyCd, jdbcType=VARCHAR}
+               AND  DIVISION_CD     = #{item.divisionCd, jdbcType=VARCHAR}
+               AND  CREATE_BY       = #{item.userId, jdbcType=VARCHAR}
+               AND  IO_RECEIPT_TYPE = 'WMI'  
+            )
+              </foreach>
+          </where>
+    </delete>  
+    <insert id="create_createBtn2" parameterType="java.util.List">
+        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+        INTO MOM_PROC_TO_WH_RECEIPT( COMPANY_CD
+                                   , DIVISION_CD
+                                   , RECEIPT_ID
+                                   , DESCRIPTION
+                                   , VAL_MSG
+                                   , MULTI_MSG
+                                   , CREATE_BY
+                                   , CREATE_DATE
+                                   )
+        VALUES                     ( #{item.companyCd, jdbcType=VARCHAR}
+                                   , #{item.divisionCd, jdbcType=VARCHAR}
+                                   , #{item.receiptId, jdbcType=VARCHAR}
+                                   , #{item.description, jdbcType=VARCHAR}
+                                   , #{item.valMsg, jdbcType=VARCHAR}
+                                   , #{item.multiMsg, jdbcType=VARCHAR}
+                                   , #{item.userId, jdbcType=VARCHAR}
+                                   , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+                                   )     
+        </foreach>
+    </insert>
+    <select id="proc_createBtn2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WMS_PKG.SP_TO_WAREHOUSE_RECEIPT( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                  , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                  , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                  , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                                  , #{userId,      jdbcType=VARCHAR, mode=IN} )}                    
+    </select>       	
 </mapper>    
