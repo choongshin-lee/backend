@@ -69,7 +69,7 @@
 	    AND    MPM.PO_TYPE       = MPC.PO_TYPE 
 	    AND    MPM.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
 	    AND    MPM.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}
-	    AND    MPM.PO_REFERENCE_TYPE IN ('10,'20')
+	    AND    MPM.PO_REFERENCE_TYPE IN ('10','20')
 	    AND    MPM.DO_INVOICE_YN = 'Y'
 	    AND    MPC.MARKET_CD     = 'D'
 	    AND    MPD.STATE         = 'POR'  
