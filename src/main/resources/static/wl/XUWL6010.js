@@ -11,10 +11,6 @@ var VIEW= {
 	event: function(e) {
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
-		if(index ==0 && btnId =='copyBtn'){	
-			  $('#receiptIdDP1').val('');
-			  $('#receiptNmDP1').val('');
-		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         if(index ==0){                                            
@@ -27,10 +23,10 @@ var VIEW= {
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {receiptId:e.item['receiptId']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {packingId:e.item['packingId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {receiptId:e.item['receiptId'],referenceNo:e.item['deliveryRequestNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(2, {packingId:e.item['packingId'],referenceNo:e.item['shippingNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
@@ -42,18 +38,25 @@ var VIEW= {
                     result.result = 'WARN';
                     return;
                 }
-                $('#issueWarehouseCdSP21').val(checkItem[0]['receiptWarehouseCd']);
-                $('#requestWarehouseCdSP21').val(checkItem[0]['requestWarehouseCd']);
-                $('#drNoSP21').val('');
-                $('#issueWarehouseCdSP21').jqxComboBox({disabled: true});
-                $('#requestWarehouseCdSP21').jqxComboBox({disabled: true});
+                $('#customerCdSP21').val(checkItem[0]['customerCd']);
+                $('#destinationCdSP21').val(checkItem[0]['destinationCd']);
+                $('#forwarderCdSP21').val(checkItem[0]['forwarderCd']);
+                $('#notifyPartyCdSP21').val(checkItem[0]['notifyPartyCd']);
+                $('#loadingPlaceCdSP21').val(checkItem[0]['loadingPlaceCd']);
+                $('#destinationPortCdSP21').val(checkItem[0]['destinationPortCd']);
+                $('#customerCdSP21').jqxComboBox({disabled: true});
+                $('#destinationCdSP21').jqxComboBox({disabled: true});
+                $('#forwarderCdSP21').jqxComboBox({disabled: true});
+                $('#notifyPartyCdSP21').jqxComboBox({disabled: true});
+                $('#loadingPlaceCdSP21').jqxComboBox({disabled: true});
+                $('#destinationPortCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 20){         
             let checkItem = widget.getCheckedRowItems(widget.grid[0]);
             if(action='C'&& btnId == 'customBtn21-1'){ 
                 for(var i=0,max=param.length; i<max;i++){
-                    param[i]['receiptId'] = checkItem[0]['receiptId'];
+                    param[i]['packingId'] = checkItem[0]['packingId'];
                 }
             }
         }
@@ -65,6 +68,6 @@ $(document).ready(function(event){
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);	
 	momWidget.init(3, menuId, VIEW);
-	momWidget.gridPopup.init(2,21,1,'XUDG0480', VIEW);  
+	momWidget.gridPopup.init(2,21,1,'XUDG0590', VIEW);  
 	VIEW.init();
 });

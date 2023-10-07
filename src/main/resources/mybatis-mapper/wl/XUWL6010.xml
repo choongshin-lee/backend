@@ -38,7 +38,7 @@
 					AND    MPM.CUSTOMER_CD     = MPC.PARTNER_CD    
 					AND    MPM.COMPANY_CD      = MPD.COMPANY_CD
 					AND    MPM.DIVISION_CD     = MPD.DIVISION_CD
-					AND    MPM.DESTINATION_CD  = MPD.CURRENCY_CD 
+					AND    MPM.DESTINATION_CD  = MPD.PARTNER_CD 
 					AND    MPM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 					AND    MPM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}  
 					AND    MPM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
@@ -58,10 +58,10 @@
 	    SELECT A.COMPANY_CD
 		     , A.DIVISION_CD
 		     , A.PACKING_ID
-		     , A.SEQ
 		     , A.SHIPPING_NO
 		     , A.SHIPPING_ORDER_ID
 		     , MSM.SHIPPING_NM
+		     , A.PACKING_CONTAINER
 		     , A.ITEM_ID
 		     , A.SHIPPING_UOM
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(A.COMPANY_CD, A.DIVISION_CD, A.SHIPPING_UOM) FROM DUAL) AS SHIPPING_UOM_NM 
@@ -69,12 +69,12 @@
 		     , TO_CHAR(MSM.SHIPPING_DUE_DATE  ,'YYYY-MM-DD') AS SHIPPING_DUE_DATE
 		     , MSM.DESCRIPTION
 		     , A.SHIPPING_ORDER_ID         AS KEY_ID 
-		FROM   (SELECT MPD.COMPANY_CD
+		FROM   (SELECT DISTINCT MPD.COMPANY_CD
 		             , MPD.DIVISION_CD
 		             , MPD.PACKING_ID
-		             , MPD.SEQ
 		             , MSD.SHIPPING_NO
 		             , MSD.SHIPPING_ORDER_ID
+		             , MPD.PACKING_CONTAINER
 		             , MSD.ITEM_ID
 		             , MSD.SHIPPING_UOM
 		             , MSD.QTY
@@ -188,7 +188,6 @@
 	        <foreach collection="list" item="item" open="" close="" separator="OR">
 	        (       COMPANY_CD       = #{item.companyCd, jdbcType=VARCHAR}
 	           AND  DIVISION_CD      = #{item.divisionCd, jdbcType=VARCHAR}
-	           AND  IO_RECEIPT_TYPE  = 'WMO'
 	           AND  CREATE_BY        = #{item.userId, jdbcType=VARCHAR}
 	        )
 	        </foreach>
@@ -212,8 +211,8 @@
 			                        , #{item.divisionCd, jdbcType=VARCHAR} 
 			                        , #{item.packingId, jdbcType=VARCHAR}
 			                        , #{item.packingDetailId, jdbcType=VARCHAR}
-				                    , #{item.referencNo, jdbcType=VARCHAR}
-				                    , #{item.referenceDtlNo, jdbcType=VARCHAR}
+				                    , #{item.shippingNo, jdbcType=VARCHAR}
+				                    , #{item.shippingOrderId, jdbcType=VARCHAR}
 				                    , #{item.description, jdbcType=VARCHAR}
 				                    , 'Y'
 				                    , #{item.valMsg, jdbcType=VARCHAR}
@@ -229,5 +228,50 @@
                                                 , #{companyCd,   jdbcType=VARCHAR, mode=IN}
                                                 , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
                                                 , #{userId,      jdbcType=VARCHAR, mode=IN} )}     
+    </select>  
+    <delete id="remove_customBtn2-2" parameterType="java.util.List">
+        DELETE FROM MOM_PROC_PACKING_CONTAINER
+        <where>
+	        <foreach collection="list" item="item" open="" close="" separator="OR">
+	        (       COMPANY_CD       = #{item.companyCd, jdbcType=VARCHAR}
+	           AND  DIVISION_CD      = #{item.divisionCd, jdbcType=VARCHAR}
+	           AND  CREATE_BY        = #{item.userId, jdbcType=VARCHAR}
+	        )
+	        </foreach>
+        </where>
+   </delete>  
+   <insert id="create_customBtn2-2" parameterType="java.util.List">
+       <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
+	       INTO MOM_PROC_PACKING_CONTAINER( COMPANY_CD
+										  , DIVISION_CD
+										  , PACKING_ID
+										  , REFERENCE_DTL_NO
+										  , PACKING_CONTAINER
+										  , DESCRIPTION
+										  , DEL_YN
+			                              , VAL_MSG
+			                              , MULTI_MSG
+			                              , CREATE_BY
+			                              , CREATE_DATE)
+           VALUES                         ( #{item.companyCd, jdbcType=VARCHAR}  
+					                      , #{item.divisionCd, jdbcType=VARCHAR} 
+					                      , #{item.packingId, jdbcType=VARCHAR}
+					                      , #{item.shippingOrderId, jdbcType=VARCHAR}
+					                      , #{item.packingContainer, jdbcType=VARCHAR}
+						                  , #{item.description, jdbcType=VARCHAR}
+						                  , 'Y'
+						                  , #{item.valMsg, jdbcType=VARCHAR}
+						                  , #{item.multiMsg, jdbcType=VARCHAR}
+						                  , #{item.userId, jdbcType=VARCHAR}
+						                  , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
+						                  )
+        </foreach>
+    </insert>
+    <select id="proc_customBtn2-2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+        { CALL MOM_WMS_PKG.SP_PACKING_CONTAINER_APPLY( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+                                                     , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
+                                                     , #{companyCd,   jdbcType=VARCHAR, mode=IN}
+                                                     , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 
+                                                     , #{userId,      jdbcType=VARCHAR, mode=IN} )}     
     </select>    	
 </mapper>    
