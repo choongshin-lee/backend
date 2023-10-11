@@ -22,6 +22,8 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.LOADING_PLACE_CD) FROM DUAL) AS LOADING_PLACE_NM
 					     , MPM.DESTINATION_PORT_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.DESTINATION_PORT_CD) FROM DUAL) AS DESTINATION_PORT_NM
+					     , MPM.PACKING_CNT
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'SM0033', MPM.PACKING_CNT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PACKING_CNT_NM
 					     , MPM.DESCRIPTION
 					     , MPM.UPDATE_BY      AS UPDATE_USER_NO
 					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
@@ -124,7 +126,8 @@
 		AND    MPD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
 		AND    MPD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
 		AND    MPD.PACKING_ID   = #{packingId, jdbcType=VARCHAR} 
-		AND    MPD.REFERENCE_NO = #{referenceNo, jdbcType=VARCHAR}       
+		AND    MPD.REFERENCE_NO = #{referenceNo, jdbcType=VARCHAR}    
+		AND    MPD.REFERENCE_DTL_NO = #{referenceDtlNo, jdbcType=VARCHAR}     
 	</select>  
     <delete id="remove_createBtn1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_PACKING_MST
@@ -149,6 +152,7 @@
                                  , NOTIFY_PARTY_CD
                                  , LOADING_PLACE_CD
                                  , DESTINATION_PORT_CD
+                                 , PACKING_CNT
                                  , DESCRIPTION
                                  , DEL_YN
                                  , VAL_MSG
@@ -166,6 +170,7 @@
                                  , #{item.notifyPartyCd, jdbcType=VARCHAR}
                                  , #{item.loadingPlaceCd, jdbcType=VARCHAR}
                                  , #{item.destinationPortCd, jdbcType=VARCHAR}
+                                 , #{item.packingCnt, jdbcType=NUMERIC}
                                  , #{item.description, jdbcType=VARCHAR}
                                  , #{item.delYn, jdbcType=VARCHAR}
                                  , #{item.valMsg, jdbcType=VARCHAR}

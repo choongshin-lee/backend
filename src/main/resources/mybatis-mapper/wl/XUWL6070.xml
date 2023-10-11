@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUWL6070">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+		    SELECT A.*
+		    FROM   (
+		</if>
+		            SELECT MPM.COMPANY_CD
+					     , MPM.DIVISION_CD
+					     , MPM.PACKING_ID
+					     , MPM.PACKING_NM
+					     , MPD.SEQ
+					     , MPD.PACKING_DETAIL_ID
+					     , MPM.CUSTOMER_CD
+					     , MPC.PARTNER_NM        AS CUSTOMER_NM
+					     , MPM.DESTINATION_CD
+					     , MPDE.PARTNER_NM        AS DESTINATION_NM
+					     , MPM.FORWARDER_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.FORWARDER_CD) FROM DUAL) AS FORWARDER_NM
+					     , MPM.NOTIFY_PARTY_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.NOTIFY_PARTY_CD) FROM DUAL) AS NOTIFY_PARTY_NM
+					     , MPM.LOADING_PLACE_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.LOADING_PLACE_CD) FROM DUAL) AS LOADING_PLACE_NM
+					     , MPM.DESTINATION_PORT_CD
+					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.DESTINATION_PORT_CD) FROM DUAL) AS DESTINATION_PORT_NM
+					     , MPM.PACKING_CNT
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'SM0033', MPM.PACKING_CNT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PACKING_CNT_NM
+					     , MPD.ITEM_ID
+					     , MI.ITEM_NM
+					     , MI.ITEM_SPEC
+					     , MI.ITEM_TYPE
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+					     , MPD.LOT_ID
+					     , MPD.PACKING_CONTAINER
+					     , (SELECT MOM_COMMON_PKG.FN_GET_ITEM_NAME(MPD.COMPANY_CD,MPD.DIVISION_CD,MPD.PACKING_CONTAINER) FROM DUAL) AS PACKING_CONTAINER_NM 
+					     , MPD.PACKING_UOM  
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.PACKING_UOM) FROM DUAL) AS PACKING_UOM_NM 
+					     , MPD.PACKING_QTY 
+					     , MPD.CONVERSION_UOM      
+					     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM
+					     , MPD.CONVERSION_QTY
+					     , MPM.STATE
+						, (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'WM0013', MPM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+					     , MPD.REFERENCE_NO      AS SHIPPING_NO
+					     , MPD.REFERENCE_DTL_NO  AS SHIPPING_ORDER_ID
+					     , MPM.DESCRIPTION
+					     , MPM.UPDATE_BY      AS UPDATE_USER_NO
+					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, MPM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+					     , TO_CHAR(MPM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+					     , TO_CHAR(MPM.CREATE_DATE ,'YYYY-MM-DD') AS CREATE_DATE
+					     , ROWIDTOCHAR(MPD.ROWID)                 AS KEY_ID
+					     , COUNT(*) OVER()                        AS TOTAL_COUNT
+					     , ROW_NUMBER() OVER(PARTITION BY MPM.COMPANY_CD,MPM.DIVISION_CD ORDER BY MPM.PACKING_ID, MPD.SEQ) AS ROW_CNT
+					FROM   MOM_PACKING_MST MPM
+					     , MOM_PACKING_DTL MPD
+					     , MOM_PARTNER MPC
+						 , MOM_PARTNER MPDE 
+					     ,  MOM_ITEM MI
+					WHERE  MPM.COMPANY_CD      = MPD.COMPANY_CD
+					AND    MPM.DIVISION_CD     = MPD.DIVISION_CD
+					AND    MPM.PACKING_ID      = MPD.PACKING_ID     
+					AND    MPM.COMPANY_CD      = MPC.COMPANY_CD
+					AND    MPM.DIVISION_CD     = MPC.DIVISION_CD
+					AND    MPM.CUSTOMER_CD     = MPC.PARTNER_CD    
+					AND    MPM.COMPANY_CD      = MPDE.COMPANY_CD
+					AND    MPM.DIVISION_CD     = MPDE.DIVISION_CD
+					AND    MPM.DESTINATION_CD  = MPDE.PARTNER_CD 
+					AND    MPD.COMPANY_CD      = MI.COMPANY_CD
+					AND    MPD.DIVISION_CD     = MI.DIVISION_CD
+					AND    MPD.ITEM_ID         = MI.ITEM_ID    
+					<if test="customerCdNm != null and customerCdNm != ''">
+					AND    (UPPER(MPM.CUSTOMER_CD) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MPC.PARTNER_NM) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%')
+					</if> 
+					<if test="destinationCdNm != null and destinationCdNm != ''">
+					AND    (UPPER(MPM.DESTINATION_CD) LIKE '%' || UPPER(#{destinationCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MPDE.PARTNER_NM) LIKE '%' || UPPER(#{destinationCdNm, jdbcType=VARCHAR}) || '%')
+					</if>      
+					<if test="packingId != null and packingId != ''">
+					AND    (UPPER(MPM.PACKING_ID) LIKE '%' || UPPER(#{packingId, jdbcType=VARCHAR}) || '%')   
+					</if>             
+					<if test="shippingNo != null and shippingNo != ''">
+					AND    (UPPER(MPD.REFERENCE_NO) LIKE '%' || UPPER(#{shippingNo, jdbcType=VARCHAR}) || '%')   
+					</if>
+					<if test="itemIdNm != null and itemIdNm != ''">
+					  AND    (UPPER(MPD.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
+					</if>         				
+		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+				       ) A
+				WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+		</if>               
+    </select> 
+</mapper>    

@@ -209,6 +209,9 @@
     <if test="searchKey != null and searchKey != ''">
     AND    ( UPPER(ITEM_ID) LIKE '%' || UPPER(TRIM(#{searchKey, jdbcType=VARCHAR}) || '%' ))
     </if>
+    <if test="itemType != null and itemType != ''">
+    AND    ITEM_TYPE = #{itemType, jdbcType=VARCHAR} 
+    </if>
     <if test="inspectionYn != null and inspectionYn != ''">
     AND    ITEM_ID IN ( SELECT MB.ITEM_ID
 						FROM   MOM_BOR MB
@@ -873,5 +876,17 @@
 	AND    MWC.USE_YN = 'Y'
 	AND    MCR.USE_YN = 'Y'
 	ORDER BY LABEL   
+	</select> 
+	<select id="get_DD00064" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	SELECT MPC.PACKING_CONTAINER  AS CODE 
+	     , MPC.PACKING_CONTAINER   ||'('|| ( SELECT MOM_COMMON_PKG.FN_GET_ITEM_NAME(MPC.COMPANY_CD, MPC.DIVISION_CD, MPC.PACKING_CONTAINER) FROM DUAL )    ||')' AS LABEL
+	FROM   MOM_ITEM_PACKING_CONTAINER MPC
+	WHERE  MPC.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+	AND    MPC.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR} 
+	<if test="itemId != null and itemId != ''">
+	AND    MPC.ITEM_ID        = #{itemId, jdbcType=VARCHAR}
+	</if>
+	AND    MPC.USE_YN      = 'Y'
+	ORDER BY LABEL  
 	</select> 
 </mapper>

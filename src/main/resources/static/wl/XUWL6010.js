@@ -21,18 +21,38 @@ var VIEW= {
             AUIGrid.clearGridData(widget.grid[2]);   
         }
     },
+    cellClickCallInit: function(index,rowIndex,e,) {
+        var item = e.item;	
+	    setTimeout(function(){
+	        mom_ajax('R', 'DD.DD00064', {itemId:item['itemId']}, function(result, data) {
+	            if(result != 'SUCCESS') {
+	                momWidget.splashHide();
+		            return;							     
+	            }	
+	            for(var i=0;i<widget.columnProperty[1].length;i++){
+		            if(widget.columnProperty[1][i]['columnId'] =='packingContainer'){
+			            widget.columnDropdown[1][widget.columnProperty[1][i]['columnId']]=data;
+		            }
+		        }
+            }, undefined, undefined, this, false);	
+	    }, 200);
+	},	
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
 			widget.findBtnClicked(1, {packingId:e.item['packingId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {packingId:e.item['packingId'],referenceNo:e.item['shippingNo']}, true, 'CELLCLICK',menuId,VIEW);
+
+		    
+
+            widget.findBtnClicked(2, {packingId:e.item['packingId'],referenceNo:e.item['shippingNo'],referenceDtlNo:e.item['shippingOrderId']}, true, 'CELLCLICK',menuId,VIEW);		
+		
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
 	    if(index == 1){ // 팝업에서 드롭다운 컬럼선택하여 열기직전 호출
 	        let checkItem = widget.getCheckedRowItems(widget.grid[0]);
-	        if(btnId == 'customGridPopBtn2-2'){ 
+	        if(btnId == 'customGridPopBtn2-1'){ 
                 if(checkItem.length==0){
                     result.msg = '상단에서 접수번호 선택필수!';
                     result.result = 'WARN';
@@ -71,3 +91,33 @@ $(document).ready(function(event){
 	momWidget.gridPopup.init(2,21,1,'XUDG0590', VIEW);  
 	VIEW.init();
 });
+
+$(document).on('click', '#fromLocationCdDP2', function () {
+   var b = $(this).val();;
+   
+   mom_ajax('R', 'DD.DD00036', {warehouseCd: $('#warehouseCdDP2').val()}, function (result, data) {
+       if (result == 'SUCCESS') {
+           if(result != 'SUCCESS') {
+               momWidget.splashHide();
+               $('#fromLocationCdDP2').val(''); 
+                   
+           }
+           var valueITem =''
+           var newItems = [];
+           if(data.length == 0 ){
+               $('#fromLocationCdDP2').val(''); 
+       	       $('#fromLocationCdDP2').jqxComboBox('source', newItems);
+		   }
+		   else {
+                valueITem = data[0].code;
+                for (var i = 0; i < data.length; i++) {
+                    newItems.push(data[i]);
+                }
+                $('#fromLocationCdDP2').val(''); 
+                $('#fromLocationCdDP2').jqxComboBox('source', newItems);
+                $('#fromLocationCdDP2' ).val(valueITem); 
+           }  
+       }
+   });   
+
+})

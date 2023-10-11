@@ -3,7 +3,7 @@ var widget = momWidget;
 var that = undefined;
 var VIEW= {
 	initParam		: undefined, 
-	partnerCd       : undefined,
+	//partnerCd       : undefined,
 	init: function() {	
 		that = this;	
 		that.event();
@@ -78,8 +78,6 @@ var VIEW= {
 
 $(document).ready(function(event){	
 	momSetup.init();
-	//momWidget.init(1, menuId, VIEW,'GRID');	
-	//momWidget.init(2, menuId, VIEW,'GRID');	
 	momWidget.init(1, menuId, VIEW);	
 	momWidget.init(2, menuId, VIEW);
 	//momWidget.gridPopup.init(2,21,1,'XUSM8100', VIEW);
