@@ -42,7 +42,8 @@
 				AND    MSM.DIVISION_CD           = MWH.DIVISION_CD
 				AND    MSM.SHIPPING_WAREHOUSE_CD = MWH.WAREHOUSE_CD  
 				AND    MSM.COMPANY_CD            = #{companyCd, jdbcType=VARCHAR}
-				AND    MSM.DIVISION_CD           = #{divisionCd, jdbcType=VARCHAR}  
+				AND    MSM.DIVISION_CD           = #{divisionCd, jdbcType=VARCHAR}
+				AND    MSM.PROCESS_CD		     = 'CR'    
 				AND    MSM.STATE                 = 'SHG'
 				AND    MSM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 				<if test="shippingNo != null and shippingNo != ''">

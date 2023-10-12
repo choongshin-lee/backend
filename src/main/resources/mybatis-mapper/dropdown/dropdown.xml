@@ -214,21 +214,15 @@
     </if>
     <if test="inspectionYn != null and inspectionYn != ''">
     AND    ITEM_ID IN ( SELECT MB.ITEM_ID
-						FROM   MOM_BOR MB
-						     , MOM_ROUTING_PATH MR
-						     , MOM_OPERATION MO
-						WHERE  MB.COMPANY_CD    = MR.COMPANY_CD
-						AND    MB.DIVISION_CD   = MR.DIVISION_CD
-						AND    MB.ROUTING_ID    = MR.ROUTING_ID    
-						AND    MR.COMPANY_CD    = MO.COMPANY_CD
-						AND    MR.DIVISION_CD   = MO.DIVISION_CD
-						AND    MR.OPERATION_ID  = MO.OPERATION_ID   
-						AND    MR.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
-						AND    MR.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}      
-						AND    MO.INSPECTION_YN = 'Y'
-						AND    MB.USE_YN        = 'Y'
-						AND    MR.USE_YN        = 'Y'
-						AND    MO.USE_YN        = 'Y')
+                        FROM   MOM_BOR MB
+                             , MOM_BOR_PATH MBP
+                        WHERE  MB.COMPANY_CD     = MBP.COMPANY_CD
+                        AND    MB.DIVISION_CD    = MBP.DIVISION_CD
+                        AND    MB.BOR_ID         = MBP.BOR_ID 
+                        AND    MB.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+                        AND    MB.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}       
+                        AND    MB.USE_YN         = 'Y'   
+                        AND    MBP.INSPECTION_YN = 'Y')
     </if>
     ORDER BY LABEL
     </select>

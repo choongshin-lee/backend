@@ -55,14 +55,14 @@ var VIEW= {
 			}
 			else if(btnId == 'customBtn2-2' ){
 			    for(var i=0,max=param.length; i<max;i++){
-				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
-				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
+				   // param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				   // param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
 			    }
 		    }
 			else if(btnId == 'customBtn2-3'){
 			    for(var i=0,max=param.length; i<max;i++){
-				    param[i]['currencyCd'] = checkItem[0]['currencyCd'];
-				    param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
+				    //param[i]['currencyCd'] = checkItem[0]['currencyCd'];
+				    //param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
 			    }
 		    }		    
 		}
