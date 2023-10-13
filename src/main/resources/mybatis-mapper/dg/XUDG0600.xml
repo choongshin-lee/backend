@@ -13,11 +13,11 @@
 				     , MSD.SEQ
 				     , MSD.SHIPPING_ORDER_ID
 				     , MSM.CUSTOMER_CD
-				     , MP.PARTNER_NM                 AS CUSTOMER_NM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.CUSTOMER_CD) FROM DUAL) AS CUSTOMER_NM
 				     , MSM.DESTINATION_CD
 				     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.DESTINATION_CD) FROM DUAL) AS DESTINATION_NM
 				     , MSM.SHIPPING_WAREHOUSE_CD
-				     , MWH.WAREHOUSE_NM               AS SHIPPING_WAREHOUSE_NM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.SHIPPING_WAREHOUSE_CD) FROM DUAL) AS SHIPPING_WAREHOUSE_NM
 				     , MSM.FORWARDER_CD
 				     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.FORWARDER_CD) FROM DUAL) AS FORWARDER_NM
 				     , MSM.NOTIFY_PARTY_CD
@@ -44,6 +44,8 @@
 				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
 				     , MSM.TAX_TYPE
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, 'SM0029', MSM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+				     , MSA.ITEM_STOCK_ID
+				     , MS.LOT_ID
 				     , MSD.ITEM_ID
 				     , MI.ITEM_NM
 				     , MI.ITEM_SPEC
@@ -56,6 +58,8 @@
 				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
 				     , MSD.CONVERSION_QTY
 				     , NVL(MSD.RETURN_QTY, 0) AS RETURN_QTY
+				     , MSA.ALLOCATE_QTY       AS SHIPPING_LOT_QTY  
+                     , NVL(MSA.RETURN_QTY, 0) AS RETURN_LOT_QTY
 				     , MSD.UNIT_PRICE
 				     , MSD.AMOUNT
 				     , MSD.LOCAL_AMOUNT
@@ -77,27 +81,28 @@
 					 , ROW_NUMBER() OVER(PARTITION BY MSD.COMPANY_CD, MSD.DIVISION_CD ORDER BY MSD.SHIPPING_ORDER_ID) AS ROW_CNT
 				FROM   MOM_SHIPPING_ORDER_MST MSM
 				     , MOM_SHIPPING_ORDER_DTL MSD
-				     , MOM_WAREHOUSE MWH
-					 , MOM_PARTNER  MP
+				     , MOM_STOCK_ALLOCATE     MSA
+				     , MOM_STOCK MS
 				     , MOM_ITEM     MI
-				WHERE  MSM.COMPANY_CD            = MSD.COMPANY_CD
-				AND    MSM.DIVISION_CD           = MSD.DIVISION_CD
-				AND    MSM.SHIPPING_NO           = MSD.SHIPPING_NO   
-				AND    MSM.COMPANY_CD            = MWH.COMPANY_CD
-				AND    MSM.DIVISION_CD           = MWH.DIVISION_CD
-				AND    MSM.SHIPPING_WAREHOUSE_CD = MWH.WAREHOUSE_CD
-				AND    MSM.COMPANY_CD            = MP.COMPANY_CD
-				AND    MSM.DIVISION_CD           = MP.DIVISION_CD
-				AND    MSM.CUSTOMER_CD           = MP.PARTNER_CD
-				AND    MSD.COMPANY_CD            = MI.COMPANY_CD
-				AND    MSD.DIVISION_CD           = MI.DIVISION_CD
-				AND    MSD.ITEM_ID               = MI.ITEM_ID   
-				AND    MSM.COMPANY_CD            = #{companyCd, jdbcType=VARCHAR}
-				AND    MSM.DIVISION_CD           = #{divisionCd, jdbcType=VARCHAR}  
-				AND    MSM.PROCESS_CD		     = 'CR'  
-				AND    MSM.STATE   	             = 'SHW'
-				AND    MSM.CUSTOMER_CD	         = #{customerCd, jdbcType=VARCHAR}  
-				AND    MSM.CURRENCY_CD	         = #{currencyCd, jdbcType=VARCHAR}  
+				WHERE  MSM.COMPANY_CD        = MSD.COMPANY_CD
+				AND    MSM.DIVISION_CD       = MSD.DIVISION_CD
+				AND    MSM.SHIPPING_NO       = MSD.SHIPPING_NO   
+				AND    MSD.COMPANY_CD        = MSA.COMPANY_CD
+				AND    MSD.DIVISION_CD       = MSA.DIVISION_CD
+				AND    MSD.SHIPPING_ORDER_ID = MSA.SOURCE_ID
+				AND    MSA.SOURCE_TYPE       = 'SHO'
+				AND    MSA.COMPANY_CD        = MS.COMPANY_CD
+				AND    MSA.DIVISION_CD       = MS.DIVISION_CD
+				AND    MSA.ITEM_STOCK_ID     = MS.ITEM_STOCK_ID  
+				AND    MSD.COMPANY_CD        = MI.COMPANY_CD
+				AND    MSD.DIVISION_CD       = MI.DIVISION_CD
+				AND    MSD.ITEM_ID           = MI.ITEM_ID 
+				AND    MSM.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
+				AND    MSM.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}  
+				AND    MSM.PROCESS_CD		 = 'CR'  
+				AND    MSM.STATE   	         = 'SHW'
+				AND    MSM.CUSTOMER_CD	     = #{customerCd, jdbcType=VARCHAR}  
+				AND    MSM.CURRENCY_CD	     = #{currencyCd, jdbcType=VARCHAR}  
 				AND    MSD.QTY - NVL(MSD.RETURN_QTY, 0) > 0
     <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
                ) A
@@ -129,6 +134,7 @@
 			                           , QTY
 			                           , UNIT_PRICE
 			                           , IO_TYPE
+			                           , ITEM_STOCK_ID
 			                           , REFERENCE_NO
 			                           , REFERENCE_DTL_NO
 			                           , DESCRIPTION
@@ -141,7 +147,7 @@
            VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}  
 		                               , #{item.divisionCd, jdbcType=VARCHAR} 
 		                               , 'RCR'        
-		                               , #{item.shippingRetrunNo, jdbcType=VARCHAR}
+		                               , #{item.shippingReturnNo, jdbcType=VARCHAR}
 		                               , NULL 
 		                               , NULL
 		                               , #{item.itemId, jdbcType=VARCHAR}
@@ -149,6 +155,7 @@
 		                               , #{item.requestReturnQty, jdbcType=NUMERIC}
 		                               , #{item.unitPrice, jdbcType=NUMERIC}
 		                               , #{item.ioType, jdbcType=VARCHAR}
+		                               , #{item.itemStockId, jdbcType=VARCHAR}
 		                               , #{item.shippingNo, jdbcType=VARCHAR}
 		                               , #{item.shippingOrderId, jdbcType=VARCHAR}
 		                               , #{item.description, jdbcType=VARCHAR}

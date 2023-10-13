@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUSD3040">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+        SELECT A.*
+        FROM   (
+    </if>
+                SELECT MSM.COMPANY_CD
+				     , MSM.DIVISION_CD
+				     , MSM.SHIPPING_NO   AS SHIPPING_RETURN_NO
+				     , MSM.SHIPPING_NM   AS SHIPPING_RETURN_NM
+				     , MSD.SEQ
+				     , MSD.SHIPPING_ORDER_ID  AS SHIPPING_RETURN_ID
+				     , MSM.CUSTOMER_CD
+				     , MP.PARTNER_NM                 AS CUSTOMER_NM
+				     , MSM.SHIPPING_WAREHOUSE_CD     AS RETURN_WAREHOUSE_CD
+				     , MWH.WAREHOUSE_NM              AS RETURN_WAREHOUSE_NM
+				     , TO_CHAR(MSM.SHIPPING_DUE_DATE ,'YYYY-MM-DD')  AS RETURN_DUE_DATE
+				     , MSM.CURRENCY_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, 'SM0017', MSM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+				     , MSM.EXCHANGE_RATE
+				     , TO_CHAR(MSM.CONFIRM_DATE ,'YYYY-MM-DD')  AS CONFIRM_DATE
+				     , MSM.CONFIRM_USER_NO
+				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
+				     , MSM.TAX_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, 'SM0029', MSM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+				     , (SELECT MOM_STOCK_PKG.FN_GET_LOT_ID(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.ITEM_STOCK_ID) FROM DUAL ) AS LOT_ID
+				     , MSD.ITEM_ID
+				     , MI.ITEM_NM
+				     , MI.ITEM_SPEC
+				     , MI.ITEM_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
+				     , MSD.SHIPPING_UOM   AS SHIPPING_RETURN_UOM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.SHIPPING_UOM ) FROM DUAL) AS SHIPPING_RETURN_UOM_NM
+				     , MSD.QTY    AS SHIPPING_RETURN_QTY
+				     , MSD.CONVERSION_UOM
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
+				     , MSD.CONVERSION_QTY
+				     , MSD.UNIT_PRICE
+				     , MSD.AMOUNT
+				     , MSD.LOCAL_AMOUNT
+				     , MSD.IO_TYPE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
+				     , MSD.REFERENCE_NO              AS SHIPPING_NO        
+				     , MSD.REFERENCE_DTL_NO          AS SHIPPING_ORDER_ID
+				     , MSM.PROCESS_CD
+				     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM    
+				     , MSM.STATE
+					 , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, 'SC0001', MSM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+					 , MSM.UPDATE_BY          AS UPDATE_USER_NO
+				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
+				     , TO_CHAR(MSM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
+				     , TO_CHAR(MSM.CREATE_DATE ,'YYYY-MM-DD') AS CREATE_DATE
+				     , MSD.DESCRIPTION
+				     , ROWIDTOCHAR(MSD.ROWID)            AS KEY_ID
+					 , COUNT(*) OVER()   AS TOTAL_COUNT
+					 , ROW_NUMBER() OVER(PARTITION BY MSD.COMPANY_CD, MSD.DIVISION_CD ORDER BY MSD.SHIPPING_ORDER_ID) AS ROW_CNT
+				FROM   MOM_SHIPPING_ORDER_MST MSM
+				     , MOM_SHIPPING_ORDER_DTL MSD
+				     , MOM_WAREHOUSE MWH
+					 , MOM_PARTNER  MP
+				     , MOM_ITEM     MI
+				WHERE  MSM.COMPANY_CD            = MSD.COMPANY_CD
+				AND    MSM.DIVISION_CD           = MSD.DIVISION_CD
+				AND    MSM.SHIPPING_NO           = MSD.SHIPPING_NO   
+				AND    MSM.COMPANY_CD            = MWH.COMPANY_CD
+				AND    MSM.DIVISION_CD           = MWH.DIVISION_CD
+				AND    MSM.SHIPPING_WAREHOUSE_CD = MWH.WAREHOUSE_CD
+				AND    MSM.COMPANY_CD            = MP.COMPANY_CD
+				AND    MSM.DIVISION_CD           = MP.DIVISION_CD
+				AND    MSM.CUSTOMER_CD           = MP.PARTNER_CD
+				AND    MSD.COMPANY_CD            = MI.COMPANY_CD
+				AND    MSD.DIVISION_CD           = MI.DIVISION_CD
+				AND    MSD.ITEM_ID               = MI.ITEM_ID   
+				AND    MSM.COMPANY_CD            = #{companyCd, jdbcType=VARCHAR}
+				AND    MSM.DIVISION_CD           = #{divisionCd, jdbcType=VARCHAR}  
+				AND    MSM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+				AND    MSM.PROCESS_CD		     = 'RCR'  
+				<if test="shippingReturnNo != null and shippingReturnNo != ''">
+				AND    (UPPER(MSM.SHIPPING_NO) LIKE '%' || UPPER(#{shippingReturnNo, jdbcType=VARCHAR}) || '%')   
+				</if>
+				<if test="customerCdNm != null and customerCdNm != ''">
+				AND    (UPPER(MSM.CUSTOMER_CD) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%')
+				</if> 
+				<if test="returnWarehouseCdNm != null and returnWarehouseCdNm != ''">
+				AND    (UPPER(MSM.SHIPPING_WAREHOUSE_CD) LIKE '%' || UPPER(#{returnWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{returnWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
+				</if> 
+				<if test="state != null and state != ''">
+				AND    MSM.STATE   IN (${state}) 
+				</if>   
+    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+               ) A
+        WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+    </if>               
+    </select>   
+</mapper>     

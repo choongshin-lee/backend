@@ -2,8 +2,7 @@ var menuId = 'XUSD3010';
 var widget = momWidget;
 var that = undefined;
 var VIEW= {
-	initParam		: undefined, 
-	  
+	initParam		 : undefined, 
 	init: function() {	
 		that = this;	
 		that.event();
@@ -24,8 +23,8 @@ var VIEW= {
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
 		if(index ==0 && btnId =='copyBtn'){	
-			  $('#shippingRetrunNoDP1').val('');
-			  $('#shippingRetrunNmDP1').val('');
+			  $('#shippingReturnNoDP1').val('');
+			  $('#shippingReturnNmDP1').val('');
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
@@ -34,12 +33,12 @@ var VIEW= {
             AUIGrid.clearGridData(widget.grid[1]);    
         }
         else if (index==20){
-            result.param = {shippingRetrunNo:checkItem[0].shippingRetrunNo};   
+            result.param = {shippingReturnNo:checkItem[0].shippingReturnNo};   
         }
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {shippingRetrunNo:e.item['shippingRetrunNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {shippingReturnNo:e.item['shippingReturnNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
     customCallInit: function(index,your,action,btnId,param,result) {
@@ -60,7 +59,7 @@ var VIEW= {
         else if(index == 20){         
             if(action='C'&& btnId == 'customBtn21-1'){ 
                 for(var i=0,max=param.length; i<max;i++){
-                    param[i]['shippingRetrunNo'] = checkItem[0]['shippingRetrunNo'];
+                    param[i]['shippingReturnNo'] = checkItem[0]['shippingReturnNo'];
                 }
             }
         }

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUICA030">
+    <select id="get_findBtn1" parameterType="java.util.HashMap"  resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+        SELECT A.*
+        FROM   (
+    </if>
+                SELECT A.COMPANY_CD
+				     , A.DIVISION_CD
+				     , A.ITEM_ID
+				     , A.WAREHOUSE_CD
+				     , A.WAREHOUSE_NM
+				     , A.UOM
+				     , A.UOM_NM
+				     , A.LOT_ID
+				     , A.CURRENT_STOCK_QTY
+				     , A.ALLOCATE_QTY
+				     , A.AVAILABLE_QTY
+				     , A.ITEM_NM
+				     , A.ITEM_SPEC
+				     , A.ITEM_TYPE
+				     , A.ITEM_TYPE_NM
+				     , A.ITEM_CATEGORY_L
+				     , A.ITEM_CATEGORY_L_NM
+				     , A.ITEM_CATEGORY_M
+				     , A.ITEM_CATEGORY_M_NM
+				     , A.ITEM_CATEGORY_S
+				     , A.ITEM_CATEGORY_S_NM
+				     , A.MATERIAL_PROPERTIES
+				     , A.MATERIAL_PROPERTIES_NM
+				     , A.DISCONTINUE_YN
+				     , A.LOT_MANAGEMENT_YN
+				     , A.DESCRIPTION
+				     , A.UPDATE_USER_NO
+				     , A.UPDATE_USER_NM
+				     , A.UPDATE_DATE
+				     , A.KEY_ID   
+				     , COUNT(*) OVER()   AS TOTAL_COUNT
+				     , ROW_NUMBER() OVER(PARTITION BY A.COMPANY_CD, A.DIVISION_CD ORDER BY A.KEY_ID) AS ROW_CNT
+				FROM   (SELECT MS.COMPANY_CD
+				             , MS.DIVISION_CD
+				             , MS.ITEM_ID
+				             , MS.WAREHOUSE_CD
+				             , MIN(MWH.WAREHOUSE_NM) AS WAREHOUSE_NM
+				             , MIN(MI.UOM) AS UOM
+				             , MIN((SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL)) AS UOM_NM
+				             , MS.LOT_ID
+				             , SUM(MS.STOCK_QTY)    AS CURRENT_STOCK_QTY
+				             , SUM(MS.ALLOCATE_QTY)  AS ALLOCATE_QTY
+				             , SUM(MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0)) AS AVAILABLE_QTY
+				             , MIN(MI.ITEM_NM)  AS  ITEM_NM
+				             , MIN(MI.ITEM_SPEC)  AS  ITEM_SPEC
+				             , MIN(MI.ITEM_TYPE)  AS ITEM_TYPE
+				             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_TYPE_NM
+				             , MIN(MI.ITEM_CATEGORY_L)  AS ITEM_CATEGORY_L
+				             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0053', MI.ITEM_CATEGORY_L, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_CATEGORY_L_NM
+				             , MIN(MI.ITEM_CATEGORY_M)  AS ITEM_CATEGORY_M
+				             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0054', MI.ITEM_CATEGORY_M, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_CATEGORY_M_NM
+				             , MIN(MI.ITEM_CATEGORY_S)  AS ITEM_CATEGORY_S
+				             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0055', MI.ITEM_CATEGORY_S, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_CATEGORY_S_NM
+				             , MIN(MI.MATERIAL_PROPERTIES)  AS MATERIAL_PROPERTIES
+				             , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0003', MI.MATERIAL_PROPERTIES, #{langCd, jdbcType=VARCHAR}) FROM DUAL)) AS MATERIAL_PROPERTIES_NM
+				             , MIN(MI.DISCONTINUE_YN)  AS DISCONTINUE_YN
+				             , MIN(MI.LOT_MANAGEMENT_YN)  AS LOT_MANAGEMENT_YN
+				             , MIN(MS.DESCRIPTION)  AS DESCRIPTION
+				             , MIN(MS.UPDATE_BY)                     AS UPDATE_USER_NO
+				             , MIN((SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MS.COMPANY_CD, MS.DIVISION_CD, MS.UPDATE_BY) FROM DUAL )) AS UPDATE_USER_NM
+				             , MIN(TO_CHAR(MS.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')) AS UPDATE_DATE
+				             , MIN(MS.ITEM_STOCK_ID)            AS KEY_ID
+				        FROM   MOM_STOCK MS
+				             , MOM_ITEM MI
+				             , MOM_WAREHOUSE MWH
+				        WHERE  MS.COMPANY_CD    = MI.COMPANY_CD
+				        AND    MS.DIVISION_CD   = MI.DIVISION_CD     
+				        AND    MS.ITEM_ID       = MI.ITEM_ID
+				        AND    MS.COMPANY_CD    = MWH.COMPANY_CD
+				        AND    MS.DIVISION_CD   = MWH.DIVISION_CD     
+				        AND    MS.WAREHOUSE_CD  = MWH.WAREHOUSE_CD
+				        AND    MS.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+				        AND    MS.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}  
+				        <if test="itemIdNm != null and itemIdNm != ''">
+				        AND    (UPPER(MS.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')    
+				        </if>
+				        <if test="warehouseCdNm != null and warehouseCdNm != ''">
+				        AND    (UPPER(MS.WAREHOUSE_CD) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWH.WAREHOUSE_NM) LIKE '%' || UPPER(#{warehouseCdNm, jdbcType=VARCHAR}) || '%')    
+				        </if>
+				        <if test="lotManagementYn != null and lotManagementYn != ''">
+				        AND    MI.LOT_MANAGEMENT_YN = #{lotManagementYn, jdbcType=VARCHAR}
+				        </if> 
+				        <if test="discontinueYn != null and discontinueYn != ''">
+				        AND    MI.DISCONTINUE_YN = #{discontinueYn, jdbcType=VARCHAR}
+				        </if> 
+				        <if test="itemType != null and itemType != ''">
+				        AND    MI.ITEM_TYPE = #{itemType, jdbcType=VARCHAR}
+				        </if> 
+				        <if test="itemCategoryL != null and itemCategoryL != ''">
+				        AND    MI.ITEM_CATEGORY_L = #{itemCategoryL, jdbcType=VARCHAR}
+				        </if> 
+				        <if test="itemCategoryM != null and itemCategoryM != ''">
+				        AND    MI.ITEM_CATEGORY_M = #{itemCategoryM, jdbcType=VARCHAR}
+				        </if> 
+				        <if test="itemCategoryS != null and itemCategoryS != ''">
+				        AND    MI.ITEM_CATEGORY_S = #{itemCategoryS, jdbcType=VARCHAR}
+				        </if> 
+				        GROUP BY MS.COMPANY_CD
+				               , MS.DIVISION_CD
+				               , MS.ITEM_ID
+				               , MS.WAREHOUSE_CD
+				               , MS.LOT_ID )  A
+    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+               ) A
+        WHERE ROW_CNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+    </if>               
+    </select>   
+</mapper>     

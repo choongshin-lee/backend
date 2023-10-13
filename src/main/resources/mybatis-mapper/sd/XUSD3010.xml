@@ -8,8 +8,8 @@
 	    </if>
 	            SELECT MSM.COMPANY_CD
 				     , MSM.DIVISION_CD
-				     , MSM.SHIPPING_NO    AS SHIPPING_RETRUN_NO
-				     , MSM.SHIPPING_NM	  AS SHIPPING_RETRUN_NM
+				     , MSM.SHIPPING_NO    AS SHIPPING_RETURN_NO
+				     , MSM.SHIPPING_NM	  AS SHIPPING_RETURN_NM
 				     , MSM.PROCESS_CD
 				     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
 				     , MSM.CUSTOMER_CD
@@ -44,8 +44,8 @@
 				AND    MSM.PROCESS_CD		     = 'RCR'
 				AND    MSM.STATE                 = 'SHG'
 				AND    MSM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-				<if test="shippingRetrunNo != null and shippingRetrunNo != ''">
-				AND    (UPPER(MSM.SHIPPING_NO) LIKE '%' || UPPER(#{shippingRetrunNo, jdbcType=VARCHAR}) || '%')   
+				<if test="shippingReturnNo != null and shippingReturnNo != ''">
+				AND    (UPPER(MSM.SHIPPING_NO) LIKE '%' || UPPER(#{shippingReturnNo, jdbcType=VARCHAR}) || '%')   
 				</if>
 				<if test="customerCdNm != null and customerCdNm != ''">
 				AND    (UPPER(MSM.CUSTOMER_CD) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{customerCdNm, jdbcType=VARCHAR}) || '%')
@@ -64,6 +64,7 @@
 		     , MSD.SHIPPING_NO         AS SHIPPING_RETURN_NO
 		     , MSD.SEQ
 		     , MSD.SHIPPING_ORDER_ID   AS SHIPPING_RETURN_ID
+		     , (SELECT MOM_STOCK_PKG.FN_GET_LOT_ID(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.ITEM_STOCK_ID) FROM DUAL ) AS LOT_ID
 		     , MSD.ITEM_ID
 		     , MI.ITEM_NM
 		     , MI.ITEM_SPEC
@@ -72,7 +73,12 @@
 		     , MSD.SHIPPING_UOM        AS SHIPPING_RETURN_UOM
 		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.SHIPPING_UOM) FROM DUAL) AS SHIPPING_RETURN_UOM_NM
 		     , MSD.QTY                 AS SHIPPING_RETURN_QTY
+		     , MSD.CONVERSION_UOM     
+	         , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MSD.COMPANY_CD, MSD.DIVISION_CD, MSD.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
+	         , MSD.CONVERSION_QTY 
 		     , MSD.UNIT_PRICE
+		     , MSD.AMOUNT
+             , MSD.LOCAL_AMOUNT
 		     , MSD.REFERENCE_NO        AS SHIPPING_NO
 		     , MSD.REFERENCE_DTL_NO    AS SHIPPING_ORDER_ID
 		     , MSD.IO_TYPE
@@ -89,7 +95,7 @@
 		AND    MSD.ITEM_ID      = MI.ITEM_ID
 		AND    MSD.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
 		AND    MSD.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}
-		AND    MSD.SHIPPING_NO  = #{shippingRetrunNo, jdbcType=VARCHAR}  
+		AND    MSD.SHIPPING_NO  = #{shippingReturnNo, jdbcType=VARCHAR}  
     </select> 
     <delete id="remove_createBtn1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_SHIP_ORDER_MST
@@ -127,8 +133,8 @@
         VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}
 		                            , #{item.divisionCd, jdbcType=VARCHAR}
 		                            , 'RCR'
-		                            , #{item.shippingRetrunNo, jdbcType=VARCHAR}
-		                            , #{item.shippingRetrunNm, jdbcType=VARCHAR}
+		                            , #{item.shippingReturnNo, jdbcType=VARCHAR}
+		                            , #{item.shippingReturnNm, jdbcType=VARCHAR}
 		                            , #{item.returnWarehouseCd, jdbcType=VARCHAR}
 		                            , #{item.customerCd, jdbcType=VARCHAR}
 		                            , #{item.destinationCd, jdbcType=VARCHAR}
@@ -190,16 +196,16 @@
         VALUES                      ( #{item.companyCd, jdbcType=VARCHAR}  
 		                            , #{item.divisionCd, jdbcType=VARCHAR} 
 		                            , 'RCR'        
-		                            , #{item.shippingNo, jdbcType=VARCHAR}
+		                            , #{item.shippingReturnNo, jdbcType=VARCHAR}
 		                            , #{item.seq, jdbcType=NUMERIC}
-		                            , #{item.shippingOrderId, jdbcType=VARCHAR}
+		                            , #{item.shippingReturnId, jdbcType=VARCHAR}
 		                            , #{item.itemId, jdbcType=VARCHAR}
-		                            , #{item.shippingUom, jdbcType=VARCHAR}
-		                            , #{item.shippingQty, jdbcType=NUMERIC}
+		                            , #{item.shippingReturnUom, jdbcType=VARCHAR}
+		                            , #{item.shippingReturnQty, jdbcType=NUMERIC}
 		                            , #{item.unitPrice, jdbcType=NUMERIC}
 		                            , #{item.ioType, jdbcType=VARCHAR}
-		                            , #{item.soNo, jdbcType=VARCHAR}
-		                            , #{item.salesOrderId, jdbcType=VARCHAR}
+		                            , #{item.shippingNo, jdbcType=VARCHAR}
+		                            , #{item.shippingOrderId, jdbcType=VARCHAR}
 		                            , #{item.description, jdbcType=VARCHAR}
 		                            , #{item.delYn, jdbcType=VARCHAR}
 		                            , #{item.valMsg, jdbcType=VARCHAR}

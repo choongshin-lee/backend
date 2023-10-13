@@ -74,6 +74,8 @@
 					           (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.IO_TYPE) FROM DUAL) 
 					       ELSE ''
 					       END    AS IO_TYPE_NM
+					     , MPR.REASON_CD AS REJECT_REASON_CD  
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPR.COMPANY_CD, MPR.DIVISION_CD, 'MM0019', MPR.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS REJECT_REASON_NM  
 					     , MPR.PURCHASE_REQUEST_ID||'_'||NVL(MPO.PURCHASE_ORDER_ID, '****')||'_'||NVL(MPI.PURCHASE_INOUT_ID, '****')  AS KEY_ID              
 					     , COUNT(*) OVER() AS TOTAL_COUNT
 					     , ROW_NUMBER() OVER(PARTITION BY MPR.COMPANY_CD,MPR.DIVISION_CD ORDER BY MPR.PR_NO, MPR.PR_SEQ, MPO.PO_NO, MPO.PO_SEQ, MPI.INOUT_NO, MPI.SEQ  ) AS ROW_COUNT   
@@ -108,6 +110,9 @@
 				    <if test="prTitle != null and prTitle != ''">
 				    AND    (UPPER(MPR.PR_TITLE) LIKE '%' || UPPER(#{prTitle, jdbcType=VARCHAR}) || '%')	  
 				    </if>	
+                    <if test="prState != null and prState != ''">
+					AND    MPR.STATE = #{prState, jdbcType=VARCHAR}
+					</if> 				    
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 			) A
 			WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
