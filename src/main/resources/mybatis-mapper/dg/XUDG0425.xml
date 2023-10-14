@@ -141,7 +141,7 @@
                             , #{item.unitPrice, jdbcType=NUMERIC}	 
                             , #{item.poOverReceiptRate, jdbcType=NUMERIC}	
                             , #{item.lotManagementYn, jdbcType=VARCHAR}
-			                , #{item.lotMake, jdbcType=VARCHAR}  
+			                , #{item.lotMark, jdbcType=VARCHAR}  
 						    , #{item.poNo, jdbcType=VARCHAR}
                             , #{item.purchaseOrderId, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
