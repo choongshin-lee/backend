@@ -58,6 +58,9 @@
 				<if test="itemIdNm != null and itemIdNm != ''">
 				AND (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm, jdbcType=VARCHAR}) || '%')
 				</if>
+				<if test="currencyCd != null and currencyCd != ''">
+				AND    MUP.CURRENCY_CD = #{currencyCd, jdbcType=VARCHAR}
+				</if>	
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		       ) A
 	    WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}

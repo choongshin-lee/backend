@@ -15,6 +15,14 @@
 	         , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.DEPARTURE_VENDOR_CD) FROM DUAL) AS DEPARTURE_VENDOR_NM
 	         , MPIM.WAREHOUSE_CD  AS RECEIPT_WAREHOUSE_CD
              , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPIM.COMPANY_CD,MPIM.DIVISION_CD,MPIM.WAREHOUSE_CD) FROM DUAL) AS RECEIPT_WAREHOUSE_NM
+             , MPIM.ETC_RECEIPT_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_IL_TYPE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.ETC_RECEIPT_TYPE) FROM DUAL) AS ETC_RECEIPT_TYPE_NM
+	         , MPIM.CURRENCY_CD
+	         , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0017', MPIM.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+	         , MPIM.EXCHANGE_RATE
+	         , MPIM.AMOUNT           AS RECEIPT_AMOUNT
+	         , MPIM.TAX_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, 'SM0029', MPIM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
 	         , MPIM.DESCRIPTION
 		     , MPIM.CONFIRM_USER_NO
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPIM.COMPANY_CD, MPIM.DIVISION_CD, MPIM.CONFIRM_USER_NO) FROM DUAL ) AS CONFIRM_USER_NM
@@ -37,7 +45,7 @@
 		AND    (UPPER(MPIM.TITLE) LIKE '%' || UPPER(#{receiptTitle, jdbcType=VARCHAR}) || '%')	  
 		</if>
 		AND    MPIM.STATE        = 'PIF'  -- 등록 
-		AND    MPIM.PROCESS_CD   = 'EI'
+		AND    MPIM.PROCESS_CD   = 'OR'
 		AND    NOT EXISTS  (SELECT '*'
 							FROM   MOM_PURCHASE_INOUT_DTL MPID
 							WHERE  MPID.COMPANY_CD    = MPIM.COMPANY_CD
@@ -64,6 +72,11 @@
 	         , MPID.INOUT_QTY        AS RECEIPT_REQUEST_QTY
 	         , MPID.REASON_CD  AS EXCEPTION_REASON_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MM0016', MPID.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EXCEPTION_REASON_NM
+		     , MPID.STOCK_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0048', MPID.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STOCK_TYPE_NM
+             , NVL(MPID.LOT_MANAGEMENT_YN, 'N')   AS LOT_USE_YN
+             , MPID.LOT_RULE        AS LOT_RULE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0052', MPID.LOT_RULE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOT_RULE_NM
 	         , MPID.DESCRIPTION
 	         , MPID.PURCHASE_INOUT_ID
 	         , ROWIDTOCHAR(MPID.ROWID)  AS KEY_ID  
@@ -84,7 +97,7 @@
             <foreach collection="list" item="item" open="" close="" separator="OR">
             (    COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
             AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-            AND  PROCESS_CD  = 'EI'
+            AND  PROCESS_CD  = 'OR'
             AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
             )
             </foreach>
@@ -103,7 +116,7 @@
 			                           , CREATE_DATE )
         VALUES                         ( #{item.companyCd, jdbcType=VARCHAR}
 	                                   , #{item.divisionCd, jdbcType=VARCHAR}
-	                                   , 'EI'
+	                                   , 'OR'
 			                           , #{item.receiptNo, jdbcType=VARCHAR}
 			                           , #{item.description, jdbcType=VARCHAR}
 			                           , #{item.valMsg, jdbcType=VARCHAR}
@@ -118,7 +131,7 @@
 			                                    , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 			                                    , #{companyCd,   jdbcType=VARCHAR , mode=IN}
 			                                    , #{divisionCd,  jdbcType=VARCHAR, mode=IN}    
-			                                    , 'EI'                   
+			                                    , 'OR'                   
 			                                    , #{userId,      jdbcType=VARCHAR, mode=IN} )}                   
     </select>  
 </mapper>

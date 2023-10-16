@@ -9,7 +9,30 @@ var VIEW= {
     that.event();
   },
   event: function(e) {
-  
+      $(document).on('change','#partnerCdDP1', function(e) {
+			mom_ajax('R', 'XUMD1030.findBtn1', {partnerCd:$('#partnerCdDP1').val(),useYn:'Y'}, function(result1, data1) { 
+		        if(result1 != 'SUCCESS' || data1.length == 0) {
+		    	  momWidget.splashHide();
+			      return;							     
+		      }			
+		     var currencyCd =  data1[0]['currencyCd'];
+		     var taxType =  data1[0]['taxType'];
+		     $('#currencyCdDP1').val(currencyCd);
+		     $('#taxTypeDP1').val(taxType);
+		      	}, undefined, undefined, this, false);
+		});	
+		$(document).on('change','#itemIdDP2', function(e) {
+			mom_ajax('R', 'XUMD3010.findBtn1', {itemId:$('#itemIdDP2').val(),vendorCdNm:$('#partnerCdDP2').val(),currencyCd:$('#currencyCdDP2').val()}, function(result1, data1) { 
+		        if(result1 != 'SUCCESS' || data1.length == 0) {
+		    	  momWidget.splashHide();
+			      return;							     
+		      }			
+		     var purchaseUom =  data1[0]['purchaseUom'];
+		     var unitPrice =  data1[0]['unitPrice'];
+		     $('#purchaseUomDP2').val(purchaseUom);
+		     $('#unitPriceDP2').val(unitPrice);
+		      	}, undefined, undefined, this, false);
+		});
   },
   editCallInit: function(index,your,action,btnId,param,result) {
       if(index ==0 && btnId =='editBtn'){ 
@@ -38,6 +61,8 @@ var VIEW= {
                 return;
             }
             $('#receiptNoDP2').val(checkItem[0].receiptNo);   
+            $('#partnerCdDP2').val(checkItem[0].partnerCd);  
+            $('#currencyCdDP2').val(checkItem[0].currencyCd);  
         }
     },
     searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 

@@ -305,6 +305,9 @@
     FROM   MOM_IL_CATEGORY   
     WHERE  COMPANY_CD  = #{companyCd, jdbcType=VARCHAR}
     AND    DIVISION_CD = #{divisionCd, jdbcType=VARCHAR} 
+    <if test="ilGroupCd != null and ilGroupCd != ''">
+    AND    IL_GROUP_CD = #{ilGroupCd, jdbcType=VARCHAR} 
+    </if>
     AND    USE_YN      = 'Y'
     ORDER BY LABEL
     </select>

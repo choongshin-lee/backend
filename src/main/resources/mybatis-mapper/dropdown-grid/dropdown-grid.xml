@@ -396,7 +396,5 @@ ORDER BY A.COMPANY_CD
 	AND    MUI.USE_YN       = 'Y'
 	ORDER BY MU.USER_NM
  </select>
- 
- 
- 
+
 </mapper>
