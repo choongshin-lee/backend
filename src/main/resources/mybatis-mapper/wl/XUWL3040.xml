@@ -87,7 +87,7 @@
 					        AND    MRM.COMPANY_CD        = MSI.COMPANY_CD
 					        AND    MRM.DIVISION_CD       = MSI.DIVISION_CD
 					        AND    MRM.ITEM_INOUT_ID     = MSI.ITEM_INOUT_ID
-					        AND    MRM.REFERENCE_TYPE    = 'WR-R'
+					        AND    MRM.REFERENCE_TYPE    = 'WR-I'
 					        AND    MWM.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
 					        AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					        AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999

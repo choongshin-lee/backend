@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUMM7030">
+<mapper namespace="com.mom.backend.XUMM4260">
     <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MPIM.COMPANY_CD				
 		     , MPIM.DIVISION_CD				
@@ -47,7 +47,7 @@
 		AND    MPIM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}			
 		AND    MPIM.RECEIPT_DATE BETWEEN TO_DATE(#{receiptDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{receiptDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 		AND    MPIM.STATE = 'PIGR'
-		AND    MPIM.PROCESS_CD   NOT IN ('OP', 'OR')  
+		AND    MPIM.PROCESS_CD = 'OR'  
 	    <if test="receiptNo != null and receiptNo != ''">
 	    AND    (UPPER(MPIM.INOUT_NO) LIKE '%' || UPPER(#{receiptNo, jdbcType=VARCHAR}) || '%')	  
 	    </if>			
@@ -60,9 +60,7 @@
 	    <if test="receiptWarehouseCd != null and receiptWarehouseCd != ''">
 	    AND      MPIM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}
 	    </if>			
-	    <if test="iqcFlag != null and iqcFlag != ''">
-	    AND     MPIM.IQC_FLAG = #{iqcFlag, jdbcType=VARCHAR}
-	    </if>				
+			
     </select>
 	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
 	    SELECT MPID.COMPANY_CD
@@ -113,10 +111,10 @@
     DELETE FROM MOM_PROC_PURCHASE_GR_CANCEL
         <where>
             <foreach collection="list" item="item" open="" close="" separator="OR">
-	        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-	           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-	           AND  RECEIPT_TYPE = 'P'
-	           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
+	        (       COMPANY_CD   = #{item.companyCd, jdbcType=VARCHAR}
+	           AND  DIVISION_CD  = #{item.divisionCd, jdbcType=VARCHAR}
+	           AND  RECEIPT_TYPE = 'E'
+	           AND  CREATE_BY    = #{item.userId, jdbcType=VARCHAR}
 	        )
             </foreach>
         </where>
@@ -135,7 +133,7 @@
 						                , CREATE_DATE )
         VALUES                          ( #{item.companyCd, jdbcType=VARCHAR}
 				                 		, #{item.divisionCd, jdbcType=VARCHAR}
-				                 		, 'P'
+				                 		, 'E'
 						                , #{item.processCd, jdbcType=VARCHAR}
 						                , #{item.receiptNo, jdbcType=VARCHAR}
 						                , #{item.description, jdbcType=VARCHAR}
@@ -151,7 +149,7 @@
 					                             , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 					                             , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 					                             , #{divisionCd,  jdbcType=VARCHAR, mode=IN}	
-					                             , 'P'										  
+					                             , 'E'										  
 					                             , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
     </select>  
 </mapper>

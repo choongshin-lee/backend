@@ -66,6 +66,9 @@
 			 , MI.UOM        
 			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MI.COMPANY_CD, MI.DIVISION_CD, MI.UOM) FROM DUAL) AS UOM_NM
 		     , MPID.INOUT_QTY        AS RECEIPT_REQUEST_QTY
+		     , MPID.CONVERSION_UOM       
+			 , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.CONVERSION_UOM) FROM DUAL) AS CONVERSION_UOM_NM
+             , MPID.CONVERSION_QTY 
 		     , MPID.STOCK_TYPE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0048', MPID.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STOCK_TYPE_NM
              , NVL(MPID.LOT_MANAGEMENT_YN, 'N')   AS LOT_USE_YN
@@ -73,8 +76,14 @@
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0052', MPID.LOT_RULE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOT_RULE_NM
 		     , MPID.REASON_CD  AS EXCEPTION_REASON_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MM0016', MPID.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EXCEPTION_REASON_NM
+		     , MPID.UNIT_PRICE
+		     , MPID.AMOUNT
+             , MPID.LOCAL_AMOUNT
+		     , MI.STOCK_TYPE
 		     , MPID.DESCRIPTION
 		     , MPID.PURCHASE_INOUT_ID
+		     , MPID.IO_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, MPID.IO_TYPE) FROM DUAL)  AS IO_TYPE_NM
 		     , ROWIDTOCHAR(MPID.ROWID)  AS KEY_ID 
 		FROM   MOM_PURCHASE_INOUT_DTL MPID
 		     , MOM_ITEM MI
@@ -171,9 +180,14 @@
 			                , ITEM_ID
 			                , INOUT_QTY
 			                , INOUT_UOM
+			                , CURRENCY_CD 
+                            , EXCHANGE_RATE 
+			                , UNIT_PRICE
 			                , PO_OVER_RECEIPT_RATE
 			                , REASON_CD
-			                , DESCRIPTION
+			                , LOT_USE_YN
+                            , LOT_RULE
+                            , DESCRIPTION
 			                , DEL_YN
 			                , VAL_MSG
 			                , MULTI_MSG
@@ -188,8 +202,13 @@
 			                , #{item.itemId, jdbcType=VARCHAR}
 			                , #{item.receiptRequestQty, jdbcType=NUMERIC}
 			                , #{item.purchaseUom, jdbcType=VARCHAR}
+			                , #{item.currencyCd, jdbcType=VARCHAR}
+			                , #{item.exchangeRate, jdbcType=NUMERIC}
+			                , #{item.unitPrice, jdbcType=NUMERIC}
 			                , #{item.poOverReceiptRate, jdbcType=NUMERIC} 
 			                , #{item.exceptionReasonCd, jdbcType=VARCHAR}
+			                , #{item.lotUseYn, jdbcType=VARCHAR}
+	                        , #{item.lotRule, jdbcType=VARCHAR}
 			                , #{item.description, jdbcType=VARCHAR}
 			                , #{item.delYn, jdbcType=VARCHAR}
 			                , #{item.valMsg, jdbcType=VARCHAR}
