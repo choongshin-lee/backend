@@ -23,6 +23,7 @@ var VIEW= {
 		}
         else if(index ==0){                                            
             AUIGrid.clearGridData(widget.grid[1]);
+            AUIGrid.clearGridData(widget.grid[2]);
         }
     },
     createCallBack: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 

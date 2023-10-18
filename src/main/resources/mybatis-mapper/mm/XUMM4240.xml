@@ -77,6 +77,8 @@
              , NVL(MPID.LOT_MANAGEMENT_YN, 'N')   AS LOT_USE_YN
              , MPID.LOT_RULE   		  AS LOT_RULE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0052', MPID.LOT_RULE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOT_RULE_NM
+             , MPID.HCN_CD
+             , TO_CHAR(MPID.EFFECTIVE_DATE ,'YYYY-MM-DD')     AS EFFECTIVE_DATE
 		     , MPID.REASON_CD  AS EXCEPTION_REASON_CD
 		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MM0016', MPID.REASON_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS EXCEPTION_REASON_NM
 		     , MPID.DESCRIPTION
@@ -159,7 +161,8 @@
 		                              , PURCHASE_INOUT_ID
 		                              , LOT_MANAGEMENT_YN
 		                              , LOT_RULE
-		                              , LOT_ID
+		                              , HCN_CD
+		                              , EFFECTIVE_DATE
 		                              , DESCRIPTION
 		                              , VAL_MSG
 		                              , MULTI_MSG
@@ -172,7 +175,8 @@
 	                                  , #{item.purchaseInoutId, jdbcType=VARCHAR}
 	                                  , #{item.lotManagementYn, jdbcType=VARCHAR}
 	                                  , #{item.lotRule, jdbcType=VARCHAR}
-	                                  , #{item.lotId, jdbcType=VARCHAR}
+	                                  , #{item.hcnCd, jdbcType=VARCHAR}
+	                                  , TO_DATE(TO_CHAR(TO_DATE(#{item.effectiveDate, jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD'),'YYYY-MM-DD')
 	                                  , #{item.description, jdbcType=VARCHAR}
 	                                  , #{item.valMsg, jdbcType=VARCHAR}
 	                                  , #{item.multiMsg, jdbcType=VARCHAR}

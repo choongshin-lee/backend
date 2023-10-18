@@ -17,6 +17,24 @@ var VIEW= {
 		}  
 	},
 	cellClickCallBack: function(index,rowIndex,target,e) {				
+		if(index == 1){
+		    var item = e.item;	
+		    setTimeout(function(){
+		        mom_ajax('R', 'DD.DD00057', {itemId:item['itemId']}, function(result, data) {
+		            if(result != 'SUCCESS') {
+		                momWidget.splashHide();
+			            return;							     
+		            }	
+		            for(var i=0;i<widget.columnProperty[1].length;i++){
+			            if(widget.columnProperty[1][i]['columnId'] =='hcnCd'){
+				            widget.columnDropdown[1][widget.columnProperty[1][i]['columnId']]=data;
+			            }
+			        }
+	            }, undefined, undefined, this, false);	
+		    }, 200);
+		}
+	},
+	cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
 			widget.findBtnClicked(1, {receiptNo:e.item['receiptNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}

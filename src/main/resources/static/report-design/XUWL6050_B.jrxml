@@ -557,7 +557,7 @@ KR]]></text>
 			<textField textAdjust="ScaleFont" isBlankWhenNull="true">
 				<reportElement x="0" y="180" width="210" height="40" uuid="7e6e9d1c-ab7e-4260-b5bb-09b0c69490a0"/>
 				<textElement>
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{CSTM__ADDR}]]></textFieldExpression>
 			</textField>
@@ -575,7 +575,7 @@ KR]]></text>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{CSTM__NM}]]></textFieldExpression>
 			</textField>
@@ -670,7 +670,7 @@ KR]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SEQ}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="ScaleFont">
 				<reportElement x="30" y="0" width="100" height="25" uuid="5c8b62ed-c556-466e-940c-c496c0929d19">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cf366d90-c985-41a6-ba87-e3713458ea0d"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -714,7 +714,7 @@ KR]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{GROSS_WEI2}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="ScaleFont">
 				<reportElement x="460" y="0" width="94" height="25" uuid="78ee358f-545f-4ba5-b012-27aa22bb54bf">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="12ec0216-0411-47da-a9d8-c4c962f8ce53"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>

@@ -346,7 +346,7 @@
 			<staticText>
 				<reportElement x="0" y="68" width="210" height="60" uuid="5fb7af6a-54f4-43e4-9bc8-7402f3740961"/>
 				<textElement>
-					<font size="9"/>
+					<font fontName="JAS-HY고딕" size="8"/>
 				</textElement>
 				<text><![CDATA[DK-LOK CO., Ltd
 7,Golden root-ro 129beon-gil, Juchon-myeon
@@ -584,14 +584,14 @@ KR]]></text>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
-					<font size="9"/>
+					<font fontName="JAS-HY고딕" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{CSTM__NM}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont" isBlankWhenNull="true">
 				<reportElement x="0" y="180" width="210" height="40" uuid="64de4f90-a8df-4024-89fc-b25a1add5f88"/>
 				<textElement>
-					<font size="9"/>
+					<font fontName="JAS-HY고딕" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{CSTM__ADDR}]]></textFieldExpression>
 			</textField>
@@ -600,7 +600,7 @@ KR]]></text>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[PHONE :]]></text>
 			</staticText>
@@ -609,7 +609,7 @@ KR]]></text>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{CSTM_PHONE}]]></textFieldExpression>
 			</textField>
@@ -720,7 +720,7 @@ KR]]></text>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{SEQ}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="ScaleFont">
 				<reportElement x="131" y="0" width="132" height="25" uuid="c26a29bf-87aa-43e6-bf59-a4a10b5d01af">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="e65dbf1a-5b04-466e-968d-fb11c5fa2063"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -773,7 +773,7 @@ KR]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PACKING_VOLUME3}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="ScaleFont">
 				<reportElement x="30" y="0" width="100" height="25" uuid="7dd7cba4-1063-4fbf-9576-b329c89b86e4">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="35b46239-58d4-49e3-85b1-7071b55967a2"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
