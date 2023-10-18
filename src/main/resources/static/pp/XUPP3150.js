@@ -36,7 +36,7 @@ var VIEW= {
 			widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {workOrderId:e.item['workOrderId'],stockInputQty:e.item['stockInputQty'],stockInputQty:e.item['stockInputQty'],warehouseCd:e.item['warehouseCd'], itemId:e.item['itemId']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(2, {workOrderId:e.item['workOrderId'],deductId:e.item['deductId'],stockInputQty:e.item['stockInputQty'],warehouseCd:e.item['warehouseCd'], itemId:e.item['itemId']}, true, 'CELLCLICK',menuId,VIEW);
 		}  
 	},
 };

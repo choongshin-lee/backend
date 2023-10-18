@@ -187,7 +187,6 @@
             (       COMPANY_CD      = #{item.companyCd, jdbcType=VARCHAR}
                AND  DIVISION_CD     = #{item.divisionCd, jdbcType=VARCHAR}
                AND  CREATE_BY       = #{item.userId, jdbcType=VARCHAR}
-               AND  IO_RECEIPT_TYPE = 'WMI'  
             )
               </foreach>
           </where>

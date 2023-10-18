@@ -53,18 +53,6 @@ var VIEW= {
 			    $('#currencyCdSP21').val(checkItem[0]['currencyCd']);
 		        $('#currencyCdSP21').jqxComboBox({disabled: true});
 			}
-			else if(btnId == 'customBtn2-2' ){
-			    for(var i=0,max=param.length; i<max;i++){
-				   // param[i]['currencyCd'] = checkItem[0]['currencyCd'];
-				   // param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
-			    }
-		    }
-			else if(btnId == 'customBtn2-3'){
-			    for(var i=0,max=param.length; i<max;i++){
-				    //param[i]['currencyCd'] = checkItem[0]['currencyCd'];
-				    //param[i]['exchangeRate'] = checkItem[0]['exchangeRate'];
-			    }
-		    }		    
 		}
 	    else if(index == 20){			    
 		    if(action='C'&& btnId == 'customBtn21-1'){ 

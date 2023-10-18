@@ -9,6 +9,7 @@
 		            SELECT MPM.COMPANY_CD
 			             , MPM.DIVISION_CD
 			             , MPM.PACKING_ID
+			             , MPM.PACKING_ID     AS DEPARTURE_NO
 			             , MPM.PACKING_NM
 			             , MPM.CUSTOMER_CD
 			             , MPC.PARTNER_NM        AS CUSTOMER_NM

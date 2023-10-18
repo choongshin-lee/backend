@@ -168,7 +168,7 @@
 		     , MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0) AS AVAILABLE_QTY
 		     , MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0) AS INPUT_QTY
 		     , #{workOrderId, jdbcType=VARCHAR}      AS WORK_ORDER_ID
-		     , #{deductId, jdbcType=VARCHAR}         AS WORK_ORDER_ID
+		     , #{deductId, jdbcType=VARCHAR}         AS DEDUCT_ID
 		     , #{stockInputQty, jdbcType=NUMERIC}    AS STOCK_INPUT_QTY
 		     , MS.ITEM_STOCK_ID
 		     , MS.DESCRIPTION

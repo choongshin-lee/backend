@@ -208,7 +208,7 @@
             VALUES              ( #{item.companyCd, jdbcType=VARCHAR}
 				                , #{item.divisionCd, jdbcType=VARCHAR}
 				                , 'DD' 
-				                , #{item.inoutNo, jdbcType=VARCHAR}
+				                , #{item.departureNo, jdbcType=VARCHAR}
 				                , #{item.purchaseInoutId, jdbcType=VARCHAR}
 				                , #{item.ioType, jdbcType=VARCHAR}
 				                , #{item.itemId, jdbcType=VARCHAR}
