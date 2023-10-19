@@ -40,6 +40,9 @@
 				AND    MS.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}  
 				AND    MS.WAREHOUSE_CD    = #{warehouseCd, jdbcType=VARCHAR}  
 				AND    MS.LOCATION_CD     = #{locationCd, jdbcType=VARCHAR}  
+				<if test="itemIdNm != null and itemIdNm != ''">
+				AND    (UPPER(MI.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm , jdbcType=VARCHAR}))
+				</if>   
 				AND    MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0) > 0
     <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
                ) A

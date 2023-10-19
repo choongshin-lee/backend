@@ -17,7 +17,7 @@ var VIEW= {
     },
     cellClickCallBack: function(index,rowIndex,target,e) {        
     if(index==0){
-      widget.findBtnClicked(1, {warehouseCd:e.item['warehouseCd'],item_id:e.item['itemId'],uom:e.item['uom'],ioDateSd:e.item['ioDateSd'],ioDateEd:e.item['ioDateEd']}, true, 'CELLCLICK',menuId,VIEW);
+      widget.findBtnClicked(1, {warehouseCd:e.item['warehouseCd'],itemId:e.item['itemId'],uom:e.item['uom'],ioDateSd:e.item['ioDateSd'],ioDateEd:e.item['ioDateEd']}, true, 'CELLCLICK',menuId,VIEW);
     }
   },
 };
