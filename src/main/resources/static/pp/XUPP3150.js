@@ -35,9 +35,10 @@ var VIEW= {
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
 			widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);
+			AUIGrid.clearGridData(widget.grid[2]);
 		}
 		else if(index==1){
-			widget.findBtnClicked(2, {workOrderId:e.item['workOrderId'],deductId:e.item['deductId'],stockInputQty:e.item['stockInputQty'],warehouseCd:e.item['warehouseCd'], itemId:e.item['itemId']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(2, {workOrderId:e.item['workOrderId'],deductId:e.item['deductId'],stockInputQty:e.item['stockInputQty'],warehouseCd:e.item['warehouseCd'], itemId:e.item['itemId'],lotUseYn:e.item['lotUseYn']}, true, 'CELLCLICK',menuId,VIEW);
 		}  
 	},
 };

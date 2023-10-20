@@ -63,7 +63,7 @@
 		AND    MPIM.WAREHOUSE_CD = #{receiptWarehouseCd, jdbcType=VARCHAR}
 		</if>	
 		AND    MPIM.STATE       = 'PIF'  -- 확정		
-		AND    MPIM.PROCESS_CD  <![CDATA[<>]]> 'OP' 
+		AND    MPIM.PROCESS_CD   NOT IN ('OP', 'OR')  	 
 		AND    MPIM.IQC_FLAG    = 'Y'		
 		ORDER BY MPIM.INOUT_NO	
     </select>

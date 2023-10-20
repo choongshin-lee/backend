@@ -72,6 +72,12 @@
 		     , MPID.AMOUNT
 		     , MPID.LOCAL_AMOUNT
 		     , MPID.PO_OVER_RECEIPT_RATE
+		     , MPID.STOCK_TYPE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0048', MPID.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STOCK_TYPE_NM
+             , NVL(MPID.LOT_MANAGEMENT_YN, 'N')      AS LOT_MANAGEMENT_YN
+             , MPID.LOT_RULE                         AS LOT_RULE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0052', MPID.LOT_RULE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOT_RULE_NM
+             , TO_CHAR(MPID.EFFECTIVE_DATE ,'YYYY-MM-DD')     AS EFFECTIVE_DATE
 		     , MPID.IO_TYPE
 		     , MPIM.CURRENCY_CD 
              , MPIM.EXCHANGE_RATE 
@@ -201,6 +207,9 @@
 		                        , EXCHANGE_RATE
 		                        , UNIT_PRICE
 		                        , PO_OVER_RECEIPT_RATE
+		                        , LOT_USE_YN
+	                            , LOT_RULE
+	                            , EFFECTIVE_DATE
 				                , REFERENCE_NO
 				                , REFERENCE_DTL_NO
 				                , DESCRIPTION
@@ -223,7 +232,10 @@
 			                    , #{item.currencyCd, jdbcType=VARCHAR}
 			                    , #{item.exchangeRate, jdbcType=NUMERIC}
 			                    , #{item.unitPrice, jdbcType=NUMERIC}
-			                    , #{item.poOverReceiptRate, jdbcType=NUMERIC}	
+			                    , #{item.poOverReceiptRate, jdbcType=NUMERIC}
+			                    , #{item.lotManagementYn, jdbcType=VARCHAR}
+                                , #{item.lotRule, jdbcType=VARCHAR}
+                                , TO_DATE(TO_CHAR(TO_DATE(#{item.effectiveDate, jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD'),'YYYY-MM-DD')	
 				                , #{item.referenceNo, jdbcType=VARCHAR}
 				                , #{item.referenceDtlNo, jdbcType=VARCHAR}
 				                , #{item.description, jdbcType=VARCHAR}

@@ -14,6 +14,13 @@
 	MSD.CUSTOMER_ITEM_ID ,
 	MI.ITEM_NM,MI.ITEM_SPEC,
 	MI.MATERIAL_PROPERTIES, 
+	(SELECT CODE_NM FROM MOM_CODE MC 
+	WHERE 1=1
+	AND MC.COMPANY_CD = MI.COMPANY_CD 
+	AND MC.DIVISION_CD = MI.DIVISION_CD
+	AND MC.GROUP_CD = 'MD0003'
+	AND MC.CODE = MI.MATERIAL_PROPERTIES
+	) AS PROPERTIES_NM,
 	TO_CHAR(MPD.PACKING_QTY,'FM990.999') AS  PACKING_QTY , 
 	TO_CHAR(MPR.ITEM_QTY,'FM990.999') AS ITEM_QTY,
 	MSOM.CUSTOMER_CD,
@@ -63,11 +70,15 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 		<property name="com.jaspersoft.studio.field.name" value="MATERIAL_PROPERTIES"/>
 		<property name="com.jaspersoft.studio.field.label" value="MATERIAL_PROPERTIES"/>
 	</field>
-	<field name="PACKING_QTY" class="java.lang.Integer">
+	<field name="PROPERTIES_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PROPERTIES_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="PROPERTIES_NM"/>
+	</field>
+	<field name="PACKING_QTY" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PACKING_QTY"/>
 		<property name="com.jaspersoft.studio.field.label" value="PACKING_QTY"/>
 	</field>
-	<field name="ITEM_QTY" class="java.lang.Integer">
+	<field name="ITEM_QTY" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="ITEM_QTY"/>
 		<property name="com.jaspersoft.studio.field.label" value="ITEM_QTY"/>
 	</field>
@@ -91,11 +102,11 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 		<property name="com.jaspersoft.studio.field.name" value="PACKING_ID"/>
 		<property name="com.jaspersoft.studio.field.label" value="PACKING_ID"/>
 	</field>
-	<field name="PKG_NO1" class="java.lang.Integer">
+	<field name="PKG_NO1" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="PKG_NO1"/>
 		<property name="com.jaspersoft.studio.field.label" value="PKG_NO1"/>
 	</field>
-	<field name="PKG_TOTAL_CNT1" class="java.lang.Integer">
+	<field name="PKG_TOTAL_CNT1" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="PKG_TOTAL_CNT1"/>
 		<property name="com.jaspersoft.studio.field.label" value="PKG_TOTAL_CNT1"/>
 	</field>
@@ -173,7 +184,7 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 					<font size="7"/>
 					<paragraph leftIndent="3"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{MATERIAL_PROPERTIES}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{PROPERTIES_NM}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="7" y="65" width="35" height="10" uuid="de75e01e-1fce-49e4-8b2f-6ec24654fb63">

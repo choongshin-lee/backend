@@ -19,7 +19,7 @@ var VIEW= {
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         if(index ==0){                                            
             AUIGrid.clearGridData(widget.grid[1]);   
-          //  AUIGrid.clearGridData(widget.grid[2]);   
+            AUIGrid.clearGridData(widget.grid[2]);   
         }
         else if(index ==1){                                            
             AUIGrid.clearGridData(widget.grid[2]);   
