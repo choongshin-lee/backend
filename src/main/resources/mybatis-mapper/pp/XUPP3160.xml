@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mom.backend.XUPP3160">
+	<select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+	    <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+        SELECT A.*
+		    FROM   (
+		    </if>		
+					SELECT MWR.COMPANY_CD
+					     , MWR.DIVISION_CD
+					     , MWR.WO_RESULT_ID
+					     , MWR.WO_RESULT_ID     AS DEPARTURE_NO
+					     , MWR.WORK_ORDER_ID
+					     , MWO.ITEM_ID     
+					     , MIN(MI.ITEM_NM)   AS ITEM_NM
+					     , MIN(MI.ITEM_SPEC) AS ITEM_SPEC
+					     , MIN(MI.ITEM_TYPE) AS ITEM_TYPE
+					     , MIN((SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD, MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL))  AS ITEM_TYPE_NM
+					     , MIN(MWR.WORK_CENTER_CD) AS WORK_CENTER_CD
+					     , MAX(MWC.WORK_CENTER_NM) AS WORK_CENTER_NM
+					     , MIN(MWO.WO_QTY)         AS WO_QTY
+					     , SUM(MWR.RESULT_QTY)  AS  RESULT_QTY
+					     , SUM(DECODE(MWR.WO_RESULT_TYPE, 'G', MWR.RESULT_QTY, 0))        AS GOOD_QTY   
+					     , SUM(DECODE(MWR.WO_RESULT_TYPE, 'D', MWR.RESULT_QTY, 0))       AS DEFECT_QTY 
+					     , MIN(TO_CHAR(MWR.WORK_DAY ,'YYYY-MM-DD'))                AS RESULT_DATE
+					     , MIN(TO_CHAR(MWR.START_TIME ,'YYYY-MM-DD HH24:MI:SS')) AS START_TIME
+					     , MIN(TO_CHAR(MWR.END_TIME ,'YYYY-MM-DD HH24:MI:SS'))   AS END_TIME   
+					     , MWR.WO_RESULT_ID             AS KEY_ID
+					     , COUNT(*) OVER()   AS TOTAL_COUNT
+					     , ROW_NUMBER() OVER(PARTITION BY MWR.COMPANY_CD,MWR.DIVISION_CD ORDER BY MWR.WO_RESULT_ID) AS ROW_CNT
+					FROM   MOM_WO_RESULT MWR
+					     , MOM_WORK_ORDER MWO                  
+					     , MOM_ITEM MI 
+					     , MOM_WORK_CENTER MWC
+					WHERE  MWR.COMPANY_CD     = MWO.COMPANY_CD
+					AND    MWR.DIVISION_CD    = MWO.DIVISION_CD
+					AND    MWR.WORK_ORDER_ID  = MWO.WORK_ORDER_ID
+					AND    MWO.COMPANY_CD     = MI.COMPANY_CD
+					AND    MWO.DIVISION_CD    = MI.DIVISION_CD
+					AND    MWO.ITEM_ID        = MI.ITEM_ID    
+					AND    MWO.COMPANY_CD     = MWC.COMPANY_CD
+					AND    MWO.DIVISION_CD    = MWC.DIVISION_CD
+					AND    MWO.WORK_CENTER_CD = MWC.WORK_CENTER_CD 
+					AND    MWR.COMPANY_CD     = #{companyCd, jdbcType=VARCHAR}
+					AND    MWR.DIVISION_CD    = #{divisionCd, jdbcType=VARCHAR}
+					AND    MWR.WORK_DAY BETWEEN TO_DATE(#{resultDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{resultDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999 
+					<if test="itemIdNm  != null and itemIdNm  != ''">
+					AND    (UPPER(MWO.ITEM_ID) LIKE '%' || UPPER(#{itemIdNm  , jdbcType=VARCHAR}) || '%' OR UPPER(MI.ITEM_NM) LIKE '%' || UPPER(#{itemIdNm  , jdbcType=VARCHAR})) 
+					</if>
+					<if test="workOrderId != null and workOrderId != ''">
+					AND    (UPPER(MWR.WORK_ORDER_ID) LIKE '%' || UPPER(#{workOrderId, jdbcType=VARCHAR}) || '%')    
+					</if>
+					<if test="woResultId != null and woResultId != ''">
+					AND    (UPPER(MWR.WO_RESULT_ID) LIKE '%' || UPPER(#{woResultId, jdbcType=VARCHAR}) || '%')    
+					</if>
+					<if test="workCenterCdNm != null and workCenterCdNm != ''">
+					AND    (UPPER(MWO.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR}) || '%' OR UPPER(MWC.WORK_CENTER_CD) LIKE '%' || UPPER(#{workCenterCdNm , jdbcType=VARCHAR})) 
+					</if>
+					AND    MWR.CANCEL_DATE IS NULL
+					AND    MWO.OUTSOURCING_YN = 'N'  
+					GROUP BY MWR.COMPANY_CD
+					       , MWR.DIVISION_CD
+					       , MWR.WO_RESULT_ID
+					       , MWR.WORK_ORDER_ID
+					       , MWO.ITEM_ID    	
+        <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
+	           ) A
+	    WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
+	    </if> 	
+	</select>
+	<select id="get_findBtn2" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
+        SELECT MRL.COMPANY_CD
+		     , MRL.DIVISION_CD
+		     , MRL.WORK_ORDER_ID
+		     , MRL.WO_RESULT_ID
+		     , MRL.BOX_NO
+		     , MRL.BOX_TOTAL_CNT
+		     , MRL.ITEM_ID
+		     , MRL.WORK_CENTER_CD
+		     , MRL.WORK_CENTER_NM
+		     , MRL.OPERATION_ID
+		     , MRL.OPERATION_NM
+		     , MRL.HCN_CD
+		     , MRL.GOOD_QTY
+		     , MRL.DEFECT_QTY
+		     , MRL.NET_WEIGHT_QTY
+		     , MRL.NET_WEIGHT_UOM
+		     , MRL.NET_WEIGHT_UOM_NM
+		     , MRL.GROSS_WEIGHT_QTY
+		     , MRL.GROSS_WEI_UOM
+		     , MRL.GROSS_WEI_UOM_NM
+		     , MRL.WORK_USER_CD
+		     , MRL.WORK_USER_NM
+		     , MRL.DESCRIPTION
+		     , ROWIDTOCHAR(MRL.ROWID)  AS KEY_ID   
+		FROM   MOM_WO_RESULT_LABEL MRL
+		WHERE  MRL.COMPANY_CD    = #{companyCd, jdbcType=VARCHAR}
+		AND    MRL.DIVISION_CD   = #{divisionCd, jdbcType=VARCHAR}	
+		AND    MRL.WO_RESULT_ID = #{woResultId, jdbcType=VARCHAR}
+		ORDER BY MRL.WO_RESULT_ID
+		       , MRL.BOX_NO	
+    </select>
+</mapper>

@@ -289,6 +289,7 @@
 						              , NET_WEIGHT_UOM
 						              , INSPECTION_YN 
 	                                  , DEFECT_TYPE 
+	                                  , BOX_QTY
 						              , DESCRIPTION
 						              , VAL_MSG
 						              , MULTI_MSG
@@ -311,6 +312,7 @@
 						              , #{item.netWeightUom, jdbcType=VARCHAR}
 						              , #{item.inspectionYn, jdbcType=VARCHAR}
 						              , #{item.defectType, jdbcType=VARCHAR}
+						              , #{item.boxQty, jdbcType=NUMERIC}
 						              , #{item.description, jdbcType=VARCHAR}
 						              , #{item.valMsg, jdbcType=VARCHAR}
 						              , #{item.multiMsg, jdbcType=VARCHAR}
@@ -358,6 +360,7 @@
 						              , NET_WEIGHT_UOM
 						              , INSPECTION_YN 
 	                                  , DEFECT_TYPE 
+	                                  , BOX_QTY
 						              , DESCRIPTION
 						              , VAL_MSG
 						              , MULTI_MSG
@@ -380,6 +383,7 @@
 						              , #{item.netWeightUom, jdbcType=VARCHAR}
 						              , #{item.inspectionYn, jdbcType=VARCHAR}
 						              , #{item.defectType, jdbcType=VARCHAR}
+						              , #{item.boxQty, jdbcType=NUMERIC}
 						              , #{item.description, jdbcType=VARCHAR}
 						              , #{item.valMsg, jdbcType=VARCHAR}
 						              , #{item.multiMsg, jdbcType=VARCHAR}
