@@ -24,6 +24,8 @@
 				     , MSM.EXCHANGE_RATE
 				     , MSM.TAX_TYPE
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, 'SM0029', MSM.TAX_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS TAX_TYPE_NM
+				     , MSM.SHIP_MODE
+				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, 'SC0002', MSM.SHIP_MODE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS SHIP_MODE_NM
 				     , MSM.DESCRIPTION
 				     , MSM.UPDATE_BY          AS UPDATE_USER_NO
 				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MSM.COMPANY_CD, MSM.DIVISION_CD, MSM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
@@ -119,6 +121,7 @@
 									, CURRENCY_CD
 									, EXCHANGE_RATE
 									, TAX_TYPE
+									, SHIP_MODE
 									, DESCRIPTION
 									, DEL_YN
 									, VAL_MSG
@@ -138,6 +141,7 @@
 		                            , #{item.currencyCd, jdbcType=VARCHAR}
 		                            , #{item.exchangeRate, jdbcType=NUMERIC}
 		                            , #{item.taxType, jdbcType=VARCHAR}
+		                            , #{item.shipMode, jdbcType=VARCHAR}
 		                            , #{item.description, jdbcType=VARCHAR}
 		                            , #{item.delYn, jdbcType=VARCHAR}
 		                            , #{item.valMsg, jdbcType=VARCHAR}

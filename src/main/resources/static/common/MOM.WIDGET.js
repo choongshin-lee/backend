@@ -14456,7 +14456,7 @@ var momWidget = {
             your.moveRowCallInit(index, your, action, btnId, param, result);
         } else if (your.delCallInit != undefined && btnId == 'delBtn') {
             your.delCallInit(index, your, action, btnId, param, result);
-        }
+        } 
         if (action == 'R' && your.searchCallInit != undefined) {
             your.searchCallInit(index, your, action, btnId, param, result, event);
         }

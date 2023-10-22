@@ -18,15 +18,22 @@
 	TRIM(MSOM.CUSTOMER_CD||'02'||'('||MP.PARTNER_NM||')') as 	CUSTOMER_NM ,
 	MP.PARTNER_NM,
 	MP.PARTNER_NM_ENG ,
-	'02' AS SHIP_MODE,
+	MC.CODE_NM AS SHIP_MODE,
 	MPR.PACKING_ID ,
 	MPR.PKG_ITEM_ID2,
 	MI.ITEM_NM ,
 	MPR.PKG_NO2 ,
 	MPR.PKG_TOTAL_CNT2 ,
 	TO_CHAR(SYSDATE,'YYYY-MM-DD PM HH:MI:SS','NLS_DATE_LANGUAGE=AMERICAN') AS PRINT_DATE ,
-	MPR.UPDATE_BY
-FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD ,MOM_SHIPPING_ORDER_MST MSOM ,MOM_ITEM MI ,MOM_PARTNER mp 
+	MPR.UPDATE_BY,
+	MU.USER_NM
+FROM 	MOM_PACKING_RESULT MPR ,
+		MOM_PACKING_DTL MPD , 
+		MOM_SHIPPING_ORDER_DTL MSOD ,
+		MOM_SHIPPING_ORDER_MST MSOM ,
+		MOM_ITEM MI ,MOM_PARTNER mp ,
+		MOM_CODE MC,
+		MOM_USER MU
 	WHERE 1=1
 	AND MPR.PACKING_DETAIL_ID = MPD.PACKING_DETAIL_ID 
 	AND MPD.REFERENCE_NO = MSOM.SHIPPING_NO(+)
@@ -37,6 +44,13 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 	AND MSOM.COMPANY_CD = MP.COMPANY_CD 
 	AND MSOM.DIVISION_CD = MP.DIVISION_CD 
 	AND MSOM.CUSTOMER_CD = MP.PARTNER_CD 
+	AND MC.COMPANY_CD = MSOM.COMPANY_CD 
+	AND MC.DIVISION_CD = MSOM.DIVISION_CD
+	AND MC.GROUP_CD = 'SC0002'
+	AND MC.CODE = MSOM.SHIP_MODE
+	AND MPR.COMPANY_CD = MU.COMPANY_CD 
+	AND MPR.DIVISION_CD = MU.DIVISION_CD 
+	AND MPR.UPDATE_BY = MU.USER_NO
 	AND MPR.COMPANY_CD = $P{companyCd}
 	AND MPR.DIVISION_CD = $P{divisionCd}
 	AND MPR.PACKING_ID = $P{departureNo}
@@ -46,13 +60,14 @@ GROUP BY
 	MSOM.CUSTOMER_CD,
 	MP.PARTNER_NM_ENG ,
 	MP.PARTNER_NM,
---	'02' AS SHIP_MODE,
+	MC.CODE_NM,
 	MPR.PACKING_ID ,
 	MPR.PKG_ITEM_ID2,
 	MI.ITEM_NM ,
 	MPR.PKG_NO2 ,
 	MPR.PKG_TOTAL_CNT2 ,
-	MPR.UPDATE_BY
+	MPR.UPDATE_BY,
+	MU.USER_NM
 ORDER BY MPR.PKG_ITEM_ID2 ASC,MPR.PKG_NO2 ASC]]>
 	</queryString>
 	<field name="NET_WEI2" class="java.math.BigDecimal">
@@ -123,13 +138,17 @@ ORDER BY MPR.PKG_ITEM_ID2 ASC,MPR.PKG_NO2 ASC]]>
 		<property name="com.jaspersoft.studio.field.name" value="UPDATE_BY"/>
 		<property name="com.jaspersoft.studio.field.label" value="UPDATE_BY"/>
 	</field>
+	<field name="USER_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="USER_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="USER_NM"/>
+	</field>
 	<detail>
 		<band height="141" splitType="Stretch">
 			<componentElement>
 				<reportElement x="7" y="9" width="223" height="31" uuid="c814fdb6-f4d3-4658-aac9-22354fbe93b1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="bottom">
+				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" moduleWidth="1.0" textPosition="bottom">
 					<jr:codeExpression><![CDATA[$F{BAR_CODE}]]></jr:codeExpression>
 				</jr:Code128>
 			</componentElement>
@@ -226,7 +245,7 @@ ORDER BY MPR.PKG_ITEM_ID2 ASC,MPR.PKG_NO2 ASC]]>
 					<font fontName="JAS-HY고딕"/>
 					<paragraph rightIndent="3"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{UPDATE_BY}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{USER_NM}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="79" y="121" width="12" height="14" uuid="09de6293-c68c-4774-8339-89827110ae27"/>

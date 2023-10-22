@@ -168,7 +168,7 @@ WHERE 1=1
 				<reportElement x="7" y="10" width="142" height="27" uuid="c814fdb6-f4d3-4658-aac9-22354fbe93b1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="bottom">
+				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" moduleWidth="1.0" textPosition="bottom">
 					<jr:codeExpression><![CDATA[$F{DEPARTURE_NO}]]></jr:codeExpression>
 				</jr:Code128>
 			</componentElement>
@@ -422,7 +422,7 @@ WHERE 1=1
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[AVG]]></text>
+				<text><![CDATA[M.AVG]]></text>
 			</staticText>
 			<textField textAdjust="ScaleFont">
 				<reportElement x="33" y="94" width="82" height="12" uuid="10bfa9be-df76-4f16-bd80-5acd8ddcef9f">

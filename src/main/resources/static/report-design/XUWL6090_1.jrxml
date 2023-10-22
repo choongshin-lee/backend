@@ -26,22 +26,38 @@
 	MSOM.CUSTOMER_CD,
 	MSD.SALES_ORDER_ID,
 	MSD.CUSTOMER_PO_NO,
-	'운송방법' AS TRANS_MTHD,
+	(SELECT CODE_NM FROM MOM_CODE MC 
+	WHERE 1=1
+	AND MC.COMPANY_CD = MI.COMPANY_CD 
+	AND MC.DIVISION_CD = MI.DIVISION_CD
+	AND MC.GROUP_CD = 'SC0002'
+	AND MC.CODE = MSOM.SHIP_MODE
+	) AS SHIP_MODE,
 	MPR.PACKING_ID ,
 	MPR.PKG_NO1 ,
 	MPR.PKG_TOTAL_CNT1 ,
 	TO_CHAR(SYSDATE,'YYYY-MM-DD PM HH:MI:SS','NLS_DATE_LANGUAGE=AMERICAN') AS PRINT_DATE,
 	MPR.UPDATE_BY,
+	MU.USER_NM,
 	MSD.CUSTOMER_ITEM_ID||';'||TO_CHAR(MPD.PACKING_QTY,'FM990.99')
 	||';'||CUSTOMER_CD||';'||MSD.SALES_ORDER_ID||';'||MSD.CUSTOMER_PO_NO||';'||'운송방법'||';'||MPR.PACKING_ID||';'||
 	TO_CHAR(SYSDATE,'YYYY-MM-DD PM HH:MI:SS','NLS_DATE_LANGUAGE=AMERICAN')||';' AS RIGHT_QR
-FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD ,MOM_SHIPPING_ORDER_MST MSOM , MOM_SO_DTL MSD , MOM_ITEM MI 
+FROM 	MOM_PACKING_RESULT MPR , 
+		MOM_PACKING_DTL MPD , 
+		MOM_SHIPPING_ORDER_DTL MSOD ,
+		MOM_SHIPPING_ORDER_MST MSOM , 
+		MOM_SO_DTL MSD , 
+		MOM_ITEM MI ,
+		MOM_USER MU
 	WHERE 1=1
 	AND MPR.PACKING_DETAIL_ID = MPD.PACKING_DETAIL_ID 
 	AND MPD.REFERENCE_NO = MSOM.SHIPPING_NO(+)
 	AND MPD.REFERENCE_DTL_NO = MSOD.SHIPPING_ORDER_ID (+)
 	AND MSOD.REFERENCE_DTL_NO = MSD.SALES_ORDER_ID(+)
 	AND MPR.ITEM_ID = MI.ITEM_ID 
+	AND MPR.COMPANY_CD = MU.COMPANY_CD 
+	AND MPR.DIVISION_CD = MU.DIVISION_CD 
+	AND MPR.UPDATE_BY = MU.USER_NO
 	AND MPR.COMPANY_CD = $P{companyCd}
 	AND MPR.DIVISION_CD = $P{divisionCd}
 	AND MPR.PACKING_ID = $P{departureNo}]]>
@@ -94,9 +110,9 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 		<property name="com.jaspersoft.studio.field.name" value="CUSTOMER_PO_NO"/>
 		<property name="com.jaspersoft.studio.field.label" value="CUSTOMER_PO_NO"/>
 	</field>
-	<field name="TRANS_MTHD" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="TRANS_MTHD"/>
-		<property name="com.jaspersoft.studio.field.label" value="TRANS_MTHD"/>
+	<field name="SHIP_MODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SHIP_MODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SHIP_MODE"/>
 	</field>
 	<field name="PACKING_ID" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="PACKING_ID"/>
@@ -118,6 +134,10 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 		<property name="com.jaspersoft.studio.field.name" value="UPDATE_BY"/>
 		<property name="com.jaspersoft.studio.field.label" value="UPDATE_BY"/>
 	</field>
+	<field name="USER_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="USER_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="USER_NM"/>
+	</field>
 	<field name="RIGHT_QR" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="RIGHT_QR"/>
 		<property name="com.jaspersoft.studio.field.label" value="RIGHT_QR"/>
@@ -128,7 +148,7 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 				<reportElement x="7" y="6" width="143" height="13" uuid="c814fdb6-f4d3-4658-aac9-22354fbe93b1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="none">
+				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" moduleWidth="1.0" textPosition="none">
 					<jr:codeExpression><![CDATA[$F{LOT_ID}]]></jr:codeExpression>
 				</jr:Code128>
 			</componentElement>
@@ -237,7 +257,7 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 					<font fontName="JAS-HY고딕" size="8"/>
 					<paragraph leftIndent="3"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{TRANS_MTHD}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{SHIP_MODE}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="ScaleFont">
 				<reportElement x="7" y="125" width="93" height="12" uuid="f9e3dc0a-4ca0-4541-8d10-8eebbf2c1578">
@@ -329,12 +349,12 @@ FROM 	MOM_PACKING_RESULT MPR , MOM_PACKING_DTL MPD , MOM_SHIPPING_ORDER_DTL MSOD
 				</textElement>
 				<text><![CDATA[HCN :]]></text>
 			</staticText>
-			<textField>
+			<textField textAdjust="ScaleFont">
 				<reportElement x="100" y="125" width="50" height="12" uuid="9599604c-2cfd-4d49-ba8d-b5849e59dbc8"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="JAS-HY고딕" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{UPDATE_BY}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{USER_NM}]]></textFieldExpression>
 			</textField>
 			<image>
 				<reportElement x="7" y="75" width="50" height="50" uuid="64eac671-5090-4413-be4f-cf612d2604aa"/>

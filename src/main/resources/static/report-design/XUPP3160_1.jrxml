@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="XUPP3160_1" pageWidth="240" pageHeight="141" orientation="Landscape" columnWidth="240" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="8b0b406e-2fe3-4ce9-95ca-e790fdd03edf">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mom_master"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="companyCd" class="java.lang.String"/>
+	<parameter name="divisionCd" class="java.lang.String"/>
+	<parameter name="departureNo" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	MWRL.*,
+	'['||NET_WEIGHT_UOM||'] :' AS NET_WEI_UOM,
+	'['||GROSS_WEI_UOM||'] :' AS GRO_WEI_UOM,
+	TO_CHAR(UPDATE_DATE,'YYYY-MM-DD PM HH:MI:SS','NLS_DATE_LANGUAGE=AMERICAN') AS PRINT_DATE
+FROM MOM_WO_RESULT_LABEL MWRL
+WHERE 1=1
+	AND MWRL.COMPANY_CD = $P{companyCd}
+	AND MWRL.DIVISION_CD = $P{divisionCd}
+	AND MWRL.WO_RESULT_ID = $P{departureNo}]]>
+	</queryString>
+	<field name="COMPANY_CD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COMPANY_CD"/>
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_CD"/>
+	</field>
+	<field name="DIVISION_CD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DIVISION_CD"/>
+		<property name="com.jaspersoft.studio.field.label" value="DIVISION_CD"/>
+	</field>
+	<field name="WORK_ORDER_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_ORDER_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_ORDER_ID"/>
+	</field>
+	<field name="WO_RESULT_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WO_RESULT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="WO_RESULT_ID"/>
+	</field>
+	<field name="BOX_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BOX_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="BOX_NO"/>
+	</field>
+	<field name="BOX_TOTAL_CNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BOX_TOTAL_CNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="BOX_TOTAL_CNT"/>
+	</field>
+	<field name="ITEM_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_ID"/>
+	</field>
+	<field name="WORK_CENTER_CD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_CENTER_CD"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_CENTER_CD"/>
+	</field>
+	<field name="WORK_CENTER_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_CENTER_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_CENTER_NM"/>
+	</field>
+	<field name="OPERATION_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OPERATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="OPERATION_ID"/>
+	</field>
+	<field name="OPERATION_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="OPERATION_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="OPERATION_NM"/>
+	</field>
+	<field name="HCN_CD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HCN_CD"/>
+		<property name="com.jaspersoft.studio.field.label" value="HCN_CD"/>
+	</field>
+	<field name="WO_QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="WO_QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="WO_QTY"/>
+	</field>
+	<field name="GOOD_QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GOOD_QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="GOOD_QTY"/>
+	</field>
+	<field name="DEFECT_QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DEFECT_QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEFECT_QTY"/>
+	</field>
+	<field name="NET_WEIGHT_QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NET_WEIGHT_QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="NET_WEIGHT_QTY"/>
+	</field>
+	<field name="GROSS_WEIGHT_QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_WEIGHT_QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_WEIGHT_QTY"/>
+	</field>
+	<field name="NET_WEIGHT_UOM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NET_WEIGHT_UOM"/>
+		<property name="com.jaspersoft.studio.field.label" value="NET_WEIGHT_UOM"/>
+	</field>
+	<field name="NET_WEIGHT_UOM_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NET_WEIGHT_UOM_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="NET_WEIGHT_UOM_NM"/>
+	</field>
+	<field name="GROSS_WEI_UOM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_WEI_UOM"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_WEI_UOM"/>
+	</field>
+	<field name="GROSS_WEI_UOM_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GROSS_WEI_UOM_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROSS_WEI_UOM_NM"/>
+	</field>
+	<field name="WORK_USER_CD" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_USER_CD"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_USER_CD"/>
+	</field>
+	<field name="WORK_USER_NM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WORK_USER_NM"/>
+		<property name="com.jaspersoft.studio.field.label" value="WORK_USER_NM"/>
+	</field>
+	<field name="LOT_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LOT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOT_ID"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="CREATE_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CREATE_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATE_BY"/>
+	</field>
+	<field name="CREATE_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="CREATE_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATE_DATE"/>
+	</field>
+	<field name="UPDATE_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATE_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATE_BY"/>
+	</field>
+	<field name="UPDATE_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATE_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATE_DATE"/>
+	</field>
+	<field name="NET_WEI_UOM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NET_WEI_UOM"/>
+		<property name="com.jaspersoft.studio.field.label" value="NET_WEI_UOM"/>
+	</field>
+	<field name="GRO_WEI_UOM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GRO_WEI_UOM"/>
+		<property name="com.jaspersoft.studio.field.label" value="GRO_WEI_UOM"/>
+	</field>
+	<field name="PRINT_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PRINT_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRINT_DATE"/>
+	</field>
+	<detail>
+		<band height="141" splitType="Stretch">
+			<componentElement>
+				<reportElement x="7" y="10" width="224" height="30" uuid="c814fdb6-f4d3-4658-aac9-22354fbe93b1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:Code128 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" moduleWidth="1.0" textPosition="bottom">
+					<jr:codeExpression><![CDATA[$F{WO_RESULT_ID}]]></jr:codeExpression>
+				</jr:Code128>
+			</componentElement>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="7" y="40" width="142" height="14" uuid="3bb6add5-3834-4d0a-8f75-d87e121b8b09">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="10" isBold="true"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_ORDER_ID}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="123" y="74" width="26" height="14" uuid="5f8eefb4-1d44-4707-88cf-897d8ed45ac7">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[공정 :]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="33" y="74" width="90" height="14" uuid="f960cd5c-9405-4cc6-8e4c-23cb8c8c3a58">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_CENTER_NM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="7" y="74" width="26" height="14" uuid="aab3aec3-4e95-4154-87ca-2c985e4f08d4">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[설비 :]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="48" y="117" width="113" height="12" uuid="cdd2e154-c076-4260-960e-c9a72282abb2">
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRINT_DATE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="169" y="117" width="46" height="12" uuid="d18749e3-724a-4f9d-87a7-03540514ead8">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WORK_USER_NM}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="149" y="74" width="82" height="14" uuid="045dbcf7-b8eb-48f0-97d3-68bddd32a41b">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OPERATION_NM}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont" pattern="#,##0.00#;#,##0.00#-">
+				<reportElement x="40" y="88" width="40" height="12" uuid="10bfa9be-df76-4f16-bd80-5acd8ddcef9f">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{WO_QTY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="7" y="88" width="33" height="12" uuid="7ec73e65-30b0-42bb-adc2-16b071f3ddb3">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[지시량 :]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="198" y="60" width="33" height="14" uuid="2360ab9c-4b6b-4193-8ed1-4d2ac0d7b44c">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HCN_CD}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="166" y="60" width="32" height="14" uuid="2048033e-5567-4a23-adf7-4de3737b8e04">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[HCN :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="168" y="43" width="29" height="14" uuid="803d7112-ac43-42f6-ab60-7bdafb417604">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="10" isBold="false"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BOX_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="202" y="43" width="29" height="14" uuid="1b444d65-d899-47b6-8e85-a2046a46c98d">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="10" isBold="false"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BOX_TOTAL_CNT}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="7" y="60" width="154" height="14" uuid="341bec4e-0309-40a4-8591-e696c3b04809">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="10" isBold="true"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_ID}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="89" y="88" width="26" height="12" uuid="1172fc51-eece-436c-9de2-fadb26547b3e">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[양품 :]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont" pattern="#,##0.00#;#,##0.00#-">
+				<reportElement x="115" y="88" width="40" height="12" uuid="cd38d642-f8ac-4640-a2e2-f7d12688496d">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GOOD_QTY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="161" y="88" width="26" height="12" uuid="4625a1c9-5e0c-4c74-ac94-197fa1d040a9">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[불량 :]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont" pattern="#,##0.00#;#,##0.00#-">
+				<reportElement x="187" y="88" width="40" height="12" uuid="caa6a565-409d-444f-890e-a1b3a828031a">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEFECT_QTY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="7" y="100" width="20" height="12" uuid="263fe44e-898d-48a7-98a8-44a435ca8d14">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[단중]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="27" y="100" width="26" height="12" uuid="7bf40b2f-6814-4743-80d0-a8edd655c91b">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_WEI_UOM}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont" pattern="#,##0.00#;#,##0.00#-">
+				<reportElement x="53" y="100" width="40" height="12" uuid="f6be52bd-bbe9-4c2b-bec5-43f0a87f01ef">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_WEIGHT_QTY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="115" y="100" width="28" height="12" uuid="f0f3e36d-f906-439e-9ee1-3a07a8fff794">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[총중량]]></text>
+			</staticText>
+			<textField textAdjust="ScaleFont" pattern="#,##0.00#;#,##0.00#-">
+				<reportElement x="168" y="100" width="40" height="12" uuid="2ee5c7ae-5531-4e28-a572-37321a4e3da9">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS_WEIGHT_QTY}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="143" y="100" width="25" height="12" uuid="c8a936c5-bc3d-4ce7-99ba-c40313ca442f">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NET_WEI_UOM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="7" y="117" width="41" height="12" uuid="9b658159-b90d-49fe-bc44-577be20d8c7b">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="8"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[등록일자 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="197" y="43" width="5" height="14" uuid="1afa68da-5524-4e0d-a4a1-eedd860c13a0">
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="JAS-HY고딕" size="10"/>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<text><![CDATA[/]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>
