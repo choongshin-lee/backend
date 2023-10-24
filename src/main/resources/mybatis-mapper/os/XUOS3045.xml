@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mom.backend.XUOS4010">
+<mapper namespace="com.mom.backend.XUOS3045">
     <select id="get_findBtn1" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" fetchSize="1000">
         <if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 		    SELECT A.*
@@ -23,6 +23,8 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MD0048', MPI.STOCK_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS STOCK_TYPE_NM
 					     , MPI.STATE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MM0013', MPI.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS STATE_NM
+					     , MPI.IQC_RESULT
+					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MM0014', MPI.IQC_RESULT, #{langCd, jdbcType=VARCHAR}) FROM DUAL)    AS IQC_RESULT_NM
 					     , MPI.INOUT_QTY   AS DEPARTURE_QTY
 					     , MPI.INOUT_UOM   AS DEPARTURE_UOM	 
 					     , MPI.GOOD_QTY
@@ -36,18 +38,29 @@
 					     , MPI.LOCAL_AMOUNT
 					     , MPI.CURRENCY_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'SM0017', MPI.CURRENCY_CD, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS CURRENCY_NM
+					     , MPI.PENALTY_AMOUNT
+                         , MPI.PENALTY_LOCAL_AMOUNT
 					     , MPI.WAREHOUSE_CD
 					     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MPI.COMPANY_CD,MPI.DIVISION_CD,MPI.WAREHOUSE_CD) FROM DUAL) AS WAREHOUSE_NM
 					     , MPI.VENDOR_CD   AS PARTNER_CD
-					     , (SELECT MOM_COMMON_PKG.FN_GET_PARTNER_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.VENDOR_CD) FROM DUAL ) AS PARTNER_NM
+					     , MP.PARTNER_NM
+					     , MPI.REFERENCE_NO
+                         , MPI.REFERENCE_DTL_NO
+					     , DECODE(MPI.ITEM_INOUT_ID, '', '',  MPI.IO_TYPE) AS IO_TYPE
+					     , CASE WHEN MPI.ITEM_INOUT_ID IS NOT NULL THEN
+					           (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.IO_TYPE) FROM DUAL) 
+					       ELSE ''
+					       END    AS IO_TYPE_NM
+					     , TO_CHAR(MPI.RECEIPT_DATE ,'YYYY-MM-DD')   AS RECEIPT_DATE
+					     , TO_CHAR(MPI.DEPARTURE_DATE ,'YYYY-MM-DD')     AS DEPARTURE_DATE
+					     , MPI.IQC_FLAG
+					     , MPI.RECEIPT_QTY
+					     , MPI.RECEIPT_YN
 					     , NVL(MPI.LOT_MANAGEMENT_YN, 'N')      AS LOT_MANAGEMENT_YN
 			             , MPI.LOT_RULE                         AS LOT_RULE
 			             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, 'MD0052', MPI.LOT_RULE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOT_RULE_NM
 			             , MPI.LOT_ID
-					     , MPI.REFERENCE_NO
-                         , MPI.REFERENCE_DTL_NO
-					     , MPI.IO_TYPE
-					     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
+			             , TO_CHAR(MPI.EFFECTIVE_DATE ,'YYYY-MM-DD')     AS EFFECTIVE_DATE
 					     , TO_CHAR(MPI.CREATE_DATE ,'YYYY-MM-DD HH24:MI:SS')     AS CREATE_DATE
 						 , MPI.CREATE_BY                                         AS CREATE_USER_NO
 						 , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPI.COMPANY_CD, MPI.DIVISION_CD, MPI.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
@@ -60,16 +73,16 @@
 					     , MOM_PARTNER MP
 					WHERE  MPI.COMPANY_CD   = MI.COMPANY_CD
 					AND    MPI.DIVISION_CD  = MI.DIVISION_CD
-					AND    MPI.ITEM_ID      = MI.ITEM_ID   
+					AND    MPI.ITEM_ID      = MI.ITEM_ID  
 					AND    MPI.COMPANY_CD   = MP.COMPANY_CD
-                    AND    MPI.DIVISION_CD  = MP.DIVISION_CD
-                    AND    MPI.VENDOR_CD    = MP.PARTNER_CD	 
+		            AND    MPI.DIVISION_CD  = MP.DIVISION_CD
+		            AND    MPI.VENDOR_CD    = MP.PARTNER_CD  
 					AND    MPI.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
 					AND    MPI.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
-					AND    MPI.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					AND    MPI.CREATE_DATE BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
 					<if test="partnerCdNm != null and partnerCdNm != ''">
-					AND    (UPPER(MPI.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
-					</if>	 
+					AND    (UPPER(MPI.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')
+					</if>  
 					<if test="departureNo != null and departureNo != ''">
 					AND    UPPER(MPI.INOUT_NO) LIKE '%' || UPPER(#{departureNo, jdbcType=VARCHAR}) || '%'
 					</if>
@@ -79,53 +92,19 @@
 					<if test="departureTitle != null and departureTitle != ''">
 					AND    UPPER(MPI.TITLE) LIKE '%' || UPPER(#{departureTitle, jdbcType=VARCHAR}) || '%'
 					</if>
-					AND    MPI.STATE       = 'PIF'  -- 확정	
-					AND    MPI.PROCESS_CD  = 'OP' 
-					AND    MPI.IQC_FLAG    = 'Y'
+					<if test="iqcFlag != null and iqcFlag != ''">
+					AND    MPI.IQC_FLAG = #{iqcFlag, jdbcType=VARCHAR}
+					</if>	
+					AND    MPI.PROCESS_CD = 'OP' 
+					<if test="state != null and state != ''">
+					AND    MPI.STATE = #{state, jdbcType=VARCHAR}
+					</if>	
+				    <if test="receiptYn != null and receiptYn != ''">
+					AND    MPI.RECEIPT_YN = #{receiptYn, jdbcType=VARCHAR}
+					</if>
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
-		</if>
+		</if>  	
 	</select>
-    <delete id="remove_customBtn1-1" parameterType="java.util.List">
-        DELETE FROM MOM_PROC_PI_RECEIVE
-        <where>
-            <foreach collection="list" item="item" open="" close="" separator="OR">
-	        (       COMPANY_CD  = #{item.companyCd, jdbcType=VARCHAR}
-	           AND  DIVISION_CD = #{item.divisionCd, jdbcType=VARCHAR}
-	           AND  CREATE_BY   = #{item.userId, jdbcType=VARCHAR}
-	        )
-            </foreach>
-        </where>
-    </delete>  
-    <insert id="create_customBtn1-1" parameterType="java.util.List">
-        <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
-        INTO MOM_PROC_PI_RECEIVE( COMPANY_CD
-		                        , DIVISION_CD
-		                        , PROCESS_CD
-		                        , INOUT_NO
-		                        , VAL_MSG
-		                        , MULTI_MSG
-		                        , DESCRIPTION
-		                        , CREATE_BY
-		                        , CREATE_DATE )
-        VALUES                  ( #{item.companyCd, jdbcType=VARCHAR}
-	                            , #{item.divisionCd, jdbcType=VARCHAR}
-	                            , #{item.processCd, jdbcType=VARCHAR}
-	                            , #{item.departureNo, jdbcType=VARCHAR}
-	                            , #{item.valMsg, jdbcType=VARCHAR}
-	                            , #{item.multiMsg, jdbcType=VARCHAR}
-	                            , #{item.description, jdbcType=VARCHAR}
-	                            , #{item.userId, jdbcType=VARCHAR}
-	                            , MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
-	                            )
-        </foreach>
-    </insert>
-    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-    { CALL MOM_MATERIAL_PKG.SP_PI_RECEIVE( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
-		                                 , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
-				                         , #{companyCd,   jdbcType=VARCHAR, mode=IN}
-				                         , #{divisionCd,  jdbcType=VARCHAR, mode=IN}											  
-				                         , #{userId,      jdbcType=VARCHAR, mode=IN} )}    	              
-    </select>  	
 </mapper>

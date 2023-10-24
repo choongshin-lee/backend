@@ -46,6 +46,16 @@
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPM.COMPANY_CD, MPM.DIVISION_CD, 'MM0005', MPM.PO_REFERENCE_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS PO_REFERENCE_TYPE_NM     
 					     , MPD.REFERENCE_NO
 					     , MPD.REFERENCE_DTL_NO
+					     , ( SELECT TO_CHAR(MDM.DO_DATE ,'YYYY-MM-DD') 
+					         FROM   MOM_DO_MST MDM
+					         WHERE  MDM.COMPANY_CD  = MPM.COMPANY_CD
+					         AND    MDM.DIVISION_CD = MPM.DIVISION_CD
+					         AND    MDM.DO_NO IN ( SELECT MDD.DO_NO 
+					                               FROM   MOM_DO_DTL MDD
+					                               WHERE  MDD.COMPANY_CD = MDM.COMPANY_CD
+					                               AND    MDD.DIVISION_CD = MDM.DIVISION_CD
+					                               AND    MDD.REFERENCE_NO = MPM.PO_NO )
+					                             )  AS INPUT_MAT_RECEIPT_DATE
 					     , MPD.CREATE_BY      AS CREATE_USER_NO
 					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
 					     , TO_CHAR(MPD.CREATE_DATE ,'YYYY-MM-DD')     AS CREATE_DATE 

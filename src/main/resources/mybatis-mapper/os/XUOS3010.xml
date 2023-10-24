@@ -77,7 +77,7 @@
              , NVL(MPID.LOT_MANAGEMENT_YN, 'N')      AS LOT_MANAGEMENT_YN
              , MPID.LOT_RULE                         AS LOT_RULE
              , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0052', MPID.LOT_RULE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOT_RULE_NM
-             , TO_CHAR(MPID.EFFECTIVE_DATE ,'YYYY-MM-DD')     AS EFFECTIVE_DATE
+             , MPID.LOT_ID 
 		     , MPID.IO_TYPE
 		     , MPIM.CURRENCY_CD 
              , MPIM.EXCHANGE_RATE 

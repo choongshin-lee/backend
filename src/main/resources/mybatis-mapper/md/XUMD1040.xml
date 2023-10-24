@@ -48,6 +48,7 @@
 	                              ,  WORK_GROUP_NM
 	                              ,  WORK_GROUP_TYPE
 	                              ,  USE_YN
+	                              ,  TRN_FLAG
 	                              ,  DESCRIPTION
 	                              ,  CREATE_BY
 	                              ,  CREATE_DATE
@@ -61,6 +62,7 @@
             ,   #{item.workGroupNm, jdbcType=VARCHAR}
             ,   #{item.workGroupType, jdbcType=VARCHAR}
             ,   #{item.useYn, jdbcType=VARCHAR}
+            ,   'A'
             ,   #{item.description, jdbcType=VARCHAR}
             ,   #{item.userId, jdbcType=VARCHAR}
             ,   MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
@@ -75,6 +77,7 @@
         SET    WORK_GROUP_NM   = #{item.workGroupNm,   jdbcType=VARCHAR}
              , WORK_GROUP_TYPE = #{item.workGroupType,   jdbcType=VARCHAR}
              , USE_YN          = #{item.useYn,         jdbcType=VARCHAR}
+             , TRN_FLAG	       = 'U'
              , DESCRIPTION     = #{item.description,   jdbcType=VARCHAR}
              , UPDATE_BY       = #{item.userId,        jdbcType=VARCHAR}
              , UPDATE_DATE     = MOM_COMMON_PKG.FN_GET_LOCAL_TIME(#{item.companyCd, jdbcType=VARCHAR},#{item.divisionCd, jdbcType=VARCHAR})
@@ -119,6 +122,7 @@
         SET    WORK_GROUP_NM   = PARAM.workGroupNm
              , WORK_GROUP_TYPE = PARAM.workGroupType
              , USE_YN          = PARAM.useYn
+             , TRN_FLAG	       = 'U'
              , DESCRIPTION     = PARAM.description
              , CREATE_BY       = PARAM.createBy
              , CREATE_DATE     = PARAM.createDate
@@ -131,6 +135,7 @@
                , WORK_GROUP_NM
                , WORK_GROUP_TYPE
                , USE_YN
+               , TRN_FLAG
                , DESCRIPTION
                , CREATE_BY
                , CREATE_DATE
@@ -142,6 +147,7 @@
                , PARAM.workGroupNm
                , PARAM.workGroupType
                , PARAM.useYn
+               , 'A'
                , PARAM.description
                , PARAM.createBy
                , PARAM.createDate

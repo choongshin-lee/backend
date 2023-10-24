@@ -49,6 +49,16 @@
 					     , MPD.CREATE_BY      AS CREATE_USER_NO
 					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPD.COMPANY_CD, MPD.DIVISION_CD, MPD.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
 					     , TO_CHAR(MPD.CREATE_DATE ,'YYYY-MM-DD')     AS CREATE_DATE 
+					     , ( SELECT TO_CHAR(MDM.DO_DATE ,'YYYY-MM-DD') 
+					         FROM   MOM_DO_MST MDM
+					         WHERE  MDM.COMPANY_CD  = MPM.COMPANY_CD
+					         AND    MDM.DIVISION_CD = MPM.DIVISION_CD
+					         AND    MDM.DO_NO IN ( SELECT MDD.DO_NO 
+					                               FROM   MOM_DO_DTL MDD
+					                               WHERE  MDD.COMPANY_CD = MDM.COMPANY_CD
+					                               AND    MDD.DIVISION_CD = MDM.DIVISION_CD
+					                               AND    MDD.REFERENCE_NO = MPM.PO_NO )
+					                             )  AS INPUT_MAT_RECEIPT_DATE
 					     , ROWIDTOCHAR(MPD.ROWID)  AS KEY_ID
 					     , COUNT(*) OVER() AS TOTAL_COUNT
                          , ROW_NUMBER() OVER(PARTITION BY MPD.COMPANY_CD,MPD.DIVISION_CD ORDER BY MPD.PURCHASE_ORDER_ID ) AS ROW_COUNT
@@ -78,7 +88,37 @@
 					</if>
 					<if test="partnerCdNm != null and partnerCdNm != ''">
 					AND    (UPPER(MPM.VENDOR_CD) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MP.PARTNER_NM) LIKE '%' || UPPER(#{partnerCdNm, jdbcType=VARCHAR}) || '%')    
-					</if> 	
+					</if> 
+					<if test="inputMatReceiptCheck != null and inputMatReceiptCheck != ''">		
+		                <choose>
+		                    <when test='inputMatReceiptCheck.equals("Y")'>	 	 
+		                    <![CDATA[  AND EXISTS ( SELECT MDM.DO_DATE
+									                FROM   MOM_DO_MST MDM
+									                WHERE  MDM.COMPANY_CD  = MPM.COMPANY_CD
+									                AND    MDM.DIVISION_CD = MPM.DIVISION_CD
+									                AND    MDM.DO_DATE IS NOT NULL
+									                AND    MDM.DO_NO IN ( SELECT MDD.DO_NO 
+									                                      FROM   MOM_DO_DTL MDD
+									                                      WHERE  MDD.COMPANY_CD = MDM.COMPANY_CD
+									                                      AND    MDD.DIVISION_CD = MDM.DIVISION_CD
+									                                      AND    MDD.REFERENCE_NO = MPM.PO_NO )
+									                             )	]]> 
+				   	        </when>
+		                    <when test='inputMatReceiptCheck.equals("N")'>
+		                    <![CDATA[  AND EXISTS ( SELECT MDM.DO_DATE
+									                FROM   MOM_DO_MST MDM
+									                WHERE  MDM.COMPANY_CD  = MPM.COMPANY_CD
+									                AND    MDM.DIVISION_CD = MPM.DIVISION_CD
+									                AND    MDM.DO_DATE IS  NULL
+									                AND    MDM.DO_NO IN ( SELECT MDD.DO_NO 
+									                                      FROM   MOM_DO_DTL MDD
+									                                      WHERE  MDD.COMPANY_CD = MDM.COMPANY_CD
+									                                      AND    MDD.DIVISION_CD = MDM.DIVISION_CD
+									                                      AND    MDD.REFERENCE_NO = MPM.PO_NO )
+									                             )	]]> 
+		                    </when>    
+		                </choose>		
+		            </if>	
 		<if test="startPage != null and startPage != '' and endPage != null and endPage != ''">
 				       ) A
 				WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
