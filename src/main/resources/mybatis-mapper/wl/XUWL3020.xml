@@ -20,6 +20,10 @@
                          , (SELECT MOM_COMMON_PKG.FN_GET_WH_IO_RECEIPT_TYPE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.IO_RECEIPT_TYPE) FROM DUAL)  AS INPUT_RECEIPT_TYPE_NM
 					     , MWM.STATE
 					     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, 'WM0002', MWM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
+					     , MWM.PROCESS_CD
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
+					     , MWM.PICKING_YN
+					     , MWM.AUTO_RECEIPT_YN
 					     , MWM.DESCRIPTION
 					     , MWM.UPDATE_BY      AS UPDATE_USER_NO
 					     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MWM.COMPANY_CD, MWM.DIVISION_CD, MWM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
@@ -115,6 +119,7 @@
 		                                , DIVISION_CD
 		                                , IO_RECEIPT_TYPE
 		                                , RECEIPT_ID
+		                                , PICKING_YN
 		                                , DESCRIPTION
 		                                , VAL_MSG
 		                                , MULTI_MSG
@@ -125,6 +130,7 @@
 		                                , #{item.divisionCd, jdbcType=VARCHAR}
 		                                , 'WMO' 
 		                                , #{item.receiptId, jdbcType=VARCHAR}
+		                                , #{item.picking_yn, jdbcType=VARCHAR}
 		                                , #{item.description, jdbcType=VARCHAR}
 		                                , #{item.valMsg, jdbcType=VARCHAR}
 		                                , #{item.multiMsg, jdbcType=VARCHAR}

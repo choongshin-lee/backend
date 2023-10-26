@@ -880,4 +880,18 @@
 	AND    MPC.USE_YN      = 'Y'
 	ORDER BY LABEL  
 	</select> 
+	<select id="get_DD00065" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap" >
+	SELECT MP.PROCESS_CD   AS CODE 
+	     , MP.PROCESS_CD   ||'('|| MP.PROCESS_NM     ||')' AS LABEL
+	FROM  MOM_WH_IO_PROCESS_MAPPING MWPM
+	    , MOM_PROCESS MP
+	WHERE MWPM.COMPANY_CD      = MP.COMPANY_CD
+	AND   MWPM.DIVISION_CD     = MP.DIVISION_CD
+	AND   MWPM.PROCESS_CD      = MP.PROCESS_CD    
+	AND   MWPM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+	AND   MWPM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR} 
+	AND   MWPM.IO_RECEIPT_TYPE = #{ioReceiptType, jdbcType=VARCHAR} 
+	AND   MWPM.USE_YN = 'Y'
+	ORDER BY LABEL  
+	</select> 
 </mapper>

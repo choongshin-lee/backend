@@ -48,6 +48,10 @@
 					     , A.ISSUE_QTY
 					     , A.ISSUE_DATE
 					     , A.ITEM_INOUT_ID
+					     , A.PROCESS_CD
+		                 , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(A.COMPANY_CD, A.DIVISION_CD, A.PROCESS_CD) FROM DUAL)  AS PROCESS_NM
+					     , A.PICKING_YN
+					     , A.AUTO_RECEIPT_YN
 					FROM   (SELECT MWM.COMPANY_CD
 					             , MWM.DIVISION_CD
 					             , MWM.RECEIPT_ID
@@ -74,6 +78,9 @@
 					             , MSI.QTY                                   AS ISSUE_QTY
 					             , TO_CHAR(MWM.ISSUE_DATE ,'YYYY-MM-DD')     AS ISSUE_DATE
 					             , MSI.ITEM_INOUT_ID  
+					             , MWM.PROCESS_CD
+				                 , MWM.PICKING_YN
+							     , MWM.AUTO_RECEIPT_YN
 					        FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
 					             , MOM_WAREHOUSE_RECEIPT_DTL MWD
 					             , MOM_REFERENCE_INOUT_MAPPING MRM
@@ -130,7 +137,10 @@
 					             , NULL                AS LOCATION_CD
 					             , NULL                AS ISSUE_QTY
 					             , NULL                AS ISSUE_DATE
-					              ,NULL                AS ITEM_INOUT_ID 
+					             , NULL                AS ITEM_INOUT_ID 
+					             , MWM.PROCESS_CD
+				                 , MWM.PICKING_YN
+							     , MWM.AUTO_RECEIPT_YN
 					        FROM   MOM_WAREHOUSE_RECEIPT_MST MWM
 					             , MOM_WAREHOUSE_RECEIPT_DTL MWD
 					        WHERE  MWM.COMPANY_CD      = MWD.COMPANY_CD

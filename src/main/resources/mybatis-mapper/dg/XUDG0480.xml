@@ -20,6 +20,7 @@
 		             , MDM.DESCRIPTION
 		             , MDM.ISSUE_WH_USE_YN    AS ISSUE_WAREHOUSE_USE_YN 
 		             , MDM.REQUEST_WH_USE_YN  AS REQUEST_WAREHOUSE_USE_YN  
+		             , MP.AUTO_RECEIPT_YN
 		             , MDM.UPDATE_BY          AS UPDATE_USER_NO
 		             , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.UPDATE_BY) FROM DUAL ) AS UPDATE_USER_NM
 		             , TO_CHAR(MDM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS') AS UPDATE_DATE
@@ -30,21 +31,26 @@
 		        FROM   MOM_DO_MST MDM
 				     , MOM_WAREHOUSE MWI
 				     , MOM_WAREHOUSE MWR
+				     , MOM_PROCESS   MP
 				WHERE  MDM.COMPANY_CD           = MWI.COMPANY_CD
 				AND    MDM.DIVISION_CD          = MWI.DIVISION_CD
 				AND    MDM.ISSUE_WAREHOUSE_CD   = MWI.WAREHOUSE_CD
 				AND    MDM.COMPANY_CD           = MWR.COMPANY_CD
 				AND    MDM.DIVISION_CD          = MWR.DIVISION_CD
 				AND    MDM.REQUEST_WAREHOUSE_CD = MWR.WAREHOUSE_CD
-		        AND    MDM.COMPANY_CD          = #{companyCd, jdbcType=VARCHAR}
-		        AND    MDM.DIVISION_CD         = #{divisionCd, jdbcType=VARCHAR}  
-		        AND    MDM.STATE               = 'DRF'
-		        AND    MDM.PROCESS_CD          IN (SELECT MIM.PROCESS_CD
-												   FROM   MOM_WH_IO_PROCESS_MAPPING MIM
-												   WHERE  MIM.COMPANY_CD      = MDM.COMPANY_CD
-												   AND    MIM.DIVISION_CD     = MDM.DIVISION_CD
-												   AND    MIM.IO_RECEIPT_TYPE = 'WMO'
-												   AND    MIM.USE_YN          = 'Y')									
+				AND    MDM.COMPANY_CD           = MP.COMPANY_CD
+				AND    MDM.DIVISION_CD          = MP.DIVISION_CD
+				AND    MDM.PROCESS_CD           = MP.PROCESS_CD
+		        AND    MDM.COMPANY_CD           = #{companyCd, jdbcType=VARCHAR}
+		        AND    MDM.DIVISION_CD          = #{divisionCd, jdbcType=VARCHAR}  
+		        AND    MDM.STATE                = 'DRF'
+		        AND    MDM.PROCESS_CD           IN (SELECT MIM.PROCESS_CD
+													FROM   MOM_WH_IO_PROCESS_MAPPING MIM
+													WHERE  MIM.COMPANY_CD      = MDM.COMPANY_CD
+													AND    MIM.DIVISION_CD     = MDM.DIVISION_CD 
+													AND    MIM.IO_RECEIPT_TYPE = 'WMO'
+													AND    MIM.USE_YN          = 'Y' )									
+		        AND    MDM.PROCESS_CD           = #{processCd, jdbcType=VARCHAR} 
 		        AND    MDM.ISSUE_WAREHOUSE_CD   = #{issueWarehouseCd, jdbcType=VARCHAR} 
 		        AND    MDM.REQUEST_WAREHOUSE_CD = #{requestWarehouseCd, jdbcType=VARCHAR}
 		        <if test="drNo != null and drNo != ''">
@@ -75,7 +81,8 @@
 			                           , RECEIPT_ID
 			                           , RECEIPT_DETAIL_ID
 			                           , REFERENCE_NO
-	                                   , DESCRIPTION
+			                           , AUTO_RECEIPT_YN
+			                           , DESCRIPTION
 			                           , DEL_YN
 			                           , VAL_MSG
 			                           , MULTI_MSG
@@ -87,6 +94,7 @@
 			                   		   , #{item.receiptId, jdbcType=VARCHAR}
 					                   , #{item.receiptDetailId, jdbcType=VARCHAR}
 					                   , #{item.deliveryRequestNo, jdbcType=VARCHAR}
+					                   , #{item.autoReceiptYn, jdbcType=VARCHAR}
 					                   , #{item.description, jdbcType=VARCHAR}
 					                   , #{item.delYn, jdbcType=VARCHAR}
 					                   , #{item.valMsg, jdbcType=VARCHAR}

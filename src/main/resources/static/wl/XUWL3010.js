@@ -44,9 +44,11 @@ var VIEW= {
                 }
                 $('#issueWarehouseCdSP21').val(checkItem[0]['receiptWarehouseCd']);
                 $('#requestWarehouseCdSP21').val(checkItem[0]['requestWarehouseCd']);
+                $('#processCdSP21').val(checkItem[0]['processCd']);
                 $('#drNoSP21').val('');
                 $('#issueWarehouseCdSP21').jqxComboBox({disabled: true});
                 $('#requestWarehouseCdSP21').jqxComboBox({disabled: true});
+                $('#processCdSP21').jqxComboBox({disabled: true});
             }
 	    }
 	    else if(index == 20){         
