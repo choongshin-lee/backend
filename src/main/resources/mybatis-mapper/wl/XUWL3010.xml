@@ -157,7 +157,7 @@
                                           , #{item.userId, jdbcType=VARCHAR}
                                           , #{item.requestWarehouseCd, jdbcType=VARCHAR}
                                           , 'WMO'
-                                          , #{item.processCde, jdbcType=VARCHAR}
+                                          , #{item.processCd, jdbcType=VARCHAR}
                                           , #{item.description, jdbcType=VARCHAR}
                                           , #{item.delYn, jdbcType=VARCHAR}
                                           , #{item.valMsg, jdbcType=VARCHAR}
