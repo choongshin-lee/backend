@@ -85,7 +85,7 @@
 		                     , CASE WHEN MWM.PICKING_YN = 'Y' THEN
 		                         MWD.RECEIPT_DETAIL_ID   
 		                       ELSE
-		                         (SELECT MDD.DELIVERY_ORDER_ID
+		                         (SELECT MDD.REFERENCE_DTL_NO
 		                          FROM   MOM_DO_DTL MDD
 		                          WHERE  MDD.COMPANY_CD         = MWD.COMPANY_CD
 		                          AND    MDD.DIVISION_CD        = MWD.DIVISION_CD

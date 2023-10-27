@@ -12,7 +12,7 @@ var VIEW= {
 	},
 	copyCallInit: function(index,your,action,btnId,param,result) {
         if(index ==0 && btnId =='copyBtn'){ 
-            $('#returnRequestNoDP1').val('');
+            $('#restoreRequestNoDP1').val('');
         }
     },
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
@@ -22,7 +22,7 @@ var VIEW= {
     },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {returnRequestNo:e.item['returnRequestNo']}, true, 'CELLCLICK',menuId,VIEW);
+			widget.findBtnClicked(1, {restoreRequestNo:e.item['restoreRequestNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
@@ -38,17 +38,17 @@ var VIEW= {
 			    }
 			    $('#requestWarehouseCdSP21').val(checkItem[0]['requestWarehouseCd']);
 		        $('#requestWarehouseCdSP21').jqxComboBox({disabled: true});
-		        $('#issueWarehouseCdSP21').val(checkItem[0]['returnWarehouseCd']);
+		        $('#issueWarehouseCdSP21').val(checkItem[0]['restoreWarehouseCd']);
 		        $('#issueWarehouseCdSP21').jqxComboBox({disabled: true});
 			}  
 		}
         else if(index == 20){			    
 		    if(action='C'&& btnId == 'customBtn21-1'){ 
 			    for(var i=0,max=param.length; i<max;i++){
-				    param[i][returnRequestNo] = checkItem[0]['returnRequestNo'];
-					
+				    param[i]['restoreRequestNo'] = checkItem[0]['restoreRequestNo'];
 			    }
-            }			        
+            }	
+	        
 		}
 	},
 };

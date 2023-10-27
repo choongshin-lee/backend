@@ -2,69 +2,100 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mom.backend.XUDG0540">
     <select id="get_findBtn21" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">
-	    SELECT MDM.COMPANY_CD
-		     , MDM.DIVISION_CD
-		     , MDM.DO_NO     AS ISSUE_REQUEST_NO
-	         , MDM.DO_NM     AS ISSUE_REQUEST_NM
-	         , MDD.SEQ
-	         , MDD.DELIVERY_ORDER_ID
-		     , MDM.PROCESS_CD
-		     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.PROCESS_CD) FROM DUAL) AS PROCESS_NM
-		     , MDM.REQUEST_WAREHOUSE_CD    
-		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.REQUEST_WAREHOUSE_CD) FROM DUAL) AS REQUEST_WAREHOUSE_NM
-		     , MDM.ISSUE_WAREHOUSE_CD      
-		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, MDM.ISSUE_WAREHOUSE_CD) FROM DUAL)   AS ISSUE_WAREHOUSE_NM
-		     , MDD.ITEM_ID
+	    WITH C_DO AS (SELECT MDM.COMPANY_CD 
+		                   , MDM.DIVISION_CD
+		                   , MDM.DO_NO              
+		                   , MDM.DO_NM              
+		                   , MDD.SEQ
+		                   , MDD.DELIVERY_ORDER_ID
+		                   , MDM.PROCESS_CD
+		                   , MDM.REQUEST_WAREHOUSE_CD  
+		                   , MDM.ISSUE_WAREHOUSE_CD     
+		                   , MDD.ITEM_ID   
+		                   , MDD.QTY
+		                   , NVL(MDD.RESTORE_QTY, 0) AS RESTORE_QTY
+		                   , MDM.STATE
+		                   , MDD.REFERENCE_NO       
+		                   , MDD.REFERENCE_DTL_NO  
+		                   , MDM.DESCRIPTION
+		              FROM   MOM_DO_MST   MDM
+		                   , MOM_DO_DTL   MDD
+		              WHERE  MDM.COMPANY_CD      = MDD.COMPANY_CD
+		              AND    MDM.DIVISION_CD     = MDD.DIVISION_CD
+		              AND    MDM.DO_NO           = MDD.DO_NO      
+		              AND    MDM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
+		              AND    MDM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}  
+		              AND    MDM.PROCESS_CD      = 'MI'
+		              AND    MDM.STATE           = 'DOE'
+		              AND    MDM.REQUEST_WAREHOUSE_CD = #{requestWarehouseCd, jdbcType=VARCHAR}
+		              AND    MDM.ISSUE_WAREHOUSE_CD   = #{issueWarehouseCd, jdbcType=VARCHAR}
+		              AND    EXISTS (SELECT '*' 
+		                             FROM   MOM_MATERIAL_DEDUCT_LIST MMDL
+		                             WHERE  MMDL.COMPANY_CD = MDD.COMPANY_CD
+		                             AND    MMDL.DIVISION_CD = MDD.DIVISION_CD
+		                             AND    MMDL.WORK_ORDER_ID = MDD.REFERENCE_NO
+		                             AND    MMDL.ITEM_ID       = MDD.ITEM_ID
+		                             AND    MMDL.INPUT_YN      = 'Y' ) ) 
+		SELECT C.COMPANY_CD 
+		     , C.DIVISION_CD
+		     , C.DO_NO               AS ISSUE_REQUEST_NO
+		     , C.DO_NM               AS ISSUE_REQUEST_NM
+		     , C.SEQ
+		     , C.DELIVERY_ORDER_ID
+		     , C.PROCESS_CD
+		     , (SELECT MOM_COMMON_PKG.FN_GET_PROCESS_NAME(C.COMPANY_CD, C.DIVISION_CD, C.PROCESS_CD) FROM DUAL) AS PROCESS_NM
+		     , C.REQUEST_WAREHOUSE_CD  
+		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(C.COMPANY_CD, C.DIVISION_CD, C.REQUEST_WAREHOUSE_CD) FROM DUAL) AS REQUEST_WAREHOUSE_NM
+		     , C.ISSUE_WAREHOUSE_CD     
+		     , (SELECT MOM_COMMON_PKG.FN_GET_WAREHOUSE_NAME(C.COMPANY_CD, C.DIVISION_CD, C.ISSUE_WAREHOUSE_CD) FROM DUAL)   AS ISSUE_WAREHOUSE_NM
+		     , C.ITEM_ID   
 		     , MI.ITEM_NM
 		     , MI.ITEM_SPEC
 		     , MI.ITEM_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, 'KR') FROM DUAL)  AS ITEM_TYPE_NM 
-		     , MII.LOT_ID
-		     , TO_CHAR(MII.IO_DATE ,'YYYY-MM-DD')      AS ISSUE_DATE
-		     , MII.QTY     AS ISSUE_QTY
-		     , MII.UOM
-		     , ''          AS RETURN_QTY
-		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.UOM ) FROM DUAL) AS UOM_NM
-		     , MII.IO_TYPE
-		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
-		     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_WH_STOCK_LOT_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.REQUEST_WAREHOUSE_CD, MII.LOT_ID) FROM DUAL)  AS AVAILABLE_QTY
-		     , (SELECT MOM_STOCK_PKG.FN_GET_ITEM_AVAILABLE_LOT_QTY( MDM.COMPANY_CD, MDM.DIVISION_CD, MDD.ITEM_ID, MDM.REQUEST_WAREHOUSE_CD, MII.LOT_ID) FROM DUAL) AS CURRENT_STOCK_QTY
-		     , MDD.REFERENCE_NO       
-		     , MDD.REFERENCE_DTL_NO  
-		     , TO_CHAR(MII.CREATE_DATE , 'YYYY-MM-DD HH24:MI:SS')      AS CREATE_DATE
-		     , MII.CREATE_BY            AS CREATE_USER_NO 
-		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MII.COMPANY_CD, MII.DIVISION_CD, MII.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
-		     , MDM.DESCRIPTION
-		     , ROWIDTOCHAR(MII.ROWID)            AS KEY_ID
-		FROM   MOM_DO_MST   MDM
-		     , MOM_DO_DTL   MDD
-		     , MOM_ITEM     MI
-		     , MOM_DO_INOUT_MAPPING MIM
-		     , MOM_ITEM_INOUT MII
-		WHERE  MDM.COMPANY_CD           = MDD.COMPANY_CD
-		AND    MDM.DIVISION_CD          = MDD.DIVISION_CD
-		AND    MDM.DO_NO                = MDD.DO_NO 
-		AND    MDD.COMPANY_CD           = MI.COMPANY_CD
-		AND    MDD.DIVISION_CD          = MI.DIVISION_CD
-		AND    MDD.ITEM_ID              = MI.ITEM_ID  
-		AND    MDD.COMPANY_CD           = MIM.COMPANY_CD
-		AND    MDD.DIVISION_CD          = MIM.DIVISION_CD
-		AND    MDD.DELIVERY_ORDER_ID    = MIM.DELIVERY_ORDER_ID
-		AND    MIM.COMPANY_CD           = MII.COMPANY_CD
-		AND    MIM.DIVISION_CD          = MII.DIVISION_CD
-		AND    MIM.ITEM_INOUT_ID        = MII.ITEM_INOUT_ID           
-		AND    MDM.COMPANY_CD           = #{companyCd, jdbcType=VARCHAR}
-		AND    MDM.DIVISION_CD          = #{divisionCd, jdbcType=VARCHAR}  
-		AND    MDM.PROCESS_CD           = 'MI'
-		AND    MDM.STATE                = 'DOE'
-		<if test="requestWarehouseCd != null and requestWarehouseCd != ''">
-		AND    MDM.REQUEST_WAREHOUSE_CD = #{requestWarehouseCd, jdbcType=VARCHAR}
-		</if> 
-		<if test="issueWarehouseCd != null and issueWarehouseCd != ''">
-		AND    MDM.ISSUE_WAREHOUSE_CD = #{issueWarehouseCd, jdbcType=VARCHAR}
-		</if> 
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM 
+		     , MSI.LOT_ID
+		     , TO_CHAR(MSI.IO_DATE ,'YYYY-MM-DD')      AS ISSUE_DATE
+		     , MSI.QTY     AS ISSUE_QTY
+		     , MSI.UOM
+		     , C.RESTORE_QTY 
+             , (MSI.QTY - C.RESTORE_QTY)  AS REMAIN_RESTORE_QTY
+		     , ''          AS RESTORE_REQUEST_QTY
+		     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MSI.COMPANY_CD, MSI.DIVISION_CD, MSI.UOM ) FROM DUAL) AS UOM_NM
+		     , MSI.IO_TYPE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_IO_TYPE_NAME(MSI.COMPANY_CD, MSI.DIVISION_CD, MSI.IO_TYPE) FROM DUAL) AS IO_TYPE_NM
+		     , MS.STOCK_QTY                           AS CURRENT_STOCK_QTY
+		     , MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0)  AS AVAILABLE_QTY 
+		     , C.REFERENCE_NO                         AS WORK_ORDER_ID  
+		     , MS.ITEM_STOCK_ID
+		     , TO_CHAR(MSI.CREATE_DATE , 'YYYY-MM-DD HH24:MI:SS')      AS CREATE_DATE
+		     , MSI.CREATE_BY            AS CREATE_USER_NO 
+		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MSI.COMPANY_CD, MSI.DIVISION_CD, MSI.CREATE_BY) FROM DUAL ) AS CREATE_USER_NM
+		     , C.DESCRIPTION
+		     , ROWIDTOCHAR(MSI.ROWID)            AS KEY_ID
+		FROM   C_DO C
+		     , MOM_ITEM  MI
+		     , MOM_STOCK_INOUT MSI
+		     , MOM_STOCK MS
+		WHERE  C.COMPANY_CD        = MSI.COMPANY_CD
+		AND    C.DIVISION_CD       = MSI.DIVISION_CD
+		AND    C.DO_NO             = MSI.PREV_REFERENCE_NO
+		AND    C.DELIVERY_ORDER_ID = MSI.PREV_REFERENCE_DTL_NO
+		AND    C.COMPANY_CD        = MI.COMPANY_CD
+		AND    C.DIVISION_CD       = MI.DIVISION_CD
+		AND    C.ITEM_ID           = MI.ITEM_ID
+		AND    MSI.COMPANY_CD      = MS.COMPANY_CD
+		AND    MSI.DIVISION_CD     = MS.DIVISION_CD
+		AND    MSI.ITEM_STOCK_ID   = MS.ITEM_STOCK_ID
+		AND    MSI.ITEM_INOUT_ID IN (SELECT MRIM.ITEM_INOUT_ID
+		                             FROM   MOM_REFERENCE_INOUT_MAPPING MRIM
+		                             WHERE  MRIM.COMPANY_CD     = C.COMPANY_CD
+		                             AND    MRIM.DIVISION_CD    = C.DIVISION_CD
+		                             AND    MRIM.REFERENCE_TYPE = 'WR-R'   
+		                             AND    MRIM.PROCESS_CD     = 'MI' )
+		AND    MS.STOCK_QTY - NVL(MS.ALLOCATE_QTY,0) > 0  
+		AND    MSI.QTY - C.RESTORE_QTY > 0
     </select>
-    <delete id="remove_createBtn21-1" parameterType="java.util.List">
+    <delete id="remove_customBtn21-1" parameterType="java.util.List">
         DELETE FROM MOM_PROC_DO_DTL
           <where>
               <foreach collection="list" item="item" open="" close="" separator="OR">
@@ -76,14 +107,13 @@
               </foreach>
           </where>
     </delete>  
-    <insert id="create_createBtn21-1" parameterType="java.util.List">
+    <insert id="create_customBtn21-1" parameterType="java.util.List">
         <foreach item="item" collection="list" index="i" separator=" " open="INSERT ALL" close="SELECT * FROM DUAL"> 
         INTO MOM_PROC_DO_DTL( COMPANY_CD
                    		    , DIVISION_CD
                    		    , PROCESS_CD
 		                    , DO_NO
 		                    , SEQ
-		                    , DELIVERY_ORDER_ID
 		                    , QTY
 		                    , ITEM_ID
 		                    , DO_UOM
@@ -92,6 +122,7 @@
 		                    , REFERENCE_NO
 		                    , REFERENCE_DTL_NO
 		                    , LOT_ID
+		                    , ITEM_STOCK_ID
 		                    , DESCRIPTION
 		                    , DEL_YN
 		                    , VAL_MSG
@@ -102,17 +133,17 @@
         VALUES             ( #{item.companyCd, jdbcType=VARCHAR}  
 		                   , #{item.divisionCd, jdbcType=VARCHAR} 
 		                   , 'MIR'        
-		                   , #{item.issueRequestNo, jdbcType=VARCHAR}
+		                   , #{item.restoreRequestNo, jdbcType=VARCHAR}
 		                   , #{item.seq, jdbcType=NUMERIC}
-		                   , #{item.deliveryOrderId, jdbcType=VARCHAR}
-		                   , #{item.returnQty, jdbcType=NUMERIC}
+		                   , #{item.restoreRequestQty, jdbcType=NUMERIC}
 		                   , #{item.itemId, jdbcType=VARCHAR}
 		                   , #{item.uom, jdbcType=VARCHAR}
 		                   , #{item.uom, jdbcType=VARCHAR}
 		                   , #{item.ioType, jdbcType=VARCHAR}
-		                   , #{item.referenceNo, jdbcType=VARCHAR}
-		                   , #{item.referenceDtlNo, jdbcType=VARCHAR}
+		                   , #{item.workOrderId, jdbcType=VARCHAR}
+		                   , #{item.workOrderId, jdbcType=VARCHAR}
 		                   , #{item.lotId, jdbcType=VARCHAR}
+		                   , #{item.itemStockId, jdbcType=VARCHAR}
 		                   , #{item.description, jdbcType=VARCHAR}
 		                   , #{item.delYn, jdbcType=VARCHAR}
 		                   , #{item.valMsg, jdbcType=VARCHAR}
@@ -122,7 +153,7 @@
 		                   )              
         </foreach>
     </insert>
-    <select id="proc_createBtn21-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    <select id="proc_customBtn21-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
         { CALL MOM_STOCK_PKG.SP_UPSERT_DO_DTL( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
                                              , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
                                              , #{companyCd,   jdbcType=VARCHAR, mode=IN}

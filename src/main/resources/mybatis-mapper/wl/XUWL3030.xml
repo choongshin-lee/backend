@@ -130,7 +130,7 @@
 		                               , #{item.divisionCd, jdbcType=VARCHAR}
 		                               , 'WMO' 
 		                               , #{item.receiptId, jdbcType=VARCHAR}
-		                               , #{item.picking_yn, jdbcType=VARCHAR}
+		                               , #{item.pickingYn, jdbcType=VARCHAR}
 		                               , #{item.description, jdbcType=VARCHAR}
 		                               , #{item.valMsg, jdbcType=VARCHAR}
 		                               , #{item.multiMsg, jdbcType=VARCHAR}

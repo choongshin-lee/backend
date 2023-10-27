@@ -133,7 +133,15 @@
 					             , MWM.CREATE_BY
 					             , TO_CHAR(MWM.UPDATE_DATE ,'YYYY-MM-DD HH24:MI:SS')    AS UPDATE_DATE
 					             , MWM.UPDATE_BY
-					             , NULL                AS LOT_ID
+					             , CASE WHEN  MWM.PICKING_YN = 'N' THEN
+			                           (SELECT MDD.LOT_ID
+			                            FROM   MOM_DO_DTL MDD
+			                            WHERE  MDD.COMPANY_CD         = MWD.COMPANY_CD
+			                            AND    MDD.DIVISION_CD        = MWD.DIVISION_CD
+			                            AND    MDD.DELIVERY_ORDER_ID  = MWD.REFERENCE_DTL_NO )
+			                       ELSE
+			                             NULL  
+			                       END                 AS LOT_ID
 					             , NULL                AS LOCATION_CD
 					             , NULL                AS ISSUE_QTY
 					             , NULL                AS ISSUE_DATE
