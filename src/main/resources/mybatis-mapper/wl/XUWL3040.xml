@@ -98,6 +98,7 @@
 					        AND    MWM.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
 					        AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					        AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					        AND    MWM.PICKING_YN = 'Y'
 					        <if test="receiptId != null and receiptId != ''">
 					        AND    (UPPER(MWM.RECEIPT_ID) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%')   
 					        </if>
@@ -157,7 +158,7 @@
 					        AND    MWM.COMPANY_CD      = #{companyCd, jdbcType=VARCHAR}
 					        AND    MWM.DIVISION_CD     = #{divisionCd, jdbcType=VARCHAR}	
 					        AND    MWM.CREATE_DATE  BETWEEN TO_DATE(#{createDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{createDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					        AND    MWM.ISSUE_DATE IS NULL
+					        AND    MWM.PICKING_YN = 'N'
 					        <if test="receiptId != null and receiptId != ''">
 					        AND    (UPPER(MWM.RECEIPT_ID) LIKE '%' || UPPER(#{receiptId, jdbcType=VARCHAR}) || '%')   
 					        </if>
