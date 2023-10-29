@@ -8,12 +8,12 @@
     </if>
                 SELECT MDM.COMPANY_CD 
 				     , MDM.DIVISION_CD
-				     , MDM.DO_NO                    AS RETURN_REQUEST_NO
-				     , MDM.DO_NM                    AS RETURN_REQUEST_NM
+				     , MDM.DO_NO                    AS RESTORE_REQUEST_NO
+				     , MDM.DO_NM                    AS RESTORE_REQUEST_NM
 				     , MDD.SEQ
 				     , MDD.DELIVERY_ORDER_ID
-				     , MDM.REQUEST_WAREHOUSE_CD    AS RETURN_WAREHOUSE_CD   
-				     , MWR.WAREHOUSE_NM            AS RETURN_WAREHOUSE_NM
+				     , MDM.REQUEST_WAREHOUSE_CD    AS RESTORE_WAREHOUSE_CD   
+				     , MWR.WAREHOUSE_NM            AS RESTORE_WAREHOUSE_NM
 				     , MDM.ISSUE_WAREHOUSE_CD      AS REQUEST_WAREHOUSE_CD
 				     , MWI.WAREHOUSE_NM            AS REQUEST_WAREHOUSE_NM
 				     , MDD.ITEM_ID
@@ -21,12 +21,12 @@
 				     , MI.ITEM_SPEC
 				     , MI.ITEM_TYPE
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,  MI.DIVISION_CD,  'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS ITEM_TYPE_NM
-				     , MDD.QTY                       AS RETURN_REQUEST_QTY
-				     , MDD.DO_UOM                    AS RETURN_UOM 
-				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS RETURN_UOM_NM
+				     , MDD.QTY                       AS RESTORE_REQUEST_QTY
+				     , MDD.DO_UOM                    AS RESTORE_UOM 
+				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.DO_UOM ) FROM DUAL) AS RESTORE_UOM_NM
 				     , MDD.CONVERSION_UOM
 				     , (SELECT MOM_COMMON_PKG.FN_GET_UNIT_NAME(MDD.COMPANY_CD, MDD.DIVISION_CD, MDD.CONVERSION_UOM ) FROM DUAL) AS CONVERSION_UOM_NM
-				     , TO_CHAR(MDM.ISSUE_DUE_DATE ,'YYYY-MM-DD')      AS RETURN_DUE_DATE
+				     , TO_CHAR(MDM.ISSUE_DUE_DATE ,'YYYY-MM-DD')      AS RESTORE_DUE_DATE
 				     , MDM.STATE
 				     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MDM.COMPANY_CD, MDM.DIVISION_CD, 'IC0002', MDM.STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS STATE_NM
 				     , TO_CHAR(MDM.CREATE_DATE , 'YYYY-MM-DD HH24:MI:SS')      AS CREATE_DATE
@@ -70,14 +70,14 @@
 				                AND    MLM.WAREHOUSE_CD  = MDM.ISSUE_WAREHOUSE_CD 
 				                AND    MLM.USE_YN       = 'Y'
 				                AND    MLM.USER_NO      = #{userId, jdbcType=VARCHAR}  )           
-				<if test="returnRequestNo != null and returnRequestNo != ''">
-				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{returnRequestNo, jdbcType=VARCHAR}) || '%')   
+				<if test="restoreRequestNo != null and restoreRequestNo != ''">
+				AND    (UPPER(MDM.DO_NO) LIKE '%' || UPPER(#{restoreRequestNo, jdbcType=VARCHAR}) || '%')   
 				</if>
 				<if test="requestWarehouseCd != null and requestWarehouseCd != ''">
 				AND    MDM.ISSUE_WAREHOUSE_CD = #{requestWarehouseCd, jdbcType=VARCHAR}   
 				</if> 
-				<if test="returnWarehouseCdNm != null and returnWarehouseCdNm != ''">
-				AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{returnWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWR.WAREHOUSE_NM) LIKE '%' || UPPER(#{returnWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
+				<if test="restoreWarehouseCdNm != null and restoreWarehouseCdNm != ''">
+				AND    (UPPER(MDM.REQUEST_WAREHOUSE_CD) LIKE '%' || UPPER(#{restoreWarehouseCdNm, jdbcType=VARCHAR}) || '%' OR UPPER(MWR.WAREHOUSE_NM) LIKE '%' || UPPER(#{restoreWarehouseCdNm, jdbcType=VARCHAR}) || '%')   
 				</if> 
 				<if test="state != null and state != ''">
 				AND    MDM.STATE   IN (${state}) 
