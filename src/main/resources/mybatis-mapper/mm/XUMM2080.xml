@@ -88,6 +88,7 @@
 					AND    MPO.COMPANY_CD        = #{companyCd, jdbcType=VARCHAR}
 					AND    MPO.DIVISION_CD       = #{divisionCd, jdbcType=VARCHAR}	  
 					AND    MPO.CONFIRM_DATE      BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+					AND    MPO.PO_REFERENCE_TYPE IN ('10','20')   
 					<if test="poNo != null and poNo != ''">
 					AND    (UPPER(MPO.PO_NO) LIKE '%' || UPPER(#{poNo, jdbcType=VARCHAR}) || '%')   
 					</if>

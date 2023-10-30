@@ -47,6 +47,7 @@
 		AND    MPM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
 		AND    MPM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999  
 		AND    MPM.STATE = 'POF'
+		AND    MPM.PO_REFERENCE_TYPE IN ('10','20') 
 		AND    NOT EXISTS ( SELECT '*'
 						    FROM   MOM_PO_DTL MPD
 						    WHERE  MPD.COMPANY_CD  = MPM.COMPANY_CD

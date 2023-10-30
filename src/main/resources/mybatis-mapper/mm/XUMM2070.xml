@@ -85,7 +85,8 @@
 					AND    MPM.COMPANY_CD   = #{companyCd, jdbcType=VARCHAR}
 					AND    MPM.DIVISION_CD  = #{divisionCd, jdbcType=VARCHAR}	
 					AND    MPD.PO_RECEIPT_DATE BETWEEN TO_DATE(#{receiptDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{receiptDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
-					AND    MPM.VENDOR_CD = #{partnerCd, jdbcType=VARCHAR}      
+					AND    MPM.VENDOR_CD = #{partnerCd, jdbcType=VARCHAR}     
+					AND    MPM.PO_REFERENCE_TYPE IN ('10','20')    
 					<if test="poNo != null and poNo != ''">
 					AND (UPPER(MPM.PO_NO) LIKE '%' || UPPER(#{poNo, jdbcType=VARCHAR}) || '%')	  
 					</if>

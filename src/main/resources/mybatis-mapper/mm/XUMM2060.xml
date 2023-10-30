@@ -75,7 +75,8 @@
 		AND    MPM.DO_INVOICE_YN = 'Y'
 		AND    MPC.MARKET_CD     = 'D'
 		AND    MPD.STATE        = 'POF'  
-		AND    MPM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999  
+		AND    MPM.CONFIRM_DATE  BETWEEN TO_DATE(#{confirmDateSD, jdbcType=VARCHAR}, 'YYYY-MM-DD')  AND TO_DATE(#{confirmDateED, jdbcType=VARCHAR}, 'YYYY-MM-DD') + 0.99999
+		AND    MPM.PO_REFERENCE_TYPE IN ('10','20')     
 		<if test="poNo != null and poNo != ''">
 		AND    (UPPER(MPM.PO_NO) LIKE '%' || UPPER(#{poNo, jdbcType=VARCHAR}) || '%')	  
 		</if>
