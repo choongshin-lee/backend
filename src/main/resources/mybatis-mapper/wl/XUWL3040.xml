@@ -144,8 +144,8 @@
 			                             NULL  
 			                       END                 AS LOT_ID
 					             , NULL                AS LOCATION_CD
-					             , NULL                AS ISSUE_QTY
-					             , NULL                AS ISSUE_DATE
+					             , MWD.RECEIPT_QTY      AS ISSUE_QTY
+                                 , TO_CHAR(MWM.ISSUE_DATE ,'YYYY-MM-DD')     AS ISSUE_DATE
 					             , NULL                AS ITEM_INOUT_ID 
 					             , MWM.PROCESS_CD
 				                 , MWM.PICKING_YN
