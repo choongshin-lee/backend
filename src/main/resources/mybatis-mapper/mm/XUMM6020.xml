@@ -96,6 +96,8 @@
 	         , MPID.DESCRIPTION
 	         , MPID.PURCHASE_INOUT_ID
 	         , NVL(MPID.LOT_MANAGEMENT_YN, 'N') AS LOT_MANAGEMENT_YN
+	         , MPID.LOT_RULE
+             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPID.COMPANY_CD, MPID.DIVISION_CD, 'MD0052', MPID.LOT_RULE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS LOT_RULE_NM
 	         , ROWIDTOCHAR(MPID.ROWID)  AS KEY_ID   
         FROM   MOM_PURCHASE_INOUT_DTL MPID  
              , MOM_ITEM MI  
@@ -186,6 +188,7 @@
 					               , ITEM_ID
 					               , IQC_RESULT
 					               , LOT_MANAGEMENT_YN
+					               , LOT_RULE
 					               , HCN_CD
 					               , VAL_MSG
 					               , MULTI_MSG
@@ -201,6 +204,7 @@
                                    , #{item.itemId, jdbcType=VARCHAR}					              
 					               , #{item.inspectionResult, jdbcType=VARCHAR}
 					               , #{item.lotManagementYn, jdbcType=VARCHAR}
+					               , #{item.lotRule, jdbcType=VARCHAR}
 					               , #{item.hcnCd, jdbcType=VARCHAR}
 					               , #{item.valMsg, jdbcType=VARCHAR}
 					               , #{item.multiMsg, jdbcType=VARCHAR}
