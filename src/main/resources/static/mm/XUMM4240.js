@@ -3,7 +3,7 @@ var widget = momWidget;
 var that = undefined;
 var VIEW= {
 	initParam		: undefined, 
-	partnerCd       : undefined,
+	//receiptNo       : undefined,
 	init: function() {	
 		that = this;	
 		that.event();
@@ -14,9 +14,9 @@ var VIEW= {
     searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         if(index==0 ){	                                             
 		    AUIGrid.clearGridData(widget.grid[1]);
-		}  
+		} 
 	},
-	cellClickCallBack: function(index,rowIndex,target,e) {				
+	cellClickCallInit: function(index,rowIndex,e,) {		
 		if(index == 1){
 		    var item = e.item;	
 		    setTimeout(function(){
@@ -36,9 +36,17 @@ var VIEW= {
 	},
 	cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
-			widget.findBtnClicked(1, {receiptNo:e.item['receiptNo']}, true, 'CELLCLICK',menuId,VIEW);
+            widget.findBtnClicked(1, {receiptNo:e.item['receiptNo']}, true, 'CELLCLICK',menuId,VIEW);
 		}
-	}
+	},
+    customCallInit: function(index,your,action,btnId,param,result) {
+        if(index == 1){
+            let checkItem = widget.getCheckedRowItems(widget.grid[1]);
+            if(action=='R' && btnId == 'customBtn2-1'){ 
+                param.receiptNo = checkItem[0]['receiptNo'];
+            }
+        }
+    },
 };
 
 $(document).ready(function(event){	

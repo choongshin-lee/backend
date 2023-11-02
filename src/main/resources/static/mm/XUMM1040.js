@@ -26,7 +26,8 @@ var VIEW= {
 		    momWidget.splashHide();
          	//http://gw.dklok.com/gw/outProcessLogOn.do?approKey=PRM20231016000002&outProcessCode=dotsest&loginId=mom&fileKey=&mod=W
          	//window.open('http://gw.dklok.com/gw/outProcessLogOn.do?approKey='+{prNo:e.item['prNo']}+'&outProcessCode=dotsest&loginId=mom&fileKey=&mod=W','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
-         	window.open('http://gw.dklok.com/gw/outProcessLogOn.do?approKey='+param[0].prNo+'&outProcessCode=dotsest&loginId=mom&fileKey=&mod=W','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+         	//window.open('http://gw.dklok.com/gw/outProcessLogOn.do?approKey='+param[0].prNo+'&outProcessCode=dotsest&loginId=mom&fileKey=&mod=W','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+         	window.open('http://gw.dklok.com/gw/outProcessLogOn.do?approKey='+param[0].prNo+'&outProcessCode=dotsest&loginId='+param[0].gwId+'&fileKey=&mod=W','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
          	//window.open('http://gw.dklok.com/gw/outProcessLogOn.do?approKey=PRM20231016000002&outProcessCode=dotsest&loginId=mom&fileKey=&mod=W','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
          				   		   			
 		}

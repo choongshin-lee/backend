@@ -16,6 +16,9 @@
 		     , MPR.REQUEST_USER_NO
 		     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MPR.COMPANY_CD, MPR.DIVISION_CD, MPR.REQUEST_USER_NO) FROM DUAL ) AS REQUEST_USER_NM
 		     , MPR.EXPECTED_AMOUNT
+		     , (SELECT MOM_COMMON_PKG.FN_GET_GW_ID(MPR.COMPANY_CD, MPR.DIVISION_CD, #{userId, jdbcType=VARCHAR}) FROM DUAL) AS GW_ID
+		     , MPR.GW_STATE
+		     , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MPR.COMPANY_CD, MPR.DIVISION_CD, 'MM0022', MPR.GW_STATE, #{langCd, jdbcType=VARCHAR}) FROM DUAL)  AS GW_STATE_NM
 		     , MPR.DESCRIPTION 
 		     , MPR.COMPANY_CD
 		     , MPR.DIVISION_CD
@@ -36,7 +39,11 @@
 		 <if test="prTitle != null and prTitle != ''">
 	    AND (UPPER(MPR.PR_TITLE) LIKE '%' || UPPER(#{prTitle, jdbcType=VARCHAR}) || '%')	  
 	    </if>	
-	
+	    AND    EXISTS ( SELECT '*'
+                        FROM   MOM_PR_DTL MPD
+                        WHERE  MPD.COMPANY_CD  = MPR.COMPANY_CD
+                        AND    MPD.DIVISION_CD = MPR.DIVISION_CD
+                        AND    MPD.PR_NO       = MPR.PR_NO )
     ORDER BY MPR.PR_NO,MPR.PR_TYPE,MPR.REQUEST_DEPT_CD
 
 	</select>

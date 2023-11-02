@@ -28,6 +28,7 @@
 				     , MU.MAP_ADDRESS
 				     , MU.IP_ADDRESS
 				     , MU.USE_YN
+				     , MU.GW_ID
 				     , MU.DESCRIPTION
 				     , MU.CREATE_BY
 				     , (SELECT MOM_COMMON_PKG.FN_GET_USER_NAME(MU.COMPANY_CD, MU.DIVISION_CD, MU.CREATE_BY) FROM DUAL)  AS CREATE_BY_NM
@@ -87,6 +88,7 @@
 								 , DEFAULT_LANGUAGE
 								 , MAP_ADDRESS
 								 , IP_ADDRESS
+								 , GW_ID
 								 , USE_YN
 								 , DESCRIPTION
 								 , CREATE_BY
@@ -109,10 +111,11 @@
 						             , #{item.faxNo,          	 jdbcType=VARCHAR}
 						             , #{item.deptCd,    		 jdbcType=VARCHAR}
 						             , #{item.authGroupCd, 	     jdbcType=VARCHAR}
-						             , #{item.partnerCd,          jdbcType=VARCHAR}
+						             , #{item.partnerCd,         jdbcType=VARCHAR}
 						             , #{item.defaultLanguuage,  jdbcType=VARCHAR}
 						             , #{item.mapAddress,    	 jdbcType=VARCHAR}
 						             , #{item.ipAddress, 		 jdbcType=VARCHAR}
+						             , #{item.gwId,              jdbcType=VARCHAR}
 						             , #{item.useYn,             jdbcType=VARCHAR}
 						             , #{item.description,       jdbcType=VARCHAR}
 						             , TRIM(#{item.userId,       jdbcType=VARCHAR})
@@ -141,6 +144,7 @@
         , DEFAULT_LANGUAGE
         , MAP_ADDRESS
         , IP_ADDRESS
+        , GW_ID
         , USE_YN
         , DESCRIPTION
         , CREATE_BY
@@ -160,13 +164,14 @@
             , #{item.email,             jdbcType=VARCHAR}
             , #{item.phoneNo,           jdbcType=VARCHAR}
             , #{item.telNo,             jdbcType=VARCHAR}
-            , #{item.faxNo,          	 jdbcType=VARCHAR}
-            , #{item.deptCd,    		 jdbcType=VARCHAR}
-            , #{item.authGroupCd, 	     jdbcType=VARCHAR}
-            , #{item.partnerCd,          jdbcType=VARCHAR}
+            , #{item.faxNo,          	jdbcType=VARCHAR}
+            , #{item.deptCd,    		jdbcType=VARCHAR}
+            , #{item.authGroupCd, 	    jdbcType=VARCHAR}
+            , #{item.partnerCd,         jdbcType=VARCHAR}
             , #{item.defaultLanguuage,  jdbcType=VARCHAR}
-            , #{item.mapAddress,    	 jdbcType=VARCHAR}
-            , #{item.ipAddress, 		 jdbcType=VARCHAR}
+            , #{item.mapAddress,    	jdbcType=VARCHAR}
+            , #{item.ipAddress, 		jdbcType=VARCHAR}
+            , #{item.gwId,              jdbcType=VARCHAR}
             , #{item.useYn,             jdbcType=VARCHAR}
             , #{item.description,       jdbcType=VARCHAR}
             , TRIM(#{item.userId,       jdbcType=VARCHAR})
@@ -184,14 +189,15 @@
 			 , USER_NM_ENG            = #{item.userNmEng,           jdbcType=VARCHAR}
 			 , AUTH_GROUP_CD		  = #{item.authGroupCd,         jdbcType=VARCHAR}
 			 , DEPT_CD  	          = #{item.deptCd,              jdbcType=VARCHAR}
-			 , POSITION               = #{item.position,          jdbcType=VARCHAR}			 
+			 , POSITION               = #{item.position,            jdbcType=VARCHAR}			 
 			 , TEL_NO                 = #{item.telNo,               jdbcType=VARCHAR}
 			 , PHONE_NO               = #{item.phoneNo,             jdbcType=VARCHAR} 
 			 , FAX_NO                 = #{item.faxNo,               jdbcType=VARCHAR}
 			 , EMAIL                  = #{item.email,               jdbcType=VARCHAR}
 			 , MAP_ADDRESS            = #{item.mapAddress,          jdbcType=VARCHAR}
 			 , IP_ADDRESS             = #{item.ipAddress,           jdbcType=VARCHAR}
-			 , VENDOR_CD              = #{item.partnerCd,            jdbcType=VARCHAR}
+			 , VENDOR_CD              = #{item.partnerCd,           jdbcType=VARCHAR}
+			 , GW_ID	              = #{item.gwId,                jdbcType=VARCHAR}
 			 , USE_YN                 = #{item.useYn,               jdbcType=VARCHAR}
 			 , DESCRIPTION            = #{item.description,         jdbcType=VARCHAR}
 		     , UPDATE_BY              = #{item.userId,              jdbcType=VARCHAR}
@@ -234,6 +240,7 @@
                             #{defaultLanguage, jdbcType=VARCHAR} as defaultLanguage,
                             #{mapAddress, jdbcType=VARCHAR} as mapAddress,
                             #{ipAddress, jdbcType=VARCHAR} as ipAddress,
+                            #{gwId, jdbcType=VARCHAR} as gwId,
                             #{useYn, jdbcType=VARCHAR} as useYn,
                             #{description, jdbcType=VARCHAR} as description,
                             #{userId, jdbcType=VARCHAR} as createBy,
@@ -260,6 +267,7 @@
                           , DEFAULT_LANGUAGE = PARAM.defaultLanguage
                           , MAP_ADDRESS = PARAM.mapAddress
                           , IP_ADDRESS = PARAM.ipAddress
+                          , GW_ID = PARAM.gwId
                           , USE_YN = PARAM.useYn
                           , DESCRIPTION = PARAM.description                
                           , UPDATE_BY = PARAM.updateBy
@@ -283,6 +291,7 @@
                             , DEFAULT_LANGUAGE
                             , MAP_ADDRESS
                             , IP_ADDRESS
+                            , GW_ID
                             , USE_YN
                             , DESCRIPTION
                             , CREATE_BY
@@ -306,6 +315,7 @@
                             , PARAM.defaultLanguage
                             , PARAM.mapAddress
                             , PARAM.ipAddress
+                            , PARAM.gwId
                             , PARAM.useYn
                             , PARAM.description
                             , PARAM.createBy
