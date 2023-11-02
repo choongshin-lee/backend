@@ -150,7 +150,7 @@
         </foreach>
     </insert>
     <select id="proc_excelUpBtnV1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
-        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_CUSTOMER_ITEM_MAP( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
+        { CALL MOM_MASTER_INFO_PKG.SP_UPSERT_USER_WORK_CENTER( #{p_err_code,  jdbcType=VARCHAR, mode=OUT}
 		                                                      , #{p_err_msg,   jdbcType=VARCHAR, mode=OUT}
 			                                                  , #{companyCd,   jdbcType=VARCHAR, mode=IN}
 			                                                  , #{divisionCd,  jdbcType=VARCHAR, mode=IN} 

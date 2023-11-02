@@ -51,14 +51,14 @@ public class ReportUtil {
             // Create a connection to the database  
               
             //Dev
-            //String url = "jdbc:oracle:thin:@211.192.46.217:1522:ORCL19C";  
-            //String username = "mom_master";  
-            //String password = "#mom0909#";  
+            String url = "jdbc:oracle:thin:@211.192.46.217:1522:ORCL19C";  
+            String username = "mom_master";  
+            String password = "#mom0909#";  
             
             // Real
-            String url = "jdbc:oracle:thin:@61.104.208.43:2109:DKLREAL";  
-            String username = "mom_master";  
-            String password = "mom#0909";
+            //String url = "jdbc:oracle:thin:@61.104.208.43:2109:DKLREAL";  
+            //String username = "mom_master";  
+            //String password = "mom#0909";
             
             connection = DriverManager.getConnection(url, username, password);  
         } catch (ClassNotFoundException e) {  
