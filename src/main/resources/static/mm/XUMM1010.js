@@ -25,6 +25,7 @@ var VIEW= {
 		if(index==1 && (btnId== "excelUpBtn2" || btnId== "createBtn2"|| btnId== "copyBtn"|| btnId== "editBtn2" || btnId== "delBtn2" || btnId== "customBtn2-1")){
 			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
 			result.param = {prNo:checkItem[0].prNo};
+			//param.prNo = checkItem[0]['prNo'];
 		}
 		else if(index ==0) {                                            
 		  AUIGrid.clearGridData(widget.grid[1]);  	
@@ -35,7 +36,7 @@ var VIEW= {
 			widget.findBtnClicked(1, {prNo:e.item['prNo']}, true, 'CELLCLICK',menuId,VIEW);			
 		}
 	},
-	createCallBack: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 
+	createCallInit: function(index,your,action,btnId,param,result,data) {  //등록버튼 팝업띄우고나서 호출되는 함수 
 		if(index ==1 && btnId =='createBtn'){
 			let checkItem = widget.getCheckedRowItems(widget.grid[0]);
 		    $('#prNoDP2').val(checkItem[0]['prNo']);

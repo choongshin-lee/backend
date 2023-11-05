@@ -22,14 +22,17 @@ var VIEW= {
 	
 	},
 	searchCallInit: function(index,your,action,btnId,param,result) {
-	   let checkItem = widget.getCheckedRowItems(widget.grid[0]);
+	    let checkItem = widget.getCheckedRowItems(widget.grid[0]);
 	    if(index==0){				
 			   AUIGrid.clearGridData(widget.grid[1]);
 		} 
         else if(index==1){	
-				if(checkItem.length>0){
-					result.param = {routingId:checkItem[0].routingId};	
-				}			
+		    //if(checkItem.length>0){
+			//		result.param = {routingId:checkItem[0].routingId};	
+			//	}
+			//let checkItem = widget.getCheckedRowItems(widget.grid[0]);	
+			//param.routingId = checkItem[0]['routingId'];			
+			//result.param = {routingId:checkItem[0].routingId};
 			    
 		} 
 		if(index == 1 && (btnId=='findBtn' ||  btnId=='EXCEL_DOWN')){	
@@ -53,8 +56,9 @@ var VIEW= {
 	},		
     cellClickCallBack: function(index,rowIndex,target,e) {
 		if(index == 0){
-			var item = e.item;		
-			momWidget.findBtnClicked(1, {routingId:item.routingId}, true, 'INIT',menuId,VIEW);
+			//var item = e.item;		
+			//momWidget.findBtnClicked(1, {routingId:item.routingId}, true, 'INIT',menuId,VIEW);
+			widget.findBtnClicked(1, {routingId:e.item['routingId']}, true, 'CELLCLICK',menuId,VIEW);
 			//that.initParam = {routingId:item.routingId}; 
 		}
 	
@@ -82,6 +86,12 @@ var VIEW= {
 		          AUIGrid.setGridData(widget.grid[10], data1);
 			  	}, undefined, undefined, this, false);
 		   }
+		else if(index == 1){
+            let checkItem = widget.getCheckedRowItems(widget.grid[1]);
+            if(action=='R' && btnId == 'customBtn2-1'){ 
+                param.routingId = checkItem[0]['routingId'];
+            }
+        }
 		else if(index == 11 &&btnId=='customBtn12-1'){
 			AUIGrid.clearGridData(widget.grid[11]);
 			

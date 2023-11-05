@@ -28,12 +28,18 @@ var VIEW= {
             }	
 			$('#userNoDP2').val(checkItem[0]['userNo']);
 			$('#warehouseCdDP2').val(checkItem[0]['warehouseCd']);
+			
 		}
 	},
 	searchCallInit: function(index,your,action,btnId,param,result,event) { //조회액션 실행 전에 호출되는 함수 
         if(index==0 ){                                                 
             AUIGrid.clearGridData(widget.grid[1]);
-        }  
+        }
+        else if(index==1 ){                                                 
+            let checkItem = widget.getCheckedRowItems(widget.grid[0]);	
+			param.userNo = checkItem[0]['userNo'];
+            param.warehouseCd = checkItem[0]['warehouseCd'];
+        }   
     },
     cellClickCallBack: function(index,rowIndex,target,e) {        
         if(index==0){
