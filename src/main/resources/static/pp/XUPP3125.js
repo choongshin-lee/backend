@@ -27,16 +27,9 @@ var VIEW= {
 	    if(index ==0) {                                             
 		  AUIGrid.clearGridData(widget.grid[1]);  	
 	    }
-	    else if(index==1 && btnId== "customBtn2-1"){
-		    let workOrderId = AUIGrid.getGridData(widget.grid[1])[1]['workOrderId'];
-			result.param = {workOrderId:workOrderId};
-		}
 	},
 	searchCallBack: function(index,your,action,btnId,param,result,data) {
 	    if(index==1){
-		    if(btnId== "customBtn2-1"){
-				widget.findBtnClicked(0, {}, true, 'CELLCLICK',menuId,VIEW);
-			}
 			let columnProp = widget.columnProperty[1];
 			for(let i =0;i<columnProp.length;i++){
 			    AUIGrid.setColumnPropByDataField(widget.grid[1], columnProp[i]['columnId'], { 		    	
@@ -75,7 +68,7 @@ var VIEW= {
                 //$('#woResultIdSP21').attr("disabled", true);
                 $('#operationIdSP21').jqxComboBox({disabled: true});
             }
-            else if(action=='R' && btnId == 'customBtn2-1' && btnId == 'customBtn2-2' && btnId == 'customBtn2-3' && btnId == 'customBtn2-4' && btnId == 'customBtn2-5'){
+            else if(action=='R' && (btnId== "customBtn2-1" || btnId== "customBtn2-2"|| btnId== "customBtn2-3"|| btnId== "customBtn2-4" )) { 
                 param.workOrderId = checkItem[0]['workOrderId'];
             }
 		}
@@ -86,15 +79,11 @@ var VIEW= {
 		}
 	},
 	customCallBack: function(index,your,action,btnId,param,result,data) {
-	    if(index == 1 &&  btnId == 'customBtn2-3'){	
-		    //widget.findBtnClicked(1, {}, true, btnId,menuId,VIEW);
-		    //widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);							   		   			
-		}
-		else if(index == 0 &&  btnId == 'customBtn1-1'){	
-		    momWidget.splashHide();
-         	window.open('../PDF/'+param[0].drawingNo+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+	    //if(index == 0 &&  btnId == 'customBtn1-1'){	
+		    //momWidget.splashHide();
+         	//window.open('../PDF/'+param[0].drawingNo+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
          				   		   			
-		}
+		//}
 	}
 };
 
