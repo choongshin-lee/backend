@@ -74,11 +74,14 @@ var VIEW= {
                 $('#workOrderIdSP21').attr("disabled", true);
                 //$('#woResultIdSP21').attr("disabled", true);
                 $('#operationIdSP21').jqxComboBox({disabled: true});
-            }	
+            }
+            else if(action=='R' && btnId == 'customBtn2-1' && btnId == 'customBtn2-2' && btnId == 'customBtn2-3' && btnId == 'customBtn2-4' && btnId == 'customBtn2-5'){
+                param.workOrderId = checkItem[0]['workOrderId'];
+            }
 		}
 		else if(index == 0 &&  btnId == 'customBtn1-1'){	
 		    momWidget.splashHide();
-         	window.open('../PDF/'+param[0].itemId+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+         	window.open('../PDF/'+param[0].drawingNo+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
          				   		   			
 		}
 	},
@@ -89,7 +92,7 @@ var VIEW= {
 		}
 		else if(index == 0 &&  btnId == 'customBtn1-1'){	
 		    momWidget.splashHide();
-         	window.open('../PDF/'+e.value+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+         	window.open('../PDF/'+param[0].drawingNo+ '.pdf','_blank','resizable=no,width=2000,height=1300,left=740,top=520');
          				   		   			
 		}
 	}

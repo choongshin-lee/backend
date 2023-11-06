@@ -9880,6 +9880,8 @@ var momWidget = {
 	                    //setTimeout(function () {
 	                        momWidget.splashHide();
 	                        window.open('../report-'+param[i2].fileType+'/'+param[i2].reportFile+'.'+param[i2].fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+	                    //   window.open('../apache-tomcat-8.5.77/bin/src/main/resources/static/report-'+param[i2].fileType+'/'+param[i2].reportFile+'.'+param[i2].fileType, '_blank','resizable=no,width=2000,height=1300,left=740,top=520');
+	                        
 	                        //history.pushState(null, null, '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType)
 	                        //location.href = location.href;
 	                        //location.href  = '../report-xlsx/'+param[0].fileName+'.'+param[0].fileType;

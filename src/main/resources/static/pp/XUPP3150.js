@@ -32,6 +32,15 @@ var VIEW= {
 			$('#workOrderIdDP'+(index+1)).val(checkedItem[0]['workOrderId']); 
 		}
 	},
+	customCallInit: function(index,your,action,btnId,param,result) {
+        if(index == 2){
+            let checkItem = widget.getCheckedRowItems(widget.grid[2]);
+            if(action=='R' && btnId == 'customBtn3-1'){ 
+                param.itemId = checkItem[0]['itemId'];
+                param.warehouseCd = checkItem[0]['warehouseCd'];
+            }
+        }
+    },
     cellClickCallBack: function(index,rowIndex,target,e) {				
 		if(index==0){
 			widget.findBtnClicked(1, {workOrderId:e.item['workOrderId']}, true, 'CELLCLICK',menuId,VIEW);
