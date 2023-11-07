@@ -36,8 +36,8 @@ var VIEW= {
 			    return false;	
 			}
 			else {
-			    widget.findBtnClicked(2, {receiptWarehouseCd:e.item['receiptWarehouseCd'],itemId:e.item['itemId'],receiptDetailId:e.item['receiptDetailId']}, true, 'CELLCLICK',menuId,VIEW);
-			}
+			    widget.findBtnClicked(2, {receiptWarehouseCd:e.item['receiptWarehouseCd'],itemId:e.item['itemId'],receiptDetailId:e.item['receiptDetailId'],lotUseYn:e.item['lotUseYn']}, true, 'CELLCLICK',menuId,VIEW);
+			}  
 		}
 	},
 	customCallInit: function(index,your,action,btnId,param,result) {
