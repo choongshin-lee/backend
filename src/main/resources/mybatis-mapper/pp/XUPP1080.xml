@@ -16,7 +16,7 @@
 			             , MI.ITEM_NM
 			             , MI.ITEM_TYPE
 			             , (SELECT MOM_COMMON_PKG.FN_GET_CODE_NAME(MI.COMPANY_CD,MI.DIVISION_CD, 'MD0002', MI.ITEM_TYPE, #{langCd, jdbcType=VARCHAR}) FROM DUAL) AS ITEM_TYPE_NM
-			             , CPM.ONHAND_QTY
+			             , CPM.ONHAND_QTY|| '/' ||MI.UOM  AS ONHAND_QTY
 			             , CPM.SAFETY_STOCK_QTY
 			             , CPM.LEAD_TIME
 			             , CPM.MOQ
@@ -58,4 +58,12 @@
 	WHERE ROW_COUNT BETWEEN #{startPage, jdbcType=INTEGER} AND #{endPage, jdbcType=INTEGER}
 	</if> 
     </select>
+    <select id="proc_customBtn1-1" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_PP_PKG.SP_MRP( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+	                        , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+	                        , #{companyCd,  jdbcType=VARCHAR, mode=IN}
+	                        , #{divisionCd, jdbcType=VARCHAR, mode=IN}		
+	                        , 'PRE'									  
+	                        , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+    </select>    
 </mapper>  	
