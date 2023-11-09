@@ -172,4 +172,11 @@
                                                , #{divisionCd, jdbcType=VARCHAR, mode=IN} 
                                                , #{userId,     jdbcType=VARCHAR, mode=IN} )}                      
     </select>   
+    <select id="proc_customBtn1-2" statementType="CALLABLE" parameterType="java.util.HashMap" resultType="com.mom.backend.dto.LowerHashMap">  
+    { CALL MOM_WO_PKG.SP_CREATE_MRP_WORK_ORDER( #{p_err_code, jdbcType=VARCHAR, mode=OUT}
+						                      , #{p_err_msg,  jdbcType=VARCHAR, mode=OUT}
+						                      , #{companyCd,  jdbcType=VARCHAR, mode=IN}
+						                      , #{divisionCd, jdbcType=VARCHAR, mode=IN}		
+						                      , #{userId,     jdbcType=VARCHAR, mode=IN} )}       	              
+    </select>    
 </mapper>
