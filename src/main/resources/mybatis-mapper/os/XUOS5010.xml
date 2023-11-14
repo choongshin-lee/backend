@@ -116,7 +116,7 @@
 						                 , 'O'
 						                 , #{item.processCd, jdbcType=VARCHAR}
 						                 , #{item.departureNo, jdbcType=VARCHAR}
-						                 , #{item.purchaseInoutId, jdbcType=VARCHAR}
+						                 , #{item.departureInoutId, jdbcType=VARCHAR}
 						                 , #{item.description, jdbcType=VARCHAR}
 						                 , #{item.valMsg, jdbcType=VARCHAR}
 						                 , #{item.multiMsg, jdbcType=VARCHAR}
